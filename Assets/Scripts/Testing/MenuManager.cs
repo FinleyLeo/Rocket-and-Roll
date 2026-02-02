@@ -107,6 +107,7 @@ public class MenuManager : MonoBehaviour
 
     void Update()
     {
+        HandleLobbiesListUpdate();
         HandleLobbyActivityCheck();
         HandleRoomUpdate();
     }
@@ -234,7 +235,7 @@ public class MenuManager : MonoBehaviour
                 catch (LobbyServiceException e)
                 {
                     Debug.Log(e);
-                    if (currentLobby.IsPrivate && e.Reason == LobbyExceptionReason.Forbidden || e.Reason == LobbyExceptionReason.LobbyNotFound)
+                    if (e.Reason == LobbyExceptionReason.Forbidden || e.Reason == LobbyExceptionReason.LobbyNotFound)
                     {
                         currentLobby = null;
                         ExitRoom();
@@ -284,6 +285,7 @@ public class MenuManager : MonoBehaviour
             if (IsHost())
             {
                 startGameButton.onClick.AddListener(StartGame);
+                startGameButton.GetComponentInChildren<TextMeshProUGUI>().text = "Start Game";
                 startGameButton.gameObject.SetActive(true);
             }
             else
@@ -318,6 +320,18 @@ public class MenuManager : MonoBehaviour
         catch(LobbyServiceException e)
         {
             Debug.Log(e);
+        }
+    }
+
+    float updateLobbiesListTimer = 2f;
+
+    void HandleLobbiesListUpdate()
+    {
+        updateLobbiesListTimer -= Time.deltaTime;
+        if (updateLobbiesListTimer <= 0)
+        {
+            ListPublicLobbies();
+            updateLobbiesListTimer = 2f;
         }
     }
 
