@@ -16,7 +16,6 @@ public class PlayerMovementTest : NetworkBehaviour
 
     InputAction moveAction;
     InputAction jumpAction;
-    InputAction mousePositionAction;
 
     [SerializeField] float jumpForce = 5;
     [SerializeField] float moveSpeed;
@@ -103,7 +102,7 @@ public class PlayerMovementTest : NetworkBehaviour
         {
             // stops y velocity and adds extra force to make it seem more like an arc rather than an instant stop
             rb.linearVelocity = new Vector2(rb.linearVelocityX, 0);
-            rb.AddForce(Vector2.up * (jumpForce * 0.5f), ForceMode2D.Impulse);
+            rb.AddForce(Vector2.up * (jumpForce * 0.3f), ForceMode2D.Impulse);
         }
     }
     void DoGroundRay()

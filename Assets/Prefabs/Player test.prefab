@@ -253,7 +253,6 @@ GameObject:
   - component: {fileID: 203415035992732322}
   - component: {fileID: 7731050287379248629}
   - component: {fileID: 9041748388637255996}
-  - component: {fileID: 1117420081661505458}
   m_Layer: 0
   m_Name: Player test
   m_TagString: Untagged
@@ -459,28 +458,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NameTagTest
   ShowTopMostFoldoutHeaderGroup: 1
   nameTagUI: {fileID: 6296701244199943670}
---- !u!95 &1117420081661505458
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4890474755170714994}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 19d8216be7a4f0a4fa5c3ea572f6a791, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7350700513735847554
 GameObject:
   m_ObjectHideFlags: 0
