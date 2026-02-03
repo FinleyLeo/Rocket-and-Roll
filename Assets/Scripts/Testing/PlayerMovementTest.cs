@@ -10,13 +10,15 @@ enum PlayerMode
 
 public class PlayerMovementTest : NetworkBehaviour
 {
-    private NetworkVariable<Vector2> position = new NetworkVariable<Vector2>(new Vector2(0, 5), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    NetworkVariable<Vector2> position = new NetworkVariable<Vector2>(new Vector2(0, 5), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     Rigidbody2D rb;
+    bool rbNotFoundYet;
 
     InputAction moveAction;
     InputAction jumpAction;
 
+    // Movement values
     [SerializeField] float jumpForce = 5;
     [SerializeField] float moveSpeed;
     [SerializeField] Vector2 axisClamps;
@@ -28,22 +30,38 @@ public class PlayerMovementTest : NetworkBehaviour
 
     PlayerMode currentMode;
 
-    Camera cam;
     [SerializeField] Transform eyePivot;
+
 
     public override void OnNetworkSpawn()
     {
         //position.OnValueChanged += (Vector2 previousPos, Vector2 nextPos) => ;
 
+        if (!IsOwner)
+        {
+            if (rb != null)
+            {
+                rb.simulated = false;
+            }
+            
+            else
+            {
+                rbNotFoundYet = true;
+            }
+        }
+    }
+
+    private void Start()
+    {
         moveAction = InputSystem.actions.FindAction("Move");
         jumpAction = InputSystem.actions.FindAction("Jump");
 
         rb = GetComponent<Rigidbody2D>();
-        cam = Camera.main;
 
-        if (!IsOwner)
+        if (rbNotFoundYet)
         {
-            rb.simulated = false;
+            rb.simulated = false; // if rb isnt referenced in OnNetworkSpawn, try again in start
+            rbNotFoundYet = false;
         }
     }
 
@@ -139,7 +157,7 @@ public class PlayerMovementTest : NetworkBehaviour
     Vector3 GetMousePosition()
     {
         Vector3 mousePos = Mouse.current.position.ReadValue();
-        Vector3 convertedMousePos = cam.ScreenToWorldPoint(mousePos);
+        Vector3 convertedMousePos = Camera.main.ScreenToWorldPoint(mousePos);
         convertedMousePos.z = Camera.main.nearClipPlane;
         return convertedMousePos;
     }
