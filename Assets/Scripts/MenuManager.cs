@@ -1,14 +1,9 @@
 using UnityEngine;
-using Unity.Services.Core;
-using Unity.Services.Authentication;
 using TMPro;
 using UnityEngine.UI;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine.SceneManagement;
-using Unity.Netcode;
 
 public class MenuManager : MonoBehaviour
 {
@@ -37,6 +32,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField] Button exitLobbyListButton;
     [SerializeField] GameObject lobbyInfoPrefab;
     [SerializeField] GameObject lobbyInfoContent;
+    bool lobbyListOpen;
 
     [Space(10)]
     [Header("Create Room Panel")]
@@ -82,10 +78,16 @@ public class MenuManager : MonoBehaviour
         openCreateLobbyButton.onClick.AddListener(OpenCreateLobbyMenu);
         exitCreateLobbyButton.onClick.AddListener(CloseCreateLobbyMenu);
 
-        exitLobbyButton.onClick.AddListener(ExitRoom);
+        //exitLobbyButton.onClick.AddListener(ExitRoom);
 
         playerNameInput.onValueChanged.AddListener(delegate
         {
+            if (playerNameInput.text == "")
+            {
+                PlayerPrefs.SetString("Username", LobbyManager.Instance.playerId);
+                return;
+            }
+
             PlayerPrefs.SetString("Username", playerNameInput.text);
         });
 
@@ -94,7 +96,10 @@ public class MenuManager : MonoBehaviour
 
     void Update()
     {
-        HandleLobbiesListUpdate();
+        if (lobbyListOpen)
+        {
+            HandleLobbiesListUpdate();
+        }
     }
 
     void OpenPlayOption()
@@ -123,6 +128,8 @@ public class MenuManager : MonoBehaviour
 
     void OpenLobbyList()
     {
+        lobbyListOpen = true;
+
         lobbyListPanel.SetActive(true);
         playQueryPanel.SetActive(false);
         mainMenuPanel.GetComponent<CanvasGroup>().interactable = false;
@@ -132,6 +139,8 @@ public class MenuManager : MonoBehaviour
 
     void CloseLobbyList()
     {
+        lobbyListOpen = false;
+
         lobbyListPanel.SetActive(false);
         mainMenuPanel.GetComponent<CanvasGroup>().interactable = true;
     }
@@ -200,9 +209,12 @@ public class MenuManager : MonoBehaviour
     void VisualiseLobbyList(List<Lobby> publicLobbies)
     {
         // We need to clear previous info
-        for (int i = 0; i < lobbyInfoContent.transform.childCount; i++)
+        if (lobbyInfoContent.transform.childCount > 0)
         {
-            Destroy(lobbyInfoContent.transform.GetChild(i).gameObject);
+            for (int i = 0; i < lobbyInfoContent.transform.childCount; i++)
+            {
+                Destroy(lobbyInfoContent.transform.GetChild(i).gameObject);
+            }
         }
 
         foreach (Lobby lobby in publicLobbies)

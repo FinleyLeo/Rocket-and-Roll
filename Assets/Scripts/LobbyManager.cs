@@ -1,9 +1,15 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Unity.Android.Gradle.Manifest;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,6 +19,8 @@ public class LobbyManager : MonoBehaviour
 
     [HideInInspector] public Lobby currentLobby;
     [HideInInspector] public string playerId;
+
+    Allocation allocation;
 
     private void Awake()
     {
@@ -75,21 +83,26 @@ public class LobbyManager : MonoBehaviour
     {
         try
         {
-            //string lobbyName = roomNameInput.text;
-            //int.TryParse(maxPlayersInput.text, out int maxPlayers);
+            if (lobbyName == "" || lobbyName == " " || lobbyName == "   " || lobbyName == null)
+            {
+                lobbyName = PlayerPrefs.GetString("Username", playerId) + "'s lobby";
+            }
+
             CreateLobbyOptions options = new CreateLobbyOptions
             {
                 IsPrivate = isPrivate,
                 Player = GetPlayer(),
                 Data = new Dictionary<string, DataObject>
                 {
-                    {"IsGameStarted", new DataObject(DataObject.VisibilityOptions.Member, "false") }
+                    {"IsGameStarted", new DataObject(DataObject.VisibilityOptions.Member, "false") },
+                    { "RelayJoinCode", new DataObject(DataObject.VisibilityOptions.Member, RelayManager.Instance.joinCode) }
                 }
             };
+
             currentLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
-            NetworkManager.Singleton.StartHost();
-            //EnterRoom();
-            OpenLobbyScene();
+            RelayManager.Instance.CreateRelay(maxPlayers);
+
+            //NetworkManager.Singleton.SceneManager.LoadScene("Testing", LoadSceneMode.Single);
         }
         catch (LobbyServiceException e)
         {
@@ -142,10 +155,17 @@ public class LobbyManager : MonoBehaviour
             {
                 Player = GetPlayer()
             };
+
             currentLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId, options);
-            //EnterRoom();
-            NetworkManager.Singleton.StartClient();
-            Debug.Log("Player in room: " + currentLobby.Players.Count);
+
+            if (currentLobby.AvailableSlots < 1)
+            {
+                Debug.Log("Lobby is full");
+                LeaveLobby();
+                return;
+            }
+
+            RelayManager.Instance.JoinRelay(currentLobby.Data["RelayJoinCode"].Value);
         }
         catch (LobbyServiceException e)
         {
@@ -161,10 +181,29 @@ public class LobbyManager : MonoBehaviour
             {
                 Player = GetPlayer()
             };
+
             currentLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode, options);
-            //EnterRoom();
+
+            if (currentLobby.AvailableSlots < 1)
+            {
+                Debug.Log("Lobby is full");
+                LeaveLobby();
+                return;
+            }
+
+            string joinCode = currentLobby.Data["RelayJoinCode"].Value;
+            JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetClientRelayData(
+                allocation.RelayServer.IpV4,
+                (ushort)allocation.RelayServer.Port,
+                allocation.AllocationIdBytes,
+                allocation.Key,
+                allocation.ConnectionData,
+                allocation.HostConnectionData
+            );
+
             NetworkManager.Singleton.StartClient();
-            Debug.Log("Player in room: " + currentLobby.Players.Count);
         }
         catch (LobbyServiceException e)
         {
@@ -177,6 +216,11 @@ public class LobbyManager : MonoBehaviour
         try
         {
             await LobbyService.Instance.RemovePlayerAsync(currentLobby.Id, playerId);
+
+            if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsHost)
+            {
+                NetworkManager.Singleton.Shutdown();
+            }
         }
         catch (LobbyServiceException e)
         {
@@ -189,6 +233,7 @@ public class LobbyManager : MonoBehaviour
         try
         {
             await LobbyService.Instance.RemovePlayerAsync(currentLobby.Id, _playerId);
+            NetworkManager.Singleton.Shutdown();
         }
         catch (LobbyServiceException e)
         {
@@ -240,11 +285,6 @@ public class LobbyManager : MonoBehaviour
                 }
             }
         }
-    }
-
-    public void OpenLobbyScene()
-    {
-        NetworkManager.Singleton.SceneManager.LoadScene("Testing", LoadSceneMode.Single);
     }
 
     public async void StartGame()
