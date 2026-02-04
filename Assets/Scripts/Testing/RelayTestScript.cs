@@ -25,10 +25,10 @@ public class RelayTestScript : MonoBehaviour
         UpdateLobbyCode();
     }
 
-    void CreateRelay()
+    async void CreateRelay()
     {
-        RelayManager.Instance.CreateRelay(4);
-        lobbyCode.text = RelayManager.Instance.GetJoinCode();
+        await RelayManager.Instance.CreateRelay(4);
+        //lobbyCode.text = RelayManager.Instance.GetJoinCode().ToString();
     }
 
     void JoinRelay()
@@ -44,6 +44,6 @@ public class RelayTestScript : MonoBehaviour
 
     void UpdateLobbyCode()
     {
-        lobbyCode.text = RelayManager.Instance.GetJoinCode();
+        //lobbyCode.text = RelayManager.Instance.GetJoinCode().ToString();
     }
 }

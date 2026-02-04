@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Services.Authentication;
@@ -9,12 +10,9 @@ using UnityEngine;
 public class RelayManager : MonoBehaviour
 {
     public static RelayManager Instance;
-    string joinCode;
 
     [HideInInspector] public Allocation allocation;
     [HideInInspector] public JoinAllocation joinAllocation;
-
-    [HideInInspector] public bool relayCreated;
 
     private void Awake()
     {
@@ -31,6 +29,10 @@ public class RelayManager : MonoBehaviour
     private void Start()
     {
         //AuthenticatePlayer();
+        NetworkManager.Singleton.OnServerStarted += () =>
+        {
+            NetworkManager.Singleton.SceneManager.LoadScene("Testing", UnityEngine.SceneManagement.LoadSceneMode.Single);
+        };
     }
 
     public async void AuthenticatePlayer()
@@ -39,29 +41,31 @@ public class RelayManager : MonoBehaviour
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
     }
 
-
-    public async void CreateRelay(int maxPlayers)
+    public async Task<string> CreateRelay(int maxPlayers)
     {
         try
         {
-            relayCreated = false;
+            if (!LobbyManager.Instance.servicesReady)
+            {
+                Debug.Log("Services not ready yet");
+                return null;
+            }
 
             allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayers - 1);
-            joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+            string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
             var relayServerData = AllocationUtils.ToRelayServerData(allocation, "dtls");
 
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
             NetworkManager.Singleton.StartHost();
-
-            relayCreated = true;
-
-            Debug.Log("Join code:" + joinCode);
+            //await Task.Yield;s 
+            return joinCode;
         }
         catch (RelayServiceException e)
         {
             Debug.Log(e);
+            return null;
         }
     }
 
@@ -69,7 +73,13 @@ public class RelayManager : MonoBehaviour
     {
         try
         {
-            if (joinCode == null)
+            if (!LobbyManager.Instance.servicesReady)
+            {
+                Debug.Log("Services not ready yet");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(joinCode))
             {
                 Debug.Log($"No lobby with join code {joinCode} found");
                 return;
@@ -110,8 +120,8 @@ public class RelayManager : MonoBehaviour
         }
     }
 
-    public string GetJoinCode()
-    {
-        return joinCode;
-    }
+    //public string GetJoinCode()
+    //{
+    //    return joinCode;
+    //}
 }

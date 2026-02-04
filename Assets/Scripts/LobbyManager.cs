@@ -1,14 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
+using System.Threading.Tasks;
 using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
-using Unity.Services.Relay;
-using Unity.Services.Relay.Models;
 using UnityEngine;
 
 public class LobbyManager : MonoBehaviour
@@ -18,7 +14,7 @@ public class LobbyManager : MonoBehaviour
     [HideInInspector] public Lobby currentLobby;
     [HideInInspector] public string playerId;
 
-    string lobbyJoinCode;
+    public bool servicesReady;
 
     private void Awake()
     {
@@ -33,28 +29,26 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
-    void Start()
+    async void Start()
     {
-        AuthenticatePlayer();
+        await AuthenticatePlayer();
+    }
+
+    public async Task AuthenticatePlayer()
+    {
+        await UnityServices.InitializeAsync();
+        await AuthenticationService.Instance.SignInAnonymouslyAsync();
+
+        playerId = AuthenticationService.Instance.PlayerId;
+        servicesReady = true;
+
+        Debug.Log("Signed in" + playerId);
     }
 
     void Update()
     {
         HandleLobbyActivityCheck();
         HandleRoomUpdate();
-    }
-
-    public async void AuthenticatePlayer()
-    {
-        await UnityServices.InitializeAsync();
-
-        AuthenticationService.Instance.SignedIn += () =>
-        {
-            playerId = AuthenticationService.Instance.PlayerId;
-            Debug.Log("Signed in " + playerId);
-        };
-
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
     }
 
     public Player GetPlayer()
@@ -77,18 +71,37 @@ public class LobbyManager : MonoBehaviour
         return player;
     }
 
-    public void CreateLobby(bool isPrivate, int maxPlayers, string lobbyName)
+    public async Task CreateLobby(bool isPrivate, int maxPlayers, string lobbyName)
     {
         try
         {
+            if (!servicesReady)
+            {
+                Debug.Log("Services not ready yet");
+                return;
+            }
+
             if (lobbyName == "" || lobbyName == " " || lobbyName == "   " || lobbyName == null)
             {
                 lobbyName = PlayerPrefs.GetString("Username", playerId) + "'s lobby";
             }
 
-            RelayManager.Instance.CreateRelay(maxPlayers);
+            string joinCode = await RelayManager.Instance.CreateRelay(maxPlayers);
 
-            WaitForRelay(isPrivate, maxPlayers, lobbyName);
+            Debug.Log("Join Code: " + joinCode);
+
+            CreateLobbyOptions options = new CreateLobbyOptions
+            {
+                IsPrivate = isPrivate,
+                Player = GetPlayer(),
+                Data = new Dictionary<string, DataObject>
+                {
+                    {"IsGameStarted", new DataObject(DataObject.VisibilityOptions.Public, "false") },
+                    {"RelayJoinCode", new DataObject(DataObject.VisibilityOptions.Public, joinCode) }
+                }
+            };
+
+            currentLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
 
             //NetworkManager.Singleton.SceneManager.LoadScene("Testing", LoadSceneMode.Single);
         }
@@ -96,41 +109,6 @@ public class LobbyManager : MonoBehaviour
         {
             Debug.Log(e);
         }
-    }
-
-    async void LobbySetUp(bool isPrivate, int maxPlayers, string lobbyName)
-    {
-        string joinCode = RelayManager.Instance.GetJoinCode();
-        Debug.Log("Join Code: " + joinCode);
-
-        CreateLobbyOptions options = new CreateLobbyOptions
-        {
-            IsPrivate = isPrivate,
-            Player = GetPlayer(),
-            Data = new Dictionary<string, DataObject>
-                {
-                    {"IsGameStarted", new DataObject(DataObject.VisibilityOptions.Member, "false") },
-                    {"RelayJoinCode", new DataObject(DataObject.VisibilityOptions.Member, RelayManager.Instance.GetJoinCode()) }
-                }
-        };
-
-        currentLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
-
-        Debug.Log("Data converted join Code: " + currentLobby.Data["RelayJoinCode"].Value);
-    }
-
-    IEnumerator WaitForRelay(bool isPrivate, int maxPlayers, string lobbyName)
-    {
-        yield return new WaitForSeconds(1);
-
-        Debug.Log("Finished timer");
-
-        //if (RelayManager.Instance.GetJoinCode() == null)
-        //{
-        //    yield return new WaitForSecondsRealtime(2);
-        //}
-
-        LobbySetUp(isPrivate, maxPlayers, lobbyName);
     }
 
     public bool IsInLobby()
@@ -174,6 +152,12 @@ public class LobbyManager : MonoBehaviour
     {
         try
         {
+            if (!servicesReady)
+            {
+                Debug.Log("Services not ready yet");
+                return;
+            }
+
             JoinLobbyByIdOptions options = new JoinLobbyByIdOptions
             {
                 Player = GetPlayer()
@@ -190,11 +174,12 @@ public class LobbyManager : MonoBehaviour
 
             string joinCode = currentLobby.Data["RelayJoinCode"].Value;
 
-            RelayManager.Instance.JoinRelay(RelayManager.Instance.GetJoinCode());
+            RelayManager.Instance.JoinRelay(joinCode);
         }
         catch (LobbyServiceException e)
         {
-            Debug.Log(e);
+            //Debug.Log(e);
+            Debug.LogError($"Failed to join lobby {lobbyId}: {e.Message} {e.Reason}");
         }
     }
 
@@ -202,6 +187,12 @@ public class LobbyManager : MonoBehaviour
     {
         try
         {
+            if (!servicesReady)
+            {
+                Debug.Log("Services not ready yet");
+                return;
+            }
+
             JoinLobbyByCodeOptions options = new JoinLobbyByCodeOptions
             {
                 Player = GetPlayer()

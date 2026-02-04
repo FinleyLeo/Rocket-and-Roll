@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class MenuManager : MonoBehaviour
 {
@@ -92,6 +93,9 @@ public class MenuManager : MonoBehaviour
         });
 
         playerNameInput.text = PlayerPrefs.GetString("Username");
+
+        joinLobbyButton.interactable = false;
+        createRoomButton.interactable = false;
     }
 
     void Update()
@@ -99,6 +103,12 @@ public class MenuManager : MonoBehaviour
         if (lobbyListOpen)
         {
             HandleLobbiesListUpdate();
+        }
+
+        if (LobbyManager.Instance.servicesReady)
+        {
+            joinLobbyButton.interactable = true;
+            createRoomButton.interactable = true;
         }
     }
 
@@ -169,11 +179,11 @@ public class MenuManager : MonoBehaviour
         lobbyListPanel.GetComponent<CanvasGroup>().interactable = true;
     }
 
-    void CreateLobby()
+    async void CreateLobby()
     {
         string lobbyName = roomNameInput.text;
         int.TryParse(maxPlayersInput.text, out int maxPlayers);
-        LobbyManager.Instance.CreateLobby(isPrivateToggle.isOn, maxPlayers, lobbyName);
+        await LobbyManager.Instance.CreateLobby(isPrivateToggle.isOn, maxPlayers, lobbyName);
     }
 
     void JoinWithCode()
@@ -185,7 +195,19 @@ public class MenuManager : MonoBehaviour
     {
         try
         {
-            QueryResponse response = await LobbyService.Instance.QueryLobbiesAsync();
+            var options = new QueryLobbiesOptions
+            {
+                Count = 25,
+                Filters = new List<QueryFilter>
+                {
+                    new QueryFilter(
+                        field: QueryFilter.FieldOptions.AvailableSlots,
+                        op: QueryFilter.OpOptions.GT,
+                        value: "0")
+                }
+            };
+
+            var response = await LobbyService.Instance.QueryLobbiesAsync(options);
             VisualiseLobbyList(response.Results);
         }
         catch(LobbyServiceException e)
@@ -209,7 +231,7 @@ public class MenuManager : MonoBehaviour
     void VisualiseLobbyList(List<Lobby> publicLobbies)
     {
         // We need to clear previous info
-        if (lobbyInfoContent.transform.childCount > 0)
+        if (lobbyInfoContent != null && lobbyInfoContent.transform.childCount > 0)
         {
             for (int i = 0; i < lobbyInfoContent.transform.childCount; i++)
             {
@@ -219,13 +241,31 @@ public class MenuManager : MonoBehaviour
 
         foreach (Lobby lobby in publicLobbies)
         {
+            if (LobbyManager.Instance.currentLobby != null && LobbyManager.Instance.currentLobby.Id == lobby.Id)
+            {
+                Debug.Log("Already in this lobby, skipping join");
+                continue;
+            }
+
+            if (!lobby.Data.ContainsKey("RelayJoinCode") || string.IsNullOrEmpty(lobby.Data["RelayJoinCode"].Value))
+            {
+                Debug.Log($"Lobby {lobby.Name} has no relay join code yet");
+                continue;
+            }
+
             GameObject newLobbyInfo = Instantiate(lobbyInfoPrefab, lobbyInfoContent.transform);
             var lobbyinfoTMPs = newLobbyInfo.GetComponentsInChildren<TextMeshProUGUI>();
 
             lobbyinfoTMPs[0].text = lobby.Name;
             lobbyinfoTMPs[1].text = (lobby.MaxPlayers - lobby.AvailableSlots) + "/" + lobby.MaxPlayers; // use maxplayers - available slots to find player count
 
-            newLobbyInfo.GetComponent<Button>().onClick.AddListener(()=>LobbyManager.Instance.JoinLobby(lobby.Id)); // call join lobby
+            if (lobby.HostId != LobbyManager.Instance.playerId)
+            {
+                newLobbyInfo.GetComponent<Button>().onClick.AddListener(() =>
+                {
+                    LobbyManager.Instance.JoinLobby(lobby.Id); // call join lobby
+                });
+            }
         }
     }
 }
