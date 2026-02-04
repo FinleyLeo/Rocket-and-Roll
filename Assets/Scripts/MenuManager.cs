@@ -228,17 +228,4 @@ public class MenuManager : MonoBehaviour
             newLobbyInfo.GetComponent<Button>().onClick.AddListener(()=>LobbyManager.Instance.JoinLobby(lobby.Id)); // call join lobby
         }
     }
-
-    void ExitRoom()
-    {
-        LobbyManager.Instance.LeaveLobby();
-        mainMenuPanel.SetActive(true);
-
-        lobbyListPanel.SetActive(true);
-        lobbyListPanel.GetComponent<CanvasGroup>().interactable = true;
-
-        createRoomPanel.SetActive(false);
-        roomPanel.SetActive(false);
-        roomCodePanel.SetActive(false);
-    }
 }
