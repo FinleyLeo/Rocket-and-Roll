@@ -27,7 +27,7 @@ public class ConsoleToGUI : MonoBehaviour
     void OnDisable() { Application.logMessageReceived -= Log; }
     void Update() 
     {
-        if (InputSystem.actions.FindAction("Open Debug").WasPressedThisFrame()) 
+        if (Keyboard.current.f1Key.wasPressedThisFrame)
         { 
             doShow = !doShow; 
         }

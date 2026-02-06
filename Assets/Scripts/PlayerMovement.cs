@@ -1,5 +1,4 @@
 using Unity.Netcode;
-using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,6 +11,7 @@ enum PlayerMode
 public class PlayerMovement : NetworkBehaviour
 {
     NetworkVariable<Vector2> position = new NetworkVariable<Vector2>(new Vector2(0, 5), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    NetworkVariable<bool> isFlipped = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     InputAction moveAction;
     InputAction jumpAction;
@@ -60,25 +60,26 @@ public class PlayerMovement : NetworkBehaviour
         anim = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
 
+
         if (rbNotFound)
         {
             rb.simulated = false; // if rb isnt referenced in OnNetworkSpawn, try again in start
             rbNotFound = false;
         }
 
-        // Set network animator to owner authoritative later so they can set animation states
     }
 
-    void UpdateNetworkPosition()
+    void UpdateNetworkValues()
     {
         transform.position = Vector3.Lerp(transform.position, position.Value, Time.deltaTime * 25); // Keeps player movement smooth on other clients
+        sr.flipX = isFlipped.Value;
     }
 
     void Update()
     {
         if (!IsOwner)
         {
-            UpdateNetworkPosition();
+            UpdateNetworkValues();
             return;
         }
 
@@ -182,6 +183,7 @@ public class PlayerMovement : NetworkBehaviour
     void AnimationChecks()
     {
         sr.flipX = moveDir < 0.1f ? true : false;
+        isFlipped.Value = sr.flipX;
 
         anim.SetBool("IsRunning", Mathf.Abs(moveDir) > 0 ? true : false);
         anim.SetBool("IsFalling", IsFalling(-3f));

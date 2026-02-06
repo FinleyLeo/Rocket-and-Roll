@@ -569,15 +569,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "Open Debug",
-                    "type": "Button",
-                    "id": "41e29fa0-60bd-44e7-8d6e-8fed94f7cde4",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -996,17 +987,6 @@
                     "processors": "",
                     "groups": "XR",
                     "action": "TrackedDeviceOrientation",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "8b36023f-1c62-4cb8-a2f8-0c765ca12b88",
-                    "path": "<Keyboard>/f1",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "Open Debug",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

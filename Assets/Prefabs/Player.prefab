@@ -120,7 +120,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 0
   AutoOwnerAuthorityTickOffset: 1
-  PositionInterpolationType: 0
+  PositionInterpolationType: 1
   RotationInterpolationType: 0
   ScaleInterpolationType: 0
   PositionLerpSmoothing: 1
@@ -147,7 +147,7 @@ MonoBehaviour:
   UseQuaternionSynchronization: 0
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
-  InLocalSpace: 0
+  InLocalSpace: 1
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
@@ -302,7 +302,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &9176300325442132300
 RectTransform:
   m_ObjectHideFlags: 0
@@ -435,8 +435,9 @@ GameObject:
   - component: {fileID: 993830800975234442}
   - component: {fileID: 5629878446974966044}
   - component: {fileID: 6583592863880152288}
-  - component: {fileID: 1297665158325267491}
+  - component: {fileID: 7269438256808642059}
   - component: {fileID: -8442060739272315709}
+  - component: {fileID: 8428599949539066022}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -617,7 +618,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1134355502
+  GlobalObjectIdHash: 1776018959
   InScenePlacedSourceGlobalObjectIdHash: 1134355502
   DeferredDespawnTick: 0
   Ownership: 1
@@ -630,7 +631,7 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &1297665158325267491
+--- !u!114 &7269438256808642059
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -639,9 +640,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8882995978763723287}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Script: {fileID: 11500000, guid: 0f4746624bca14e40ac6832d059089a6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkAnimator
+  m_EditorClassIdentifier: Assembly-CSharp::OwnerNetworkAnimator
   ShowTopMostFoldoutHeaderGroup: 1
   TransitionStateInfoList:
   - IsCrossFadeExit: 0
@@ -692,3 +693,17 @@ MonoBehaviour:
   collideLayer:
     serializedVersion: 2
     m_Bits: 8
+--- !u!114 &8428599949539066022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8882995978763723287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe553a23973fc8e43830281c4272b7dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NameTagDisplay
+  ShowTopMostFoldoutHeaderGroup: 1
+  nameTagUI: {fileID: 4874331361860019789}

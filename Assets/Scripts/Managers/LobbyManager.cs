@@ -166,7 +166,9 @@ public class LobbyManager : MonoBehaviour
 
             currentLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId, options);
 
-            if (currentLobby.AvailableSlots < 1)
+            Debug.Log(currentLobby.AvailableSlots);
+
+            if (currentLobby.AvailableSlots < 0)
             {
                 Debug.Log("Lobby is full");
                 LeaveLobby();
@@ -179,7 +181,6 @@ public class LobbyManager : MonoBehaviour
         }
         catch (LobbyServiceException e)
         {
-            //Debug.Log(e);
             Debug.LogError($"Failed to join lobby {lobbyId}: {e.Message} {e.Reason}");
         }
     }
@@ -201,7 +202,7 @@ public class LobbyManager : MonoBehaviour
 
             currentLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode, options);
 
-            if (currentLobby.AvailableSlots < 1)
+            if (currentLobby.AvailableSlots <= 2)
             {
                 Debug.Log("Lobby is full");
                 LeaveLobby();

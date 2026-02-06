@@ -78,15 +78,36 @@ public class MenuManager : MonoBehaviour
         openCreateLobbyButton.onClick.AddListener(OpenCreateLobbyMenu);
         exitCreateLobbyButton.onClick.AddListener(CloseCreateLobbyMenu);
 
-        playerNameInput.onValueChanged.AddListener(delegate
+        playerNameInput.onEndEdit.AddListener(delegate
         {
-            if (playerNameInput.text == "")
+            if (string.IsNullOrEmpty(playerNameInput.text))
             {
                 PlayerPrefs.SetString("Username", LobbyManager.Instance.playerId);
                 return;
             }
 
             PlayerPrefs.SetString("Username", playerNameInput.text);
+        });
+
+        maxPlayersInput.onEndEdit.AddListener(delegate
+        {
+            if (string.IsNullOrEmpty(maxPlayersInput.text))
+            {
+                maxPlayersInput.text = 4.ToString();
+                return;
+            }
+
+            int.TryParse(maxPlayersInput.text, out int playerAmount);
+
+            if (playerAmount <= 1)
+            {
+                maxPlayersInput.text = 2.ToString(); // clamp lower limit to 2
+            }
+
+            else if (playerAmount > 12)
+            {
+                maxPlayersInput.text = 12.ToString(); // clamp upper limit to 12
+            }
         });
 
         playerNameInput.text = PlayerPrefs.GetString("Username");
@@ -156,6 +177,7 @@ public class MenuManager : MonoBehaviour
     {
         playQueryPanel.SetActive(false);
         createRoomPanel.SetActive(true);
+        roomNameInput.text = PlayerPrefs.GetString("Username") + "'s Lobby";
     }
 
     void CloseCreateLobbyMenu()
