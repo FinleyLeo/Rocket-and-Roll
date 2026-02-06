@@ -27,7 +27,7 @@ public class ConsoleToGUI : MonoBehaviour
     void OnDisable() { Application.logMessageReceived -= Log; }
     void Update() 
     {
-        if (InputSystem.actions.FindAction("Jump").IsPressed()) 
+        if (InputSystem.actions.FindAction("Open Debug").WasPressedThisFrame()) 
         { 
             doShow = !doShow; 
         }

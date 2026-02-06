@@ -1,31 +1,37 @@
-using UnityEngine;
 using Unity.Netcode;
+using UnityEditor.Build;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerMovementTest : NetworkBehaviour
+enum PlayerMode
+{
+    Normal,
+    Balled
+}
+
+public class PlayerMovement : NetworkBehaviour
 {
     NetworkVariable<Vector2> position = new NetworkVariable<Vector2>(new Vector2(0, 5), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-
-    Rigidbody2D rb;
-    bool rbNotFoundYet;
 
     InputAction moveAction;
     InputAction jumpAction;
 
-    // Movement values
-    [SerializeField] float jumpForce = 5;
-    [SerializeField] float moveSpeed;
-    [SerializeField] Vector2 axisClamps;
-
-    // Jump stuff
-    [SerializeField] LayerMask ground;
-    float rayLength = 1.25f;
-    bool isGrounded;
+    bool rbNotFound;
+    Rigidbody2D rb;
+    Animator anim;
+    SpriteRenderer sr;
 
     PlayerMode currentMode;
 
-    [SerializeField] Transform eyePivot;
+    // Movement values
+    [SerializeField] float jumpForce = 16f;
+    [SerializeField] float moveSpeed = 8f;
+    [SerializeField] Vector2 axisMaxClamps;
+    float moveDir;
 
+    [SerializeField] LayerMask collideLayer;
+    float rayLength = 1.1f;
+    bool isGrounded;
 
     public override void OnNetworkSpawn()
     {
@@ -37,37 +43,38 @@ public class PlayerMovementTest : NetworkBehaviour
             {
                 rb.simulated = false;
             }
-            
+
             else
             {
-                rbNotFoundYet = true;
+                rbNotFound = true;
             }
         }
     }
 
-    private void Start()
+    void Start()
     {
         moveAction = InputSystem.actions.FindAction("Move");
         jumpAction = InputSystem.actions.FindAction("Jump");
 
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>();
 
-        if (rbNotFoundYet)
+        if (rbNotFound)
         {
             rb.simulated = false; // if rb isnt referenced in OnNetworkSpawn, try again in start
-            rbNotFoundYet = false;
+            rbNotFound = false;
         }
 
-        rb.linearVelocity = Vector2.zero;
+        // Set network animator to owner authoritative later so they can set animation states
     }
-
 
     void UpdateNetworkPosition()
     {
         transform.position = Vector3.Lerp(transform.position, position.Value, Time.deltaTime * 25); // Keeps player movement smooth on other clients
     }
 
-    private void Update()
+    void Update()
     {
         if (!IsOwner)
         {
@@ -76,14 +83,16 @@ public class PlayerMovementTest : NetworkBehaviour
         }
 
         Move();
-        JumpCheck();
         ClampVelocity();
-        LookAtMouse();
+        JumpCheck();
+        DoWallRay();
+
+        AnimationChecks();
     }
 
     void Move()
     {
-        float moveDir = moveAction.ReadValue<Vector2>().x;
+        moveDir = moveAction.ReadValue<Vector2>().x;
 
         rb.linearVelocity = new Vector2(moveDir * moveSpeed, rb.linearVelocityY);
         position.Value = transform.position;
@@ -91,14 +100,14 @@ public class PlayerMovementTest : NetworkBehaviour
 
     void ClampVelocity()
     {
-        if (Mathf.Abs(rb.linearVelocityY) > axisClamps.y)
+        if (Mathf.Abs(rb.linearVelocityY) > axisMaxClamps.y)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocityX, Mathf.Clamp(rb.linearVelocityY, -axisClamps.y, axisClamps.y));
+            rb.linearVelocity = new Vector2(rb.linearVelocityX, Mathf.Clamp(rb.linearVelocityY, -axisMaxClamps.y, axisMaxClamps.y));
         }
 
-        if (Mathf.Abs(rb.linearVelocityX) > axisClamps.x)
+        if (Mathf.Abs(rb.linearVelocityX) > axisMaxClamps.x)
         {
-            rb.linearVelocity = new Vector2(Mathf.Clamp(rb.linearVelocityX, -axisClamps.x, axisClamps.x), rb.linearVelocityY);
+            rb.linearVelocity = new Vector2(Mathf.Clamp(rb.linearVelocityX, -axisMaxClamps.x, axisMaxClamps.x), rb.linearVelocityY);
         }
     }
 
@@ -110,6 +119,8 @@ public class PlayerMovementTest : NetworkBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocityX, 0);
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+
+            anim.SetTrigger("Jump");
         }
 
         // Stops jump early if not already falling
@@ -120,9 +131,10 @@ public class PlayerMovementTest : NetworkBehaviour
             rb.AddForce(Vector2.up * (jumpForce * 0.3f), ForceMode2D.Impulse);
         }
     }
+
     void DoGroundRay()
     {
-        if (Physics2D.Raycast(transform.position, Vector2.down, rayLength, ground))
+        if (Physics2D.Raycast(transform.position, Vector2.down, rayLength, collideLayer))
         {
             Debug.DrawRay(transform.position, Vector2.down * rayLength, Color.green);
             isGrounded = true;
@@ -131,6 +143,22 @@ public class PlayerMovementTest : NetworkBehaviour
         {
             Debug.DrawRay(transform.position, Vector2.down * rayLength, Color.red);
             isGrounded = false;
+        }
+    }
+
+    // used to stop sticking to walls
+    void DoWallRay()
+    {
+        bool facedDir = moveDir > 0.1f ? true : false;
+
+        if (Physics2D.Raycast(transform.position, facedDir ? Vector2.right : Vector2.left, rayLength / 2, collideLayer))
+        {
+            Debug.DrawRay(transform.position, (facedDir ? Vector2.right : Vector2.left) * (rayLength / 2), Color.green);
+            rb.linearVelocity = new Vector2(0, rb.linearVelocityY);
+        }
+        else
+        {
+            Debug.DrawRay(transform.position, (facedDir ? Vector2.right : Vector2.left) * (rayLength / 2), Color.red);
         }
     }
 
@@ -151,19 +179,11 @@ public class PlayerMovementTest : NetworkBehaviour
         return false;
     }
 
-    Vector3 GetMousePosition()
+    void AnimationChecks()
     {
-        Vector3 mousePos = Mouse.current.position.ReadValue();
-        Vector3 convertedMousePos = Camera.main.ScreenToWorldPoint(mousePos);
-        convertedMousePos.z = Camera.main.nearClipPlane;
-        return convertedMousePos;
-    }
+        sr.flipX = moveDir < 0.1f ? true : false;
 
-    void LookAtMouse()
-    {
-        Vector2 lookDir = GetMousePosition() - eyePivot.position;
-        float lookAngle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
-
-        eyePivot.rotation = Quaternion.Euler(new Vector3(0, 0, lookAngle));
+        anim.SetBool("IsRunning", Mathf.Abs(moveDir) > 0 ? true : false);
+        anim.SetBool("IsFalling", IsFalling(-3f));
     }
 }

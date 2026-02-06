@@ -28,17 +28,10 @@ public class RelayManager : MonoBehaviour
     }
     private void Start()
     {
-        //AuthenticatePlayer();
-        NetworkManager.Singleton.OnServerStarted += () =>
-        {
-            NetworkManager.Singleton.SceneManager.LoadScene("Testing", UnityEngine.SceneManagement.LoadSceneMode.Single);
-        };
-    }
-
-    public async void AuthenticatePlayer()
-    {
-        await UnityServices.InitializeAsync();
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        //NetworkManager.Singleton.OnServerStarted += () =>
+        //{
+        //    NetworkManager.Singleton.SceneManager.LoadScene("Lobby", UnityEngine.SceneManagement.LoadSceneMode.Single);
+        //};
     }
 
     public async Task<string> CreateRelay(int maxPlayers)
@@ -59,7 +52,6 @@ public class RelayManager : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
             NetworkManager.Singleton.StartHost();
-            //await Task.Yield;s 
             return joinCode;
         }
         catch (RelayServiceException e)
@@ -119,9 +111,4 @@ public class RelayManager : MonoBehaviour
             Debug.Log(e);
         }
     }
-
-    //public string GetJoinCode()
-    //{
-    //    return joinCode;
-    //}
 }

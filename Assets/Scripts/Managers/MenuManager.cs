@@ -4,7 +4,6 @@ using UnityEngine.UI;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 
 public class MenuManager : MonoBehaviour
 {
@@ -44,15 +43,15 @@ public class MenuManager : MonoBehaviour
     [SerializeField] Button createRoomButton;
     [SerializeField] Toggle isPrivateToggle;
 
-    [Space(10)]
-    [Header("Room Panel")]
-    [SerializeField] GameObject roomPanel;
-    [SerializeField] Button exitLobbyButton;
-    [SerializeField] Button startGameButton;
-    [SerializeField] TextMeshProUGUI roomName;
-    [SerializeField] TextMeshProUGUI roomCode;
-    [SerializeField] GameObject playerInfoPrefab;
-    [SerializeField] GameObject playerInfoContent;
+    //[Space(10)]
+    //[Header("Room Panel")]
+    //[SerializeField] GameObject roomPanel;
+    //[SerializeField] Button exitLobbyButton;
+    //[SerializeField] Button startGameButton;
+    //[SerializeField] TextMeshProUGUI roomName;
+    //[SerializeField] TextMeshProUGUI roomCode;
+    //[SerializeField] GameObject playerInfoPrefab;
+    //[SerializeField] GameObject playerInfoContent;
 
     [Space(10)]
     [Header("Join Room With Code")]
@@ -78,8 +77,6 @@ public class MenuManager : MonoBehaviour
 
         openCreateLobbyButton.onClick.AddListener(OpenCreateLobbyMenu);
         exitCreateLobbyButton.onClick.AddListener(CloseCreateLobbyMenu);
-
-        //exitLobbyButton.onClick.AddListener(ExitRoom);
 
         playerNameInput.onValueChanged.AddListener(delegate
         {

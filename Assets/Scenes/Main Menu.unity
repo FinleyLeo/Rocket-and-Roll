@@ -257,7 +257,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 36397959}
-    PlayerPrefab: {fileID: 4890474755170714994, guid: 592ecad20beb65c4faa94557c6c9e555, type: 3}
+    PlayerPrefab: {fileID: 8882995978763723287, guid: a85d8f13ae4d78149973e9636fd6bee3, type: 3}
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: 2060ff8ebe6266b4f8e2b0b7ff554030, type: 2}
@@ -1939,13 +1939,6 @@ MonoBehaviour:
   exitCreateLobbyButton: {fileID: 2115990754}
   createRoomButton: {fileID: 1039317948}
   isPrivateToggle: {fileID: 1718243186}
-  roomPanel: {fileID: 0}
-  exitLobbyButton: {fileID: 0}
-  startGameButton: {fileID: 0}
-  roomName: {fileID: 0}
-  roomCode: {fileID: 0}
-  playerInfoPrefab: {fileID: 8579459927478489073, guid: aa0f088cac0bd524eb05b31b0747080e, type: 3}
-  playerInfoContent: {fileID: 0}
   roomCodePanel: {fileID: 855135104}
   roomCodeInput: {fileID: 1776697732}
   exitRoomCodePanel: {fileID: 710378718}
@@ -8378,7 +8371,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 1
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -8403,7 +8396,7 @@ Transform:
   m_GameObject: {fileID: 2146101658}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 0, y: 100, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
