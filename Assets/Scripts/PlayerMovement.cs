@@ -182,8 +182,11 @@ public class PlayerMovement : NetworkBehaviour
 
     void AnimationChecks()
     {
-        sr.flipX = moveDir < 0.1f ? true : false;
-        isFlipped.Value = sr.flipX;
+        if (Mathf.Abs(moveDir) > 0.1f) // only update when moving
+        {
+            sr.flipX = moveDir < 0.1f ? true : false;
+            isFlipped.Value = sr.flipX;
+        }
 
         anim.SetBool("IsRunning", Mathf.Abs(moveDir) > 0 ? true : false);
         anim.SetBool("IsFalling", IsFalling(-3f));
