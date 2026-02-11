@@ -25,14 +25,6 @@ public class NameTagDisplay : NetworkBehaviour
         bool canDisplay = Keyboard.current.tabKey.isPressed;
 
         DisplayTags(canDisplay);
-        //if (Keyboard.current.tabKey.wasPressedThisFrame)
-        //{
-        //    DisplayTags(true);
-        //}
-        //else
-        //{
-        //    DisplayTags(false);
-        //}
     }
 
     void UpdateTag()
