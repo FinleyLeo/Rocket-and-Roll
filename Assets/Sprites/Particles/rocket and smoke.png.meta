@@ -60,7 +60,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 8
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -144,32 +144,6 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: tvOS
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WindowsStoreApps
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -177,12 +151,12 @@ TextureImporter:
       name: rocket and smoke_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 15
-        width: 9
-        height: 5
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 0
+        y: 0
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.375, y: 0.65625}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -199,12 +173,12 @@ TextureImporter:
       name: rocket and smoke_1
       rect:
         serializedVersion: 2
-        x: 21
-        y: 1
-        width: 12
-        height: 12
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 16
+        y: 0
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.375, y: 0.625}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -221,12 +195,12 @@ TextureImporter:
       name: rocket and smoke_2
       rect:
         serializedVersion: 2
-        x: 2
-        y: 4
-        width: 7
-        height: 7
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 32
+        y: 0
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.375, y: 0.625}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -243,12 +217,12 @@ TextureImporter:
       name: rocket and smoke_3
       rect:
         serializedVersion: 2
-        x: 10
-        y: 2
-        width: 10
-        height: 10
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 48
+        y: 0
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.40625, y: 0.59375}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -265,20 +239,20 @@ TextureImporter:
       name: rocket and smoke_4
       rect:
         serializedVersion: 2
-        x: 14
-        y: 15
-        width: 6
-        height: 6
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 64
+        y: 0
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.375, y: 0.625}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 78ce97413c19ba343bc440fd5ec3afd0
-      internalID: -1532982038
+      spriteID: 65e70220eac904043a2d0340b6ee5f3a
+      internalID: 373506716
       vertices: []
       indices: 
       edges: []
@@ -287,20 +261,20 @@ TextureImporter:
       name: rocket and smoke_5
       rect:
         serializedVersion: 2
-        x: 21
-        y: 16
-        width: 5
-        height: 5
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 80
+        y: 0
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.34375, y: 0.65625}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 289097b8cc991044aaae82b15770ca06
-      internalID: -1440523503
+      spriteID: f3aa2103acc3c1d46a7538c7242d2392
+      internalID: 1990573029
       vertices: []
       indices: 
       edges: []
@@ -309,20 +283,20 @@ TextureImporter:
       name: rocket and smoke_6
       rect:
         serializedVersion: 2
-        x: 27
-        y: 17
-        width: 3
-        height: 3
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 96
+        y: 0
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.40625, y: 0.65625}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6e3678878a91d744da2efd1a03c9971b
-      internalID: -487964361
+      spriteID: fe122866c0bec57408909c9e8d139b1a
+      internalID: -515300385
       vertices: []
       indices: 
       edges: []
@@ -331,7 +305,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 97f3bc3846b919440823a8927b4bcde5
+    spriteID: 36cb294b16af7ab429a72c1978e899e2
     internalID: 0
     vertices: []
     indices: 
@@ -339,15 +313,17 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":16.0,"y":16.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       rocket and smoke_0: -6549142082443387971
       rocket and smoke_1: 3155016726047824490
       rocket and smoke_2: -1949675430736399677
       rocket and smoke_3: -4338012161948070149
-      rocket and smoke_4: -1532982038
-      rocket and smoke_5: -1440523503
-      rocket and smoke_6: -487964361
+      rocket and smoke_4: 373506716
+      rocket and smoke_5: 1990573029
+      rocket and smoke_6: -515300385
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

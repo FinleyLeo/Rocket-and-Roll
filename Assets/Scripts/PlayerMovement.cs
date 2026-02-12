@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -11,7 +12,7 @@ enum PlayerMode
 public class PlayerMovement : NetworkBehaviour
 {
     NetworkVariable<Vector2> position = new NetworkVariable<Vector2>(new Vector2(0, 5), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    NetworkVariable<bool> isFlipped = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    [HideInInspector] public NetworkVariable<bool> isFlipped = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     InputAction moveAction;
     InputAction jumpAction;
@@ -30,8 +31,14 @@ public class PlayerMovement : NetworkBehaviour
     float moveDir;
 
     [SerializeField] LayerMask collideLayer;
-    float rayLength = 1.1f;
-    bool isGrounded;
+    [SerializeField] float groundRayLength = 0.8f;
+    [SerializeField] float wallRayLength = 0.6f;
+    [SerializeField] float[] wallRayChecks;
+    [SerializeField] bool isGrounded;
+    [SerializeField] bool jumpPressed;
+
+    [SerializeField] float coyoteTimerCounter;
+    [SerializeField] float jumpRegisterCounter;
 
     public override void OnNetworkSpawn()
     {
@@ -86,6 +93,8 @@ public class PlayerMovement : NetworkBehaviour
         Move();
         ClampVelocity();
         JumpCheck();
+        JumpPreRegister();
+        JumpCoyoteTime();
         DoWallRay();
 
         AnimationChecks();
@@ -116,33 +125,82 @@ public class PlayerMovement : NetworkBehaviour
     {
         DoGroundRay();
 
-        if (jumpAction.WasPressedThisFrame() && isGrounded)
+        if (jumpAction.WasPressedThisFrame() || jumpRegisterCounter > 0)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocityX, 0);
-            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            if (isGrounded || coyoteTimerCounter > 0 && !jumpPressed)
+            {
+                jumpPressed = true;
 
-            anim.SetTrigger("Jump");
+                coyoteTimerCounter = 0;
+                jumpRegisterCounter = -1;
+
+                rb.linearVelocity = new Vector2(rb.linearVelocityX, 0);
+                rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+
+                anim.SetTrigger("Jump");
+
+                Debug.Log("Jumped!");
+            }
         }
-
+       
         // Stops jump early if not already falling
-        if (jumpAction.WasReleasedThisFrame() && !isGrounded && !IsFalling(3f))
+        if (!jumpAction.IsPressed() && !isGrounded && !IsFalling(3f) && jumpPressed)
         {
+            jumpPressed = false;
+
+            Debug.Log("Jump canceleed");
+
             // stops y velocity and adds extra force to make it seem more like an arc rather than an instant stop
             rb.linearVelocity = new Vector2(rb.linearVelocityX, 0);
             rb.AddForce(Vector2.up * (jumpForce * 0.3f), ForceMode2D.Impulse);
+        }
+        
+    }
+
+    //IEnumerator JumpDelay()
+    //{
+    //    jumpPressed = true;
+    //    yield return new WaitForSeconds(0.01f);
+    //    jumpPressed = false;
+    //}
+
+    void JumpPreRegister()
+    {
+        if (jumpRegisterCounter <= 0)
+        {
+            if (jumpAction.WasPressedThisFrame() && !isGrounded)
+            {
+                jumpRegisterCounter = 0.5f;
+            }
+        }
+        else
+        {
+            jumpRegisterCounter -= Time.deltaTime;
+        }
+    }
+    
+    void JumpCoyoteTime()
+    {
+        if (isGrounded)
+        {
+            coyoteTimerCounter = 0.5f;
+        }
+        else
+        {
+            coyoteTimerCounter -= Time.deltaTime;
         }
     }
 
     void DoGroundRay()
     {
-        if (Physics2D.Raycast(transform.position, Vector2.down, rayLength, collideLayer))
+        if (Physics2D.Raycast(transform.position, Vector2.down, groundRayLength, collideLayer))
         {
-            Debug.DrawRay(transform.position, Vector2.down * rayLength, Color.green);
+            Debug.DrawRay(transform.position, Vector2.down * groundRayLength, Color.green);
             isGrounded = true;
         }
         else
         {
-            Debug.DrawRay(transform.position, Vector2.down * rayLength, Color.red);
+            Debug.DrawRay(transform.position, Vector2.down * groundRayLength, Color.red);
             isGrounded = false;
         }
     }
@@ -152,14 +210,17 @@ public class PlayerMovement : NetworkBehaviour
     {
         bool facedDir = moveDir > 0.1f ? true : false;
 
-        if (Physics2D.Raycast(transform.position, facedDir ? Vector2.right : Vector2.left, rayLength / 2, collideLayer))
+        for (int i = 0; i < wallRayChecks.Length; i++)
         {
-            Debug.DrawRay(transform.position, (facedDir ? Vector2.right : Vector2.left) * (rayLength / 2), Color.green);
-            rb.linearVelocity = new Vector2(0, rb.linearVelocityY);
-        }
-        else
-        {
-            Debug.DrawRay(transform.position, (facedDir ? Vector2.right : Vector2.left) * (rayLength / 2), Color.red);
+            if (Physics2D.Raycast(transform.position + new Vector3(0, wallRayChecks[i], 0), facedDir ? Vector2.right : Vector2.left, wallRayLength, collideLayer))
+            {
+                Debug.DrawRay(transform.position + new Vector3(0, wallRayChecks[i], 0), (facedDir ? Vector2.right : Vector2.left) * wallRayLength, Color.green);
+                rb.linearVelocity = new Vector2(0, rb.linearVelocityY);
+            }
+            else
+            {
+                Debug.DrawRay(transform.position + new Vector3(0, wallRayChecks[i], 0), (facedDir ? Vector2.right : Vector2.left) * wallRayLength, Color.red);
+            }
         }
     }
 
@@ -184,11 +245,25 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (Mathf.Abs(moveDir) > 0.1f) // only update when moving
         {
-            sr.flipX = moveDir < 0.1f ? true : false;
-            isFlipped.Value = sr.flipX;
+            //bool flipped = moveDir < 0.1f ? true : false;
+            //sr.flipX = ;
+            transform.rotation = Quaternion.Euler(0, moveDir < 0.1f ? 180 : 0, 0);
+            isFlipped.Value = moveDir < 0.1f ? true : false;
         }
 
         anim.SetBool("IsRunning", Mathf.Abs(moveDir) > 0 ? true : false);
         anim.SetBool("IsFalling", IsFalling(-3f));
+    }
+
+    private void OnDrawGizmos()
+    {
+        bool facedDir = moveDir > 0.1f ? true : false;
+
+        for (int i = 0; i < wallRayChecks.Length; i++)
+        {
+            Gizmos.DrawLine(transform.position + new Vector3(0, wallRayChecks[i], 0), transform.position + new Vector3(0, wallRayChecks[i], 0) + (facedDir ? Vector3.right : Vector3.left) * wallRayLength);
+        }
+
+        Gizmos.DrawLine(transform.position, transform.position + (Vector3.down * groundRayLength));
     }
 }

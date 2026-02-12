@@ -2478,8 +2478,8 @@
     "m_ShaderOutputName": "Frequency",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 20.0,
-        "y": 20.0
+        "x": 15.0,
+        "y": 16.0
     },
     "m_DefaultValue": {
         "x": 1.0,
@@ -3222,7 +3222,7 @@
     "m_Title": "Noise",
     "m_Position": {
         "x": -1838.0,
-        "y": 323.0
+        "y": 323.0000915527344
     }
 }
 
@@ -3392,7 +3392,7 @@
     "m_Title": "Checkerboard",
     "m_Position": {
         "x": -1590.0,
-        "y": 1238.0
+        "y": 1237.9998779296875
     }
 }
 

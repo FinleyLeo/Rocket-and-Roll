@@ -5,11 +5,21 @@ using UnityEngine.InputSystem;
 public class PlayerLookAt : NetworkBehaviour
 {
     Transform eyePivot;
+    Transform eyeTransform;
+    PlayerMovement playerScript;
     float clampDistance = 0.35f;
 
     private void Start()
     {
-        eyePivot = transform.parent;
+        playerScript = GetComponent<PlayerMovement>();
+
+        if (playerScript == null)
+        {
+            Debug.Log("Player script not found");
+        }
+
+        eyePivot = transform.GetChild(1);
+        eyeTransform = eyePivot.GetChild(0);
     }
 
     void Update()
@@ -32,15 +42,17 @@ public class PlayerLookAt : NetworkBehaviour
 
     void LookAtMouse()
     {
+        eyePivot.rotation = Quaternion.Euler(0, 0, 0); // Makes sure rotation is always the same
         Vector2 lookDir = GetMousePosition() - eyePivot.position;
-        float lookAngle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
+        //float lookAngle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
+        //lookDir = playerScript.isFlipped.Value ? -lookDir : lookDir;
 
-        transform.position = GetMousePosition();
+        eyeTransform.position = GetMousePosition();
 
         if (Vector3.Distance(eyePivot.position, GetMousePosition()) > clampDistance)
         {
             //eyePivot.rotation = Quaternion.Euler(new Vector3(0, 0, lookAngle));
-            transform.localPosition = lookDir.normalized * (clampDistance - 0.1f);
+            eyeTransform.localPosition = lookDir.normalized * (clampDistance - 0.1f);
         }
     }
 }
