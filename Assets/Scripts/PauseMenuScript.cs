@@ -3,20 +3,26 @@ using TMPro;
 using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class PauseMenuScript : NetworkBehaviour
 {
     [SerializeField] GameObject pauseMenuPanel;
     [SerializeField] GameObject settingsMenuPanel;
-    [SerializeField] Button quitButton;
+    [SerializeField] Button quitToMenuButton;
     [SerializeField] Button closePausebutton;
     [SerializeField] Button openSettingsButton;
     [SerializeField] Button closeSettingsButton;
     [SerializeField] GameObject playerInfoContent;
     [SerializeField] GameObject playerInfoPrefab;
+    [SerializeField] Material buttonBannerMat;
+
+    Animator anim;
 
     string playerName;
+    bool pauseMenuOpen = true;
+    float fillAmount;
 
     private void Start()
     {
@@ -25,20 +31,49 @@ public class PauseMenuScript : NetworkBehaviour
             playerName = PlayerPrefs.GetString("Username", "Player " + NetworkObjectId);
         }
 
+        anim = transform.GetChild(0).GetComponent<Animator>();
+
         closePausebutton.onClick.AddListener(ExitPauseMenu);
-        quitButton.onClick.AddListener(QuitToMenu);
-        openSettingsButton.onClick.AddListener(OpenSettings);
-        closeSettingsButton.onClick.AddListener(CloseSettings);
+        quitToMenuButton.onClick.AddListener(QuitToMenu);
+        //openSettingsButton.onClick.AddListener(OpenSettings);
+        //closeSettingsButton.onClick.AddListener(CloseSettings);
+
+        anim.SetBool("isOpen", !pauseMenuOpen);
     }
 
     private void Update()
     {
-        HandlePlayerListUpdate();
+        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            pauseMenuOpen = !pauseMenuOpen;
+            anim.SetBool("isOpen", !pauseMenuOpen);
+        }
+
+        //HandlePlayerListUpdate();
+        FadeInOutBanner();
+    }
+
+    void FadeInOutBanner()
+    {
+        fillAmount = buttonBannerMat.GetFloat("_FillAmount");
+
+        if (pauseMenuOpen)
+        {
+            fillAmount -= Time.deltaTime;
+        }
+        else if (!pauseMenuOpen)
+        {
+            fillAmount += Time.deltaTime;
+        }
+
+        fillAmount = Mathf.Clamp(fillAmount, -0.05f, 1.05f);
+        buttonBannerMat.SetFloat("_FillAmount", fillAmount);
     }
 
     void ExitPauseMenu()
     {
-        pauseMenuPanel.SetActive(false);
+        pauseMenuOpen = !pauseMenuOpen;
+        anim.SetBool("isOpen", !pauseMenuOpen);
     }
 
     void QuitToMenu()

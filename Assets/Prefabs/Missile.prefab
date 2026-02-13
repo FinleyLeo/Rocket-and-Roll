@@ -80,7 +80,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 6
   m_Sprite: {fileID: -6549142082443387971, guid: 7d39a9bde44761a438dd99ae3bf47bfd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -146,9 +146,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 9193533493524436005}
     m_Modifications:
+    - target: {fileID: 153630027569927310, guid: 6d46a3732f80f854ea3ded2abe0be35d, type: 3}
+      propertyPath: m_SortingOrder
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1526041674307315153, guid: 6d46a3732f80f854ea3ded2abe0be35d, type: 3}
       propertyPath: m_Name
       value: Thruster smoke
+      objectReference: {fileID: 0}
+    - target: {fileID: 2989927092045470474, guid: 6d46a3732f80f854ea3ded2abe0be35d, type: 3}
+      propertyPath: EmissionModule.rateOverDistance.scalar
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7987029815445996821, guid: 6d46a3732f80f854ea3ded2abe0be35d, type: 3}
       propertyPath: m_LocalPosition.x
