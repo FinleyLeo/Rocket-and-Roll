@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: TilemapMat
+  m_Name: PlayerMat
   m_Shader: {fileID: -6465566751694194690, guid: b581fe599ff932a42886252bf24e92ed, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -53,9 +53,12 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
-    m_Floats: []
+    m_Floats:
+    - _UseOutline: 1
     m_Colors:
-    - _BaseColour: {r: 0.9528302, g: 0.92136884, b: 0.92136884, a: 1}
-    - _OutlineColour: {r: 0.5377358, g: 0.51868266, b: 0.4946155, a: 1}
+    - _BaseColour: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseIn: {r: 1, g: 1, b: 1, a: 1}
+    - _OutlineColour: {r: 0.6415094, g: 0.41456032, b: 0.41456032, a: 1}
+    - _OutlineIn: {r: 0.7960785, g: 0.7960785, b: 0.7960785, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

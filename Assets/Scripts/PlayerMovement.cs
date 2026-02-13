@@ -35,10 +35,10 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] float wallRayLength = 0.6f;
     [SerializeField] float[] wallRayChecks;
     [SerializeField] bool isGrounded;
-    [SerializeField] bool jumpPressed;
+    [SerializeField] bool canStopEarly;
 
-    [SerializeField] float coyoteTimerCounter;
-    [SerializeField] float jumpRegisterCounter;
+    [SerializeField] float bufferTime;
+    [SerializeField] float bufferTimer;
 
     public override void OnNetworkSpawn()
     {
@@ -79,7 +79,8 @@ public class PlayerMovement : NetworkBehaviour
     void UpdateNetworkValues()
     {
         transform.position = Vector3.Lerp(transform.position, position.Value, Time.deltaTime * 25); // Keeps player movement smooth on other clients
-        sr.flipX = isFlipped.Value;
+        //sr.flipX = isFlipped.Value;
+        transform.rotation = Quaternion.Euler(0, isFlipped.Value ? 180 : 0, 0);
     }
 
     void Update()
@@ -94,7 +95,6 @@ public class PlayerMovement : NetworkBehaviour
         ClampVelocity();
         JumpCheck();
         JumpPreRegister();
-        JumpCoyoteTime();
         DoWallRay();
 
         AnimationChecks();
@@ -125,28 +125,15 @@ public class PlayerMovement : NetworkBehaviour
     {
         DoGroundRay();
 
-        if (jumpAction.WasPressedThisFrame() || jumpRegisterCounter > 0)
+        if (bufferTimer > 0 && isGrounded)
         {
-            if (isGrounded || coyoteTimerCounter > 0 && !jumpPressed)
-            {
-                jumpPressed = true;
-
-                coyoteTimerCounter = 0;
-                jumpRegisterCounter = -1;
-
-                rb.linearVelocity = new Vector2(rb.linearVelocityX, 0);
-                rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-
-                anim.SetTrigger("Jump");
-
-                Debug.Log("Jumped!");
-            }
+            Jump();
         }
-       
+
         // Stops jump early if not already falling
-        if (!jumpAction.IsPressed() && !isGrounded && !IsFalling(3f) && jumpPressed)
+        if (!jumpAction.IsPressed() && canStopEarly && !isGrounded && !IsFalling(3f))
         {
-            jumpPressed = false;
+            canStopEarly = false;
 
             Debug.Log("Jump canceleed");
 
@@ -154,40 +141,28 @@ public class PlayerMovement : NetworkBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocityX, 0);
             rb.AddForce(Vector2.up * (jumpForce * 0.3f), ForceMode2D.Impulse);
         }
-        
     }
+    void Jump()
+    {
+        canStopEarly = true;
+        bufferTimer = -1;
 
-    //IEnumerator JumpDelay()
-    //{
-    //    jumpPressed = true;
-    //    yield return new WaitForSeconds(0.01f);
-    //    jumpPressed = false;
-    //}
+        rb.linearVelocity = new Vector2(rb.linearVelocityX, 0);
+        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
 
+        anim.SetTrigger("Jump");
+    }
     void JumpPreRegister()
     {
-        if (jumpRegisterCounter <= 0)
+        if (jumpAction.WasPressedThisFrame())
         {
-            if (jumpAction.WasPressedThisFrame() && !isGrounded)
-            {
-                jumpRegisterCounter = 0.5f;
-            }
+            bufferTimer = bufferTime;
+
+            Debug.Log("Jump pressed");
         }
         else
         {
-            jumpRegisterCounter -= Time.deltaTime;
-        }
-    }
-    
-    void JumpCoyoteTime()
-    {
-        if (isGrounded)
-        {
-            coyoteTimerCounter = 0.5f;
-        }
-        else
-        {
-            coyoteTimerCounter -= Time.deltaTime;
+            bufferTimer -= Time.deltaTime;
         }
     }
 
@@ -245,19 +220,17 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (Mathf.Abs(moveDir) > 0.1f) // only update when moving
         {
-            //bool flipped = moveDir < 0.1f ? true : false;
-            //sr.flipX = ;
             transform.rotation = Quaternion.Euler(0, moveDir < 0.1f ? 180 : 0, 0);
-            isFlipped.Value = moveDir < 0.1f ? true : false;
+            isFlipped.Value = moveDir < 0.1f;
         }
 
-        anim.SetBool("IsRunning", Mathf.Abs(moveDir) > 0 ? true : false);
+        anim.SetBool("IsRunning", Mathf.Abs(moveDir) > 0);
         anim.SetBool("IsFalling", IsFalling(-3f));
     }
 
     private void OnDrawGizmos()
     {
-        bool facedDir = moveDir > 0.1f ? true : false;
+        bool facedDir = moveDir > 0.1f;
 
         for (int i = 0; i < wallRayChecks.Length; i++)
         {

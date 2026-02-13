@@ -5,9 +5,11 @@ using UnityEngine.InputSystem;
 public class PlayerLookAt : NetworkBehaviour
 {
     Transform eyePivot;
+    Transform rpgPivot;
     Transform eyeTransform;
     PlayerMovement playerScript;
-    float clampDistance = 0.35f;
+
+    readonly float clampDistance = 0.35f;
 
     private void Start()
     {
@@ -20,12 +22,18 @@ public class PlayerLookAt : NetworkBehaviour
 
         eyePivot = transform.GetChild(1);
         eyeTransform = eyePivot.GetChild(0);
+
+        rpgPivot = transform.GetChild(2);
     }
 
     void Update()
     {
+        // Makes sure rotation is always the same
+        eyePivot.rotation = Quaternion.Euler(0, 0, 0);
+
         if (!IsOwner)
         {
+            rpgPivot.rotation = Quaternion.Euler(0, 0, 0);
             return;
         }
 
@@ -42,17 +50,29 @@ public class PlayerLookAt : NetworkBehaviour
 
     void LookAtMouse()
     {
-        eyePivot.rotation = Quaternion.Euler(0, 0, 0); // Makes sure rotation is always the same
-        Vector2 lookDir = GetMousePosition() - eyePivot.position;
-        //float lookAngle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
-        //lookDir = playerScript.isFlipped.Value ? -lookDir : lookDir;
+        Vector2 eyelookDir = GetMousePosition() - eyePivot.position;
+        Vector2 rpglookDir = GetMousePosition() - rpgPivot.position;
+        float rpglookAngle = Mathf.Atan2(rpglookDir.y, rpglookDir.x) * Mathf.Rad2Deg;
 
+        // manages eye position
         eyeTransform.position = GetMousePosition();
 
+        // clamps to certain distance, rotating around the edge of the head
         if (Vector3.Distance(eyePivot.position, GetMousePosition()) > clampDistance)
         {
-            //eyePivot.rotation = Quaternion.Euler(new Vector3(0, 0, lookAngle));
-            eyeTransform.localPosition = lookDir.normalized * (clampDistance - 0.1f);
+            eyeTransform.localPosition = eyelookDir.normalized * (clampDistance - 0.1f);
+        }
+
+        // manages rpg rotation
+        //rpgPivot.rotation = Quaternion.Euler(0, 0, rpglookAngle);
+
+        if (GetMousePosition().x < rpgPivot.position.x)
+        {
+            rpgPivot.rotation = Quaternion.Euler(180, 0, -rpglookAngle);
+        }
+        else
+        {
+            rpgPivot.rotation = Quaternion.Euler(0, 0, rpglookAngle);
         }
     }
 }
