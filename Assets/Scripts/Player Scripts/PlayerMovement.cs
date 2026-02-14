@@ -67,19 +67,16 @@ public class PlayerMovement : NetworkBehaviour
         anim = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
 
-
         if (rbNotFound)
         {
             rb.simulated = false; // if rb isnt referenced in OnNetworkSpawn, try again in start
             rbNotFound = false;
         }
-
     }
 
     void UpdateNetworkValues()
     {
         transform.position = Vector3.Lerp(transform.position, position.Value, Time.deltaTime * 25); // Keeps player movement smooth on other clients
-        //sr.flipX = isFlipped.Value;
         transform.rotation = Quaternion.Euler(0, isFlipped.Value ? 180 : 0, 0);
     }
 
@@ -91,12 +88,23 @@ public class PlayerMovement : NetworkBehaviour
             return;
         }
 
-        Move();
+        if (PauseMenuScript.instance != null)
+        {
+            if (!PauseMenuScript.instance.isPaused)
+            {
+                Move();
+                JumpPreRegister();
+            }
+            else
+            {
+                moveDir = 0;
+                bufferTimer = 0;
+            }
+        }
+
         ClampVelocity();
         JumpCheck();
-        JumpPreRegister();
         DoWallRay();
-
         AnimationChecks();
     }
 

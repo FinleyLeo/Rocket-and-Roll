@@ -4,25 +4,41 @@ using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PauseMenuScript : NetworkBehaviour
 {
+    public static PauseMenuScript instance;
+
     [SerializeField] GameObject pauseMenuPanel;
     [SerializeField] GameObject settingsMenuPanel;
-    [SerializeField] Button quitToMenuButton;
+
     [SerializeField] Button closePausebutton;
+
+    [SerializeField] Button quitToMenuButton;
+    [SerializeField] Button quitGameButton;
+
     [SerializeField] Button openSettingsButton;
     [SerializeField] Button closeSettingsButton;
+
+    [SerializeField] Button openCustomisationButton;
+    [SerializeField] Button closeCustomisationButton;
+
     [SerializeField] GameObject playerInfoContent;
     [SerializeField] GameObject playerInfoPrefab;
+
     [SerializeField] Material buttonBannerMat;
+    [SerializeField] Material buttonHighlightMat;
 
     Animator anim;
 
     string playerName;
-    bool pauseMenuOpen = true;
+
     float fillAmount;
+
+    public bool isPaused;
+    bool animEnded;
 
     private void Start()
     {
@@ -31,56 +47,79 @@ public class PauseMenuScript : NetworkBehaviour
             playerName = PlayerPrefs.GetString("Username", "Player " + NetworkObjectId);
         }
 
-        anim = transform.GetChild(0).GetComponent<Animator>();
+        instance = this;
 
-        closePausebutton.onClick.AddListener(ExitPauseMenu);
+        anim = GetComponent<Animator>();
+
+        closePausebutton.onClick.AddListener(ResumeGame);
         quitToMenuButton.onClick.AddListener(QuitToMenu);
         //openSettingsButton.onClick.AddListener(OpenSettings);
         //closeSettingsButton.onClick.AddListener(CloseSettings);
 
-        anim.SetBool("isOpen", !pauseMenuOpen);
+        buttonBannerMat.SetFloat("_FillAmount", 0);
+        buttonHighlightMat.SetFloat("_FillAmount", 0);
+        anim.SetBool("isOpen", isPaused);
     }
 
     private void Update()
     {
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        if (animEnded)
         {
-            pauseMenuOpen = !pauseMenuOpen;
-            anim.SetBool("isOpen", !pauseMenuOpen);
+            if (Keyboard.current.escapeKey.wasPressedThisFrame)
+            {
+                animEnded = false;
+                isPaused = !isPaused;
+
+                anim.SetBool("isOpen", isPaused);
+            }
         }
 
-        //HandlePlayerListUpdate();
         FadeInOutBanner();
+        //HandlePlayerListUpdate();
+
+        Debug.Log("isOpen bool:" + anim.GetBool("isOpen"));
+        Debug.Log(isPaused);
     }
 
     void FadeInOutBanner()
     {
         fillAmount = buttonBannerMat.GetFloat("_FillAmount");
 
-        if (pauseMenuOpen)
+        if (isPaused)
         {
-            fillAmount -= Time.deltaTime;
+            fillAmount += Time.deltaTime * 1.5f;
         }
-        else if (!pauseMenuOpen)
+        else
         {
-            fillAmount += Time.deltaTime;
+            fillAmount -= Time.deltaTime * 1f;
         }
 
-        fillAmount = Mathf.Clamp(fillAmount, -0.05f, 1.05f);
+        fillAmount = Mathf.Clamp(fillAmount, -0.3f, 1.05f);
         buttonBannerMat.SetFloat("_FillAmount", fillAmount);
+        buttonHighlightMat.SetFloat("_FillAmount", fillAmount);
     }
 
-    void ExitPauseMenu()
+    // Tells script when animation has finished updating through event to respond accordingly
+    public void NotifyEnd()
     {
-        pauseMenuOpen = !pauseMenuOpen;
-        anim.SetBool("isOpen", !pauseMenuOpen);
+        animEnded = true;
+    }
+
+    void ResumeGame()
+    {
+        if (animEnded)
+        {
+            animEnded = false;
+            isPaused = false;
+
+            anim.SetBool("isOpen", isPaused);
+        }
     }
 
     void QuitToMenu()
     {
         LobbyManager.Instance.LeaveLobby();
-        Debug.Log("Left lobby");
-        // switch scenes if needed, test first
+        SceneManager.LoadScene("Main Menu");
     }
 
     void OpenSettings()

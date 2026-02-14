@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3198037554345888743}
   - component: {fileID: 7097917822442464889}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player hand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 4153869312361080147}
   - component: {fileID: 2598950915115792294}
   - component: {fileID: 8828445408451868675}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Eyes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -236,7 +236,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1190699841494986593}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Eye pivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -269,7 +269,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2504061587926897748}
   - component: {fileID: 1531466917340074816}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player hand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -359,7 +359,7 @@ GameObject:
   m_Component:
   - component: {fileID: 264526465283841572}
   - component: {fileID: 9102787971290134942}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RPG pivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -438,7 +438,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7610431373245036391}
   - component: {fileID: 5062338464860521485}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player hand 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -528,7 +528,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9108001809276087787}
   - component: {fileID: 9190109609599747944}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: player RPG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -550,6 +550,7 @@ Transform:
   m_Children:
   - {fileID: 2504061587926897748}
   - {fileID: 3322706760950409898}
+  - {fileID: 4552068440995538192}
   m_Father: {fileID: 264526465283841572}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &9190109609599747944
@@ -610,6 +611,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &4562543330884219674
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4552068440995538192}
+  - component: {fileID: 3059495041840673623}
+  m_Layer: 7
+  m_Name: Shoot point
+  m_TagString: Untagged
+  m_Icon: {fileID: -5938655980376293919, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4552068440995538192
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4562543330884219674}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.75, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9108001809276087787}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3059495041840673623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4562543330884219674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d71694dd2684ef4489fd74175d2fec29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerShooting
+  missilePrefab: {fileID: 788531414899324624, guid: b645a1e553cb275448dc7008094f5e33, type: 3}
+  cooldown: 0
 --- !u!1 &5331919449554707111
 GameObject:
   m_ObjectHideFlags: 0
@@ -622,7 +669,7 @@ GameObject:
   - component: {fileID: 2351867964035726490}
   - component: {fileID: 8294091860444611838}
   - component: {fileID: 6396847729678716976}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -722,7 +769,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3322706760950409898}
   - component: {fileID: 837100320175453162}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player hand 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -813,7 +860,7 @@ GameObject:
   - component: {fileID: 9176300325442132300}
   - component: {fileID: 1205028464359409083}
   - component: {fileID: 4874331361860019789}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -947,7 +994,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2472075815115680262}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Celeb hands
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -989,9 +1036,9 @@ GameObject:
   - component: {fileID: -8442060739272315709}
   - component: {fileID: 8428599949539066022}
   - component: {fileID: 8499360465936672072}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1341,6 +1388,10 @@ PrefabInstance:
     - target: {fileID: 5496714559603816999, guid: bdb300c768e218b478b6e02f08ce0a7b, type: 3}
       propertyPath: m_Name
       value: Smoke trail
+      objectReference: {fileID: 0}
+    - target: {fileID: 5496714559603816999, guid: bdb300c768e218b478b6e02f08ce0a7b, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

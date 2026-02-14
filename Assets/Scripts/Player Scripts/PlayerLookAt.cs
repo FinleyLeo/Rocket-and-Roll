@@ -37,7 +37,13 @@ public class PlayerLookAt : NetworkBehaviour
             return;
         }
 
-        LookAtMouse();
+        if (PauseMenuScript.instance != null)
+        {
+            if (!PauseMenuScript.instance.isPaused)
+            {
+                LookAtMouse();
+            }
+        }
     }
 
     Vector3 GetMousePosition()

@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Missile
+  - Wall
   layers:
   - Default
   - TransparentFX

@@ -42,6 +42,8 @@ public class PlayerMovementTest : NetworkBehaviour
             {
                 rbNotFoundYet = true;
             }
+
+            return;
         }
     }
 
@@ -59,6 +61,11 @@ public class PlayerMovementTest : NetworkBehaviour
         }
 
         rb.linearVelocity = Vector2.zero;
+
+        if (IsOwner)
+        {
+            gameObject.layer = LayerMask.GetMask("Player");
+        }
     }
 
 

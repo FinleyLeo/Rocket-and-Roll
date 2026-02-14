@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 9193533493524436005}
   - component: {fileID: 4699463647589228105}
   - component: {fileID: 3881919374266789048}
+  - component: {fileID: -4973864561080205772}
   m_Layer: 0
   m_Name: Missile
   m_TagString: Missile
@@ -80,7 +81,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 6
+  m_SortingOrder: 2
   m_Sprite: {fileID: -6549142082443387971, guid: 7d39a9bde44761a438dd99ae3bf47bfd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -138,6 +139,18 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.8720691, y: 0.37799072}
   m_EdgeRadius: 0
+--- !u!114 &-4973864561080205772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 788531414899324624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c6aef9c31701384b934babbe4fe0a08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MissileScript
 --- !u!1001 &6910703437241985633
 PrefabInstance:
   m_ObjectHideFlags: 0
