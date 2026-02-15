@@ -33,7 +33,6 @@ public class PlayerLookAt : NetworkBehaviour
 
         if (!IsOwner)
         {
-            rpgPivot.rotation = Quaternion.Euler(0, 0, 0);
             return;
         }
 

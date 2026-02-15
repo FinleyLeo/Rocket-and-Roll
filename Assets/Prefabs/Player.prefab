@@ -399,21 +399,21 @@ MonoBehaviour:
   AutoOwnerAuthorityTickOffset: 1
   PositionInterpolationType: 1
   RotationInterpolationType: 1
-  ScaleInterpolationType: 0
+  ScaleInterpolationType: 1
   PositionLerpSmoothing: 1
   PositionMaxInterpolationTime: 0.1
   RotationLerpSmoothing: 1
   RotationMaxInterpolationTime: 0.01
-  ScaleLerpSmoothing: 1
-  ScaleMaxInterpolationTime: 0.1
+  ScaleLerpSmoothing: 0
+  ScaleMaxInterpolationTime: 0.01
   AuthorityMode: 1
   TickSyncChildren: 0
   UseUnreliableDeltas: 0
   SyncPositionX: 0
   SyncPositionY: 0
   SyncPositionZ: 0
-  SyncRotAngleX: 0
-  SyncRotAngleY: 0
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
   SyncRotAngleZ: 1
   SyncScaleX: 0
   SyncScaleY: 0
@@ -655,8 +655,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d71694dd2684ef4489fd74175d2fec29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerShooting
+  ShowTopMostFoldoutHeaderGroup: 1
   missilePrefab: {fileID: 788531414899324624, guid: b645a1e553cb275448dc7008094f5e33, type: 3}
-  cooldown: 0
+  cooldown: 2
+  cooldownTimer: 0
+  playerScript: {fileID: -8442060739272315709}
 --- !u!1 &5331919449554707111
 GameObject:
   m_ObjectHideFlags: 0
@@ -1310,6 +1313,7 @@ MonoBehaviour:
   canStopEarly: 0
   bufferTime: 0.5
   bufferTimer: 0
+  playerId: 
 --- !u!114 &8428599949539066022
 MonoBehaviour:
   m_ObjectHideFlags: 0

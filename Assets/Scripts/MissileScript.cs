@@ -6,6 +6,7 @@ public class MissileScript : MonoBehaviour
     float velocity;
     float lifeTime = 5;
 
+    public string playerId;
 
     void Start()
     {
@@ -44,7 +45,7 @@ public class MissileScript : MonoBehaviour
         Debug.Log("Collided");
 
         // checks if collided with wall or player
-        if (collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Wall") || (collision.gameObject.CompareTag("Player") && collision.GetComponent<PlayerMovement>().playerId != playerId)) // Collides if is wall/player without same ID
         {
             Debug.Log("Exploded");
             Explode();

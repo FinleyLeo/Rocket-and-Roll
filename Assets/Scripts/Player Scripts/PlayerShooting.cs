@@ -1,14 +1,17 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerShooting : MonoBehaviour
+public class PlayerShooting : NetworkBehaviour
 {
     [SerializeField] GameObject missilePrefab;
 
     InputAction attackAction;
 
-    [SerializeField] float cooldown;
-    float cooldownTimer;
+    [SerializeField] float cooldown = 1f;
+    [SerializeField] float cooldownTimer;
+
+    [SerializeField] PlayerMovement playerScript;
 
     private void Start()
     {
@@ -17,12 +20,17 @@ public class PlayerShooting : MonoBehaviour
 
     private void Update()
     {
-        cooldownTimer -= Time.deltaTime;
-
-        if (attackAction.WasPressedThisFrame() && cooldown <= 0)
+        if (IsOwner)
         {
-            cooldownTimer = cooldown;
-            Instantiate(missilePrefab, transform.position, transform.rotation);
+            cooldownTimer -= Time.deltaTime;
+
+            if (attackAction.WasPressedThisFrame() && cooldownTimer <= 0)
+            {
+                cooldownTimer = cooldown;
+
+                MissileScript missile = Instantiate(missilePrefab, transform.position, transform.rotation).GetComponent<MissileScript>();
+                missile.playerId = playerScript.playerId; 
+            }
         }
     }
 }

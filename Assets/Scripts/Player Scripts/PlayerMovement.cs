@@ -1,5 +1,7 @@
 using System.Collections;
 using Unity.Netcode;
+using Unity.Services.Lobbies.Models;
+using Unity.Services.Matchmaker.Models;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -39,6 +41,8 @@ public class PlayerMovement : NetworkBehaviour
 
     [SerializeField] float bufferTime;
     [SerializeField] float bufferTimer;
+
+    public string playerId;
 
     public override void OnNetworkSpawn()
     {
