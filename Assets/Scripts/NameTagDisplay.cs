@@ -24,7 +24,10 @@ public class NameTagDisplay : NetworkBehaviour
     {
         bool canDisplay = Keyboard.current.tabKey.isPressed;
 
-        DisplayTags(canDisplay);
+        if (NetworkManager.Singleton != null)
+        {
+            DisplayTags(canDisplay);
+        }
     }
 
     void UpdateTag()

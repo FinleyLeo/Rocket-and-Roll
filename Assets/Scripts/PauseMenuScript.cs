@@ -33,8 +33,6 @@ public class PauseMenuScript : NetworkBehaviour
 
     Animator anim;
 
-    string playerName;
-
     float fillAmount;
 
     public bool isPaused;
@@ -42,11 +40,6 @@ public class PauseMenuScript : NetworkBehaviour
 
     private void Start()
     {
-        if (IsOwner)
-        {
-            playerName = PlayerPrefs.GetString("Username", "Player " + NetworkObjectId);
-        }
-
         instance = this;
 
         anim = GetComponent<Animator>();
@@ -76,9 +69,6 @@ public class PauseMenuScript : NetworkBehaviour
 
         FadeInOutBanner();
         //HandlePlayerListUpdate();
-
-        Debug.Log("isOpen bool:" + anim.GetBool("isOpen"));
-        Debug.Log(isPaused);
     }
 
     void FadeInOutBanner()

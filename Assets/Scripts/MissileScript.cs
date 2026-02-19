@@ -8,6 +8,8 @@ public class MissileScript : MonoBehaviour
 
     public string playerId;
 
+    [SerializeField] ParticleSystem explosion;
+
     void Start()
     {
         velocity = 4;
@@ -36,18 +38,32 @@ public class MissileScript : MonoBehaviour
 
     void Explode()
     {
+        GameObject particleObj = Instantiate(explosion, transform.position, Quaternion.Euler(-90, 0, 0)).gameObject;
+        Destroy(particleObj, explosion.main.startLifetime.constant);
+
         Destroy(gameObject);
+
+        Debug.Log("Exploded");
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Make sure it cant collide with person who shot, give it player id value or something
         Debug.Log("Collided");
 
         // checks if collided with wall or player
-        if (collision.gameObject.CompareTag("Wall") || (collision.gameObject.CompareTag("Player") && collision.GetComponent<PlayerMovement>().playerId != playerId)) // Collides if is wall/player without same ID
+        if (collision.gameObject.CompareTag("Player"))
         {
-            Debug.Log("Exploded");
+            Debug.Log("Collided with a player");
+
+            // Only collides if hitting someone other than the shooter
+            if (playerId != collision.gameObject.GetComponent<PlayerMovement>().playerId)
+            {
+                Explode();
+            }
+        }
+
+        if (collision.gameObject.CompareTag("Wall"))
+        {
             Explode();
         }
     }

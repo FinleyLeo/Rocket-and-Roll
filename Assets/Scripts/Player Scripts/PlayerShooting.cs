@@ -20,7 +20,7 @@ public class PlayerShooting : NetworkBehaviour
 
     private void Update()
     {
-        if (IsOwner)
+        if (IsOwner && (PauseMenuScript.instance != null && !PauseMenuScript.instance.isPaused))
         {
             cooldownTimer -= Time.deltaTime;
 

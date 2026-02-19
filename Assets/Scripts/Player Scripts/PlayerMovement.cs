@@ -1,7 +1,4 @@
-using System.Collections;
 using Unity.Netcode;
-using Unity.Services.Lobbies.Models;
-using Unity.Services.Matchmaker.Models;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -44,6 +41,8 @@ public class PlayerMovement : NetworkBehaviour
 
     public string playerId;
 
+    [SerializeField] float fallThreshold = -3;
+
     public override void OnNetworkSpawn()
     {
         //position.OnValueChanged += (Vector2 previousPos, Vector2 nextPos) => ;
@@ -52,7 +51,8 @@ public class PlayerMovement : NetworkBehaviour
         {
             if (rb != null)
             {
-                rb.simulated = false;
+                // stops rb from fighting with movement updates while keeping collisions
+                rb.gravityScale = 0f;
             }
 
             else
@@ -73,15 +73,21 @@ public class PlayerMovement : NetworkBehaviour
 
         if (rbNotFound)
         {
-            rb.simulated = false; // if rb isnt referenced in OnNetworkSpawn, try again in start
+            // stops rb from fighting with movement updates while keeping collisions
+            rb.gravityScale = 0f;
             rbNotFound = false;
         }
     }
 
     void UpdateNetworkValues()
     {
-        transform.position = Vector3.Lerp(transform.position, position.Value, Time.deltaTime * 25); // Keeps player movement smooth on other clients
-        transform.rotation = Quaternion.Euler(0, isFlipped.Value ? 180 : 0, 0);
+        if (Vector2.Distance(transform.position, position.Value) > 0.001f)
+        {
+            transform.position = Vector3.Lerp(transform.position, position.Value, Time.deltaTime * 40); // Keeps player movement smooth on other clients
+        }
+
+        //transform.rotation = Quaternion.Euler(0, isFlipped.Value ? 180 : 0, 0);
+        sr.flipX = isFlipped.Value;
     }
 
     void Update()
@@ -110,6 +116,8 @@ public class PlayerMovement : NetworkBehaviour
         JumpCheck();
         DoWallRay();
         AnimationChecks();
+
+        position.Value = transform.position;
     }
 
     void Move()
@@ -117,7 +125,7 @@ public class PlayerMovement : NetworkBehaviour
         moveDir = moveAction.ReadValue<Vector2>().x;
 
         rb.linearVelocity = new Vector2(moveDir * moveSpeed, rb.linearVelocityY);
-        position.Value = transform.position;
+        // jump animation bug
     }
 
     void ClampVelocity()
@@ -232,12 +240,14 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (Mathf.Abs(moveDir) > 0.1f) // only update when moving
         {
-            transform.rotation = Quaternion.Euler(0, moveDir < 0.1f ? 180 : 0, 0);
-            isFlipped.Value = moveDir < 0.1f;
+            //transform.rotation = Quaternion.Euler(0, moveDir < 0.1f ? 180 : 0, 0);
+            sr.flipX = moveDir < 0.1f;
+            isFlipped.Value = sr.flipX;
         }
 
         anim.SetBool("IsRunning", Mathf.Abs(moveDir) > 0);
-        anim.SetBool("IsFalling", IsFalling(-3f));
+        anim.SetBool("IsFalling", IsFalling(fallThreshold));
+        anim.SetBool("IsGrounded", isGrounded);
     }
 
     private void OnDrawGizmos()

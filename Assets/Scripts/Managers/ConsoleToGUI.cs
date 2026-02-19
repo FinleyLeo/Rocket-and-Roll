@@ -27,9 +27,12 @@ public class ConsoleToGUI : MonoBehaviour
     void OnDisable() { Application.logMessageReceived -= Log; }
     void Update() 
     {
-        if (Keyboard.current.f1Key.wasPressedThisFrame)
-        { 
-            doShow = !doShow; 
+        if (Keyboard.current != null)
+        {
+            if (Keyboard.current.f1Key.wasPressedThisFrame)
+            {
+                doShow = !doShow;
+            }
         }
     }
 

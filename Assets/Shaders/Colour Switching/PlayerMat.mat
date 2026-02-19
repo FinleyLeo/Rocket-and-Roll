@@ -56,9 +56,10 @@ Material:
     m_Floats:
     - _UseOutline: 1
     m_Colors:
+    - White: {r: 1, g: 1, b: 1, a: 1}
     - _BaseColour: {r: 1, g: 1, b: 1, a: 1}
     - _BaseIn: {r: 1, g: 1, b: 1, a: 1}
-    - _OutlineColour: {r: 0.6415094, g: 0.41456032, b: 0.41456032, a: 1}
+    - _OutlineColour: {r: 0.816, g: 0.22878502, b: 0.2777197, a: 1}
     - _OutlineIn: {r: 0.7960785, g: 0.7960785, b: 0.7960785, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
