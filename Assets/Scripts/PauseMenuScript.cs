@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Globalization;
 using TMPro;
 using Unity.Netcode;
@@ -109,6 +110,19 @@ public class PauseMenuScript : NetworkBehaviour
     void QuitToMenu()
     {
         LobbyManager.Instance.LeaveLobby();
+
+        StartCoroutine(DelayLeave());
+    }
+
+    IEnumerator DelayLeave()
+    {
+        TransitionManager.Instance.StartTransitionManually();
+
+        while (TransitionManager.Instance.fillAmount < 1)
+        {
+            yield return null;
+        }
+
         SceneManager.LoadScene("Main Menu");
     }
 

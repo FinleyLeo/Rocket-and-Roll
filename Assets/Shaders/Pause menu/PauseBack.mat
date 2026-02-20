@@ -43,7 +43,7 @@ Material:
     m_Floats:
     - _ColorMask: 15
     - _DitherSize: 0.93
-    - _FillAmount: -0.3
+    - _FillAmount: 1.05
     - _FillRotation: 0
     - _Rotation: 135
     - _Stencil: 0

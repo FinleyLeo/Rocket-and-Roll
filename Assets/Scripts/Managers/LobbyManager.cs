@@ -105,7 +105,8 @@ public class LobbyManager : MonoBehaviour
 
             currentLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
 
-            NetworkManager.Singleton.SceneManager.LoadScene("Lobby", LoadSceneMode.Single);
+            //NetworkManager.Singleton.SceneManager.LoadScene("Lobby", LoadSceneMode.Single);
+            TransitionManager.Instance.LoadScene("Lobby");
         }
         catch (LobbyServiceException e)
         {
@@ -179,6 +180,7 @@ public class LobbyManager : MonoBehaviour
             string joinCode = currentLobby.Data["RelayJoinCode"].Value;
 
             RelayManager.Instance.JoinRelay(joinCode);
+            TransitionManager.Instance.StartTransitionManually();
         }
         catch (LobbyServiceException e)
         {
@@ -213,6 +215,7 @@ public class LobbyManager : MonoBehaviour
             string joinCode = currentLobby.Data["RelayJoinCode"].Value;
 
             RelayManager.Instance.JoinRelay(joinCode);
+            TransitionManager.Instance.StartTransitionManually();
         }
         catch (LobbyServiceException e)
         {
