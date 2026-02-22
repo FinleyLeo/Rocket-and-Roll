@@ -1,22 +1,51 @@
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
-public class MissileScript : MonoBehaviour
+public class MissileScript : NetworkBehaviour
 {
+    NetworkVariable<Vector2> position = new NetworkVariable<Vector2>();
+    NetworkVariable<bool> trailActive = new NetworkVariable<bool>(false);
+
+    [SerializeField] float velocityMulti = 2f;
     float velocity;
-    float lifeTime = 5;
+    [SerializeField] float lifeTime = 5;
 
     public string playerId;
 
     [SerializeField] ParticleSystem explosion;
+    [SerializeField] GameObject rocketTrail;
+
+    public override void OnNetworkSpawn()
+    {
+        trailActive.OnValueChanged += (bool prev, bool next) => rocketTrail.SetActive(trailActive.Value);
+    }
 
     void Start()
     {
+        if (!IsServer) return;
+
+        position.Value = transform.position;
         velocity = 4;
+
+        StartCoroutine(TrailDelay());
+    }
+
+    IEnumerator TrailDelay()
+    {
+        yield return new WaitForSeconds(0.25f);
+
+        trailActive.Value = true;
     }
 
     void Update()
     {
+        if (!IsServer)
+        {
+            transform.position = position.Value;
+            return;
+        }
+
         // If still alive after x seconds, destroy
         lifeTime -= Time.deltaTime;
 
@@ -30,24 +59,36 @@ public class MissileScript : MonoBehaviour
 
     void MissileMovement()
     {
-        velocity += Time.deltaTime * 10f;
+        velocity += Time.deltaTime * velocityMulti;
         velocity = Mathf.Clamp(velocity, 0, 30);
 
         transform.position += (Time.deltaTime * velocity * transform.right);
+        position.Value = transform.position;
     }
 
     void Explode()
     {
-        GameObject particleObj = Instantiate(explosion, transform.position, Quaternion.Euler(-90, 0, 0)).gameObject;
-        Destroy(particleObj, explosion.main.startLifetime.constant);
+        SendExplosionEffectRPC();
 
-        Destroy(gameObject);
+        // If host then despawn
+        if (IsServer) GetComponent<NetworkObject>().Despawn();
 
         Debug.Log("Exploded");
     }
 
+    [Rpc(SendTo.ClientsAndHost)]
+    void SendExplosionEffectRPC()
+    {
+        Debug.Log($"Explode called on {OwnerClientId} | Server: {IsServer}");
+
+        GameObject particleObj = Instantiate(explosion, transform.position, Quaternion.Euler(-90, 0, 0)).gameObject;
+        Destroy(particleObj, explosion.main.startLifetime.constant);
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (!IsServer) return;
+
         Debug.Log("Collided");
 
         // checks if collided with wall or player
@@ -55,8 +96,8 @@ public class MissileScript : MonoBehaviour
         {
             Debug.Log("Collided with a player");
 
-            // Only collides if hitting someone other than the shooter
-            if (playerId != collision.gameObject.GetComponent<PlayerMovement>().playerId)
+            // Only collides if hitting someone other than the shooter and if the player id is set
+            if (playerId != collision.gameObject.GetComponent<PlayerMovement>().playerId && !string.IsNullOrEmpty(playerId))
             {
                 Explode();
             }

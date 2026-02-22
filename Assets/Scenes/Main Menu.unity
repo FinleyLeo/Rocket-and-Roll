@@ -4193,8 +4193,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TransitionManager
   transitionMat: {fileID: 2100000, guid: 9c8cfb220be1d5a43a438211a94322ed, type: 2}
+  fillAmount: 0
   transitionSpeed: 2
-  loadingScene: 0
 --- !u!1 &1033670087
 GameObject:
   m_ObjectHideFlags: 0

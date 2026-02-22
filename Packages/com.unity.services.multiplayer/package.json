@@ -1,0 +1,36 @@
+{
+  "name": "com.unity.services.multiplayer",
+  "displayName": "Multiplayer Services",
+  "version": "2.0.0",
+  "unity": "6000.3",
+  "unityRelease": "0b10",
+  "_upm": {
+    "gameService": {},
+    "changelog": "### Added\n- Local matchmaker queue and environment files have a new `Fetch from Remote` command in the Deployment Window that will override the local configuration with the content from the Cloud Dashboard configuration.\n\n### Fixed\n- Fixed an issue where Matchmaker configuration assets would not deploy with their latest changes from the Deployment Window.\n- Fixed Lobby events being raised before re-subscribing when joining the same Lobby again."
+  },
+  "description": "The Multiplayer Services package is a one-stop solution for adding multiplayer elements to a game developed in Unity. The Unity Gaming Services (UGS) Multiplayer services powers these capabilities to define how groups of players interact in your games.",
+  "dependencies": {
+    "com.unity.modules.unitywebrequest": "1.0.0",
+    "com.unity.nuget.newtonsoft-json": "3.2.1",
+    "com.unity.services.authentication": "3.5.1",
+    "com.unity.services.core": "1.15.1",
+    "com.unity.services.qos": "1.3.0",
+    "com.unity.services.wire": "1.4.0",
+    "com.unity.transport": "2.5.0",
+    "com.unity.collections": "2.2.1",
+    "com.unity.services.deployment": "1.6.2"
+  },
+  "relatedPackages": {
+    "com.unity.services.multiplayer.tests": "2.0.0"
+  },
+  "upmCi": {
+    "footprint": "4f3aa0f6f6658e03ee2d7e4befb69d7fe23cbff3"
+  },
+  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.services.multiplayer@2.0/manual/index.html",
+  "repository": {
+    "url": "https://github.cds.internal.unity3d.com/unity/operate-services-sdk.git",
+    "type": "git",
+    "revision": "39e37d6fb55a965c77fc1f41ebcd2d7c0c13bf74"
+  },
+  "_fingerprint": "8d17beeef99f8a9acc220284c5ae2437f2d96c60"
+}

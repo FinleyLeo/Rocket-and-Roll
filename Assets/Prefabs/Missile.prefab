@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4699463647589228105}
   - component: {fileID: 3881919374266789048}
   - component: {fileID: 1790575205713177775}
+  - component: {fileID: -8944956269455122237}
   - component: {fileID: -4973864561080205772}
   m_Layer: 0
   m_Name: Missile
@@ -168,6 +169,31 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &-8944956269455122237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 788531414899324624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 3598352466
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &-4973864561080205772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180,8 +206,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c6aef9c31701384b934babbe4fe0a08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MissileScript
+  ShowTopMostFoldoutHeaderGroup: 1
+  velocityMulti: 5
+  lifeTime: 5
   playerId: 
   explosion: {fileID: 2664842954057001165, guid: 5d95aaf9cd2c7b04fa24b70593c35f31, type: 3}
+  rocketTrail: {fileID: 5389215527814467504}
 --- !u!1001 &6910703437241985633
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -193,6 +223,10 @@ PrefabInstance:
     - target: {fileID: 1526041674307315153, guid: 6d46a3732f80f854ea3ded2abe0be35d, type: 3}
       propertyPath: m_Name
       value: Thruster smoke
+      objectReference: {fileID: 0}
+    - target: {fileID: 1526041674307315153, guid: 6d46a3732f80f854ea3ded2abe0be35d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7987029815445996821, guid: 6d46a3732f80f854ea3ded2abe0be35d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -242,5 +276,10 @@ PrefabInstance:
 --- !u!4 &3544439996196712308 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7987029815445996821, guid: 6d46a3732f80f854ea3ded2abe0be35d, type: 3}
+  m_PrefabInstance: {fileID: 6910703437241985633}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5389215527814467504 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1526041674307315153, guid: 6d46a3732f80f854ea3ded2abe0be35d, type: 3}
   m_PrefabInstance: {fileID: 6910703437241985633}
   m_PrefabAsset: {fileID: 0}
