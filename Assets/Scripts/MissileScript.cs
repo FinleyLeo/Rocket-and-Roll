@@ -7,9 +7,10 @@ public class MissileScript : NetworkBehaviour
     NetworkVariable<Vector2> position = new NetworkVariable<Vector2>();
     NetworkVariable<bool> trailActive = new NetworkVariable<bool>(false);
 
-    [SerializeField] float velocityMulti = 2f;
-    float velocity;
-    [SerializeField] float lifeTime = 5;
+    [SerializeField] float velocityMulti = 8f;
+    [SerializeField] float constantVelocity;
+    [HideInInspector] public Vector2 startVelocity;
+    float lifeTime = 5;
 
     public string playerId;
 
@@ -26,14 +27,14 @@ public class MissileScript : NetworkBehaviour
         if (!IsServer) return;
 
         position.Value = transform.position;
-        velocity = 4;
+        constantVelocity = 10;
 
         StartCoroutine(TrailDelay());
     }
 
     IEnumerator TrailDelay()
     {
-        yield return new WaitForSeconds(0.25f);
+        yield return new WaitForSeconds(0.15f);
 
         trailActive.Value = true;
     }
@@ -59,28 +60,30 @@ public class MissileScript : NetworkBehaviour
 
     void MissileMovement()
     {
-        velocity += Time.deltaTime * velocityMulti;
-        velocity = Mathf.Clamp(velocity, 0, 30);
+        constantVelocity += Time.deltaTime * velocityMulti;
+        constantVelocity = Mathf.Clamp(constantVelocity, 0, 40);
 
-        transform.position += (Time.deltaTime * velocity * transform.right);
+        transform.position += (Time.deltaTime * constantVelocity * transform.right);
+        transform.position += (Vector3)startVelocity;
+
+        startVelocity *= 0.98f;
+
         position.Value = transform.position;
     }
 
     void Explode()
     {
-        SendExplosionEffectRPC();
-
-        // If host then despawn
-        if (IsServer) GetComponent<NetworkObject>().Despawn();
-
-        Debug.Log("Exploded");
+        // If host then explode and despawn
+        if (IsServer)
+        {
+            SendExplosionEffectRPC();
+            GetComponent<NetworkObject>().Despawn();
+        }
     }
 
-    [Rpc(SendTo.ClientsAndHost)]
+        [Rpc(SendTo.ClientsAndHost)]
     void SendExplosionEffectRPC()
     {
-        Debug.Log($"Explode called on {OwnerClientId} | Server: {IsServer}");
-
         GameObject particleObj = Instantiate(explosion, transform.position, Quaternion.Euler(-90, 0, 0)).gameObject;
         Destroy(particleObj, explosion.main.startLifetime.constant);
     }
@@ -94,11 +97,11 @@ public class MissileScript : NetworkBehaviour
         // checks if collided with wall or player
         if (collision.gameObject.CompareTag("Player"))
         {
-            Debug.Log("Collided with a player");
-
             // Only collides if hitting someone other than the shooter and if the player id is set
             if (playerId != collision.gameObject.GetComponent<PlayerMovement>().playerId && !string.IsNullOrEmpty(playerId))
             {
+                Debug.Log("Collided with enemy player");
+
                 Explode();
             }
         }

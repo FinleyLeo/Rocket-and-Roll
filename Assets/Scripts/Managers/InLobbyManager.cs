@@ -67,8 +67,6 @@ public class InLobbyManager : NetworkBehaviour
                 clientOrder = ((int)clientObj.GetComponent<PlayerMovement>().NetworkObjectId - 1);
             }
 
-            Debug.Log($"client order for {players[i].Id}: {clientOrder}");
-
             SetOrder(clientObj, clientOrder, 2);
 
             for (int j = 0; j < clientObj.transform.childCount; j++)

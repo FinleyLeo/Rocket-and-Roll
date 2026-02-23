@@ -6,14 +6,18 @@ public class PlayerLookAt : NetworkBehaviour
 {
     Transform eyePivot;
     Transform rpgPivot;
+    Transform rpg;
     Transform eyeTransform;
     PlayerMovement playerScript;
+    PlayerShooting playerShootScript;
 
     readonly float clampDistance = 0.35f;
+
 
     private void Start()
     {
         playerScript = GetComponent<PlayerMovement>();
+        playerShootScript = GetComponentInChildren<PlayerShooting>();
 
         if (playerScript == null)
         {
@@ -24,6 +28,8 @@ public class PlayerLookAt : NetworkBehaviour
         eyeTransform = eyePivot.GetChild(0);
 
         rpgPivot = transform.GetChild(2);
+        rpg = rpgPivot.GetChild(0);
+
     }
 
     void Update()
@@ -31,10 +37,7 @@ public class PlayerLookAt : NetworkBehaviour
         // Makes sure rotation is always the same
         eyePivot.rotation = Quaternion.Euler(0, 0, 0);
 
-        if (!IsOwner)
-        {
-            return;
-        }
+        if (!IsOwner) return;
 
         if (PauseMenuScript.instance != null)
         {
@@ -55,8 +58,8 @@ public class PlayerLookAt : NetworkBehaviour
 
     void LookAtMouse()
     {
-        Vector2 eyelookDir = GetMousePosition() - eyePivot.position;
-        Vector2 rpglookDir = GetMousePosition() - rpgPivot.position;
+        Vector2 eyelookDir = (GetMousePosition() - eyePivot.position).normalized;
+        Vector2 rpglookDir = (GetMousePosition() - rpgPivot.position).normalized;
         float rpglookAngle = Mathf.Atan2(rpglookDir.y, rpglookDir.x) * Mathf.Rad2Deg;
 
         // manages eye position
@@ -69,15 +72,16 @@ public class PlayerLookAt : NetworkBehaviour
         }
 
         // manages rpg rotation
-        //rpgPivot.rotation = Quaternion.Euler(0, 0, rpglookAngle);
-
         if (GetMousePosition().x < rpgPivot.position.x)
         {
-            rpgPivot.rotation = Quaternion.Euler(180, 0, -rpglookAngle);
+            rpg.rotation = Quaternion.Euler(180, 0, -rpglookAngle);
         }
         else
         {
-            rpgPivot.rotation = Quaternion.Euler(0, 0, rpglookAngle);
+            rpg.rotation = Quaternion.Euler(0, 0, rpglookAngle);
         }
+
+        // Visualises cooldown through rpg recoil
+        rpg.localPosition = rpglookDir * (-playerShootScript.cooldownTimer * 0.45f);
     }
 }

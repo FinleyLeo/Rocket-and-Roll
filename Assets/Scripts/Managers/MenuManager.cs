@@ -175,6 +175,8 @@ public class MenuManager : MonoBehaviour
 
     void OpenCreateLobbyMenu()
     {
+        createRoomPanel.GetComponent<CanvasGroup>().interactable = true;
+
         playQueryPanel.SetActive(false);
         createRoomPanel.SetActive(true);
         roomNameInput.text = PlayerPrefs.GetString("Username") + "'s Lobby";
@@ -200,8 +202,11 @@ public class MenuManager : MonoBehaviour
 
     async void CreateLobby()
     {
+        createRoomPanel.GetComponent<CanvasGroup>().interactable = false;
+
         string lobbyName = roomNameInput.text;
         int.TryParse(maxPlayersInput.text, out int maxPlayers);
+
         await LobbyManager.Instance.CreateLobby(isPrivateToggle.isOn, maxPlayers, lobbyName);
     }
 

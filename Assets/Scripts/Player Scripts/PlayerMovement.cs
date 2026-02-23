@@ -155,8 +155,6 @@ public class PlayerMovement : NetworkBehaviour
         {
             canStopEarly = false;
 
-            Debug.Log("Jump canceleed");
-
             // stops y velocity and adds extra force to make it seem more like an arc rather than an instant stop
             rb.linearVelocity = new Vector2(rb.linearVelocityX, 0);
             rb.AddForce(Vector2.up * (jumpForce * 0.3f), ForceMode2D.Impulse);
@@ -177,8 +175,6 @@ public class PlayerMovement : NetworkBehaviour
         if (jumpAction.WasPressedThisFrame())
         {
             bufferTimer = bufferTime;
-
-            Debug.Log("Jump pressed");
         }
         else
         {

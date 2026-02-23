@@ -6,7 +6,6 @@ using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class LobbyManager : MonoBehaviour
 {
@@ -90,8 +89,6 @@ public class LobbyManager : MonoBehaviour
 
             string joinCode = await RelayManager.Instance.CreateRelay(maxPlayers);
 
-            Debug.Log("Join Code: " + joinCode);
-
             CreateLobbyOptions options = new CreateLobbyOptions
             {
                 IsPrivate = isPrivate,
@@ -167,8 +164,6 @@ public class LobbyManager : MonoBehaviour
             };
 
             currentLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId, options);
-
-            Debug.Log(currentLobby.AvailableSlots);
 
             if (currentLobby.AvailableSlots < 0)
             {
