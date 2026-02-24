@@ -29,31 +29,39 @@ public class PlayerShooting : NetworkBehaviour
             cooldownTimer -= Time.deltaTime;
             cooldownTimer = Mathf.Clamp(cooldownTimer, 0, cooldown);
 
-            if (attackAction.WasPressedThisFrame() && cooldownTimer <= 0)
+            if (playerScript.rollState == RollState.Normal)
             {
-                cooldownTimer = cooldown;
-
-                Vector3 lookDir = (GetMousePosition() - transform.position).normalized;
-                float lookAngle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
-
-                transform.rotation = Quaternion.Euler(0, 0, lookAngle);
-
-                if (IsHost)
+                if (attackAction.WasPressedThisFrame() && cooldownTimer <= 0)
                 {
-                    var missile = Instantiate(missilePrefab, transform.position, transform.rotation);
-
-                    MissileScript missileScript = missile.GetComponent<MissileScript>();
-
-                    missileScript.playerId = playerScript.playerId;
-                    missileScript.startVelocity = playerRB.linearVelocity * 0.002f;
-
-                    missile.GetComponent<NetworkObject>().Spawn(true);
-                }
-                else
-                {
-                    SpawnMissileRPC(playerRB.linearVelocity);
+                    Shoot();
                 }
             }
+        }
+    }
+
+    void Shoot()
+    {
+        cooldownTimer = cooldown;
+
+        Vector3 lookDir = (GetMousePosition() - transform.position).normalized;
+        float lookAngle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
+
+        transform.rotation = Quaternion.Euler(0, 0, lookAngle);
+
+        if (IsHost)
+        {
+            var missile = Instantiate(missilePrefab, transform.position, transform.rotation);
+
+            MissileScript missileScript = missile.GetComponent<MissileScript>();
+
+            missileScript.playerId = playerScript.playerId;
+            missileScript.startVelocity = playerRB.linearVelocity * 0.002f;
+
+            missile.GetComponent<NetworkObject>().Spawn(true);
+        }
+        else
+        {
+            SpawnMissileRPC(playerRB.linearVelocity);
         }
     }
 

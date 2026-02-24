@@ -1,4 +1,5 @@
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,6 +14,7 @@ public class PlayerLookAt : NetworkBehaviour
 
     readonly float clampDistance = 0.35f;
 
+    bool eyesLocked;
 
     private void Start()
     {
@@ -35,7 +37,7 @@ public class PlayerLookAt : NetworkBehaviour
     void Update()
     {
         // Makes sure rotation is always the same
-        eyePivot.rotation = Quaternion.Euler(0, 0, 0);
+        //eyePivot.rotation = Quaternion.Euler(0, 0, 0);
 
         if (!IsOwner) return;
 
@@ -45,6 +47,23 @@ public class PlayerLookAt : NetworkBehaviour
             {
                 LookAtMouse();
             }
+        }
+
+        if (playerScript.inFullRoll)
+        {
+            if (Mathf.Abs(playerScript.moveDir) > 0) // if moving
+            {
+                eyeTransform.localPosition = eyePivot.localPosition;
+                eyesLocked = true;
+            }
+            else
+            {
+                eyesLocked = false;
+            }
+        }
+        else
+        {
+            eyesLocked = false;
         }
     }
 
@@ -62,13 +81,17 @@ public class PlayerLookAt : NetworkBehaviour
         Vector2 rpglookDir = (GetMousePosition() - rpgPivot.position).normalized;
         float rpglookAngle = Mathf.Atan2(rpglookDir.y, rpglookDir.x) * Mathf.Rad2Deg;
 
-        // manages eye position
-        eyeTransform.position = GetMousePosition();
-
-        // clamps to certain distance, rotating around the edge of the head
-        if (Vector3.Distance(eyePivot.position, GetMousePosition()) > clampDistance)
+        // Only move eyes if not lcoked in place
+        if (!eyesLocked)
         {
-            eyeTransform.localPosition = eyelookDir.normalized * (clampDistance - 0.1f);
+            // manages eye position
+            eyeTransform.position = GetMousePosition();
+
+            // clamps to certain distance, rotating around the edge of the head
+            if (Vector3.Distance(eyePivot.position, GetMousePosition()) > clampDistance)
+            {
+                eyeTransform.localPosition = eyelookDir.normalized * (clampDistance - 0.1f);
+            }
         }
 
         // manages rpg rotation

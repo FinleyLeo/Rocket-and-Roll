@@ -22,7 +22,7 @@ public class PlayerMovementTest : NetworkBehaviour
     float rayLength = 1.25f;
     bool isGrounded;
 
-    PlayerMode currentMode;
+    RollState currentMode;
 
     [SerializeField] Transform eyePivot;
 

@@ -2,7 +2,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-enum PlayerMode
+public enum RollState
 {
     Normal,
     Balled
@@ -11,23 +11,26 @@ enum PlayerMode
 public class PlayerMovement : NetworkBehaviour
 {
     NetworkVariable<Vector2> position = new NetworkVariable<Vector2>(new Vector2(0, 5), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    NetworkVariable<float> zAngle = new NetworkVariable<float>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     [HideInInspector] public NetworkVariable<bool> isFlipped = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     InputAction moveAction;
     InputAction jumpAction;
+    InputAction rollAction;
 
     bool rbNotFound;
     Rigidbody2D rb;
     Animator anim;
     SpriteRenderer sr;
 
-    PlayerMode currentMode;
+    [HideInInspector] public RollState rollState;
+    public bool inFullRoll;
 
     // Movement values
     [SerializeField] float jumpForce = 16f;
     [SerializeField] float moveSpeed = 8f;
     [SerializeField] Vector2 axisMaxClamps;
-    float moveDir;
+    [HideInInspector] public float moveDir;
 
     [SerializeField] LayerMask collideLayer;
     [SerializeField] float groundRayLength = 0.8f;
@@ -42,6 +45,8 @@ public class PlayerMovement : NetworkBehaviour
     public string playerId;
 
     [SerializeField] float fallThreshold = -3;
+
+    [SerializeField] PhysicsMaterial2D physMat;
 
     public override void OnNetworkSpawn()
     {
@@ -66,6 +71,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         moveAction = InputSystem.actions.FindAction("Move");
         jumpAction = InputSystem.actions.FindAction("Jump");
+        rollAction = InputSystem.actions.FindAction("Roll");
 
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
@@ -86,7 +92,11 @@ public class PlayerMovement : NetworkBehaviour
             transform.position = Vector3.Lerp(transform.position, position.Value, Time.deltaTime * 40); // Keeps player movement smooth on other clients
         }
 
-        //transform.rotation = Quaternion.Euler(0, isFlipped.Value ? 180 : 0, 0);
+        if (transform.rotation.z > zAngle.Value + 0.01f || transform.rotation.z < zAngle.Value - 0.01f)
+        {
+            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0, 0, zAngle.Value), Time.deltaTime * 40);
+        }
+
         sr.flipX = isFlipped.Value;
     }
 
@@ -112,20 +122,31 @@ public class PlayerMovement : NetworkBehaviour
             }
         }
 
-        ClampVelocity();
+        
+
         JumpCheck();
+        RollCheck();
         DoWallRay();
+        ClampVelocity();
         AnimationChecks();
 
         position.Value = transform.position;
+        zAngle.Value = transform.rotation.z;
     }
 
     void Move()
     {
         moveDir = moveAction.ReadValue<Vector2>().x;
 
-        rb.linearVelocity = new Vector2(moveDir * moveSpeed, rb.linearVelocityY);
-        // jump animation bug
+        if (!inFullRoll)
+        {
+            rb.linearVelocity = new Vector2(moveDir * moveSpeed, rb.linearVelocityY);
+        }
+        else
+        {
+            rb.AddForce(moveSpeed * moveDir * Vector2.right);
+            rb.AddTorque(moveDir);
+        }
     }
 
     void ClampVelocity()
@@ -162,11 +183,13 @@ public class PlayerMovement : NetworkBehaviour
     }
     void Jump()
     {
+        float jumpForceMulti = inFullRoll ? 0.8f : 1f;
+
         canStopEarly = true;
         bufferTimer = -1;
 
         rb.linearVelocity = new Vector2(rb.linearVelocityX, 0);
-        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        rb.AddForce(jumpForce * jumpForceMulti * Vector2.up, ForceMode2D.Impulse);
 
         anim.SetTrigger("Jump");
     }
@@ -184,6 +207,8 @@ public class PlayerMovement : NetworkBehaviour
 
     void DoGroundRay()
     {
+        groundRayLength = inFullRoll ? 0.65f : 0.52f;
+
         if (Physics2D.Raycast(transform.position, Vector2.down, groundRayLength, collideLayer))
         {
             Debug.DrawRay(transform.position, Vector2.down * groundRayLength, Color.green);
@@ -196,12 +221,49 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
+    void RollCheck()
+    {
+        if (rollAction.IsPressed()) // enter roll state
+        {
+            if (rollState != RollState.Balled)
+            {
+                Debug.Log("Switched to balled");
+                rollState = RollState.Balled;
+
+                anim.SetBool("IsRolling", true);
+            }
+        }
+        else if (!rollAction.IsPressed()) // enter normal state
+        {
+            if (rollState != RollState.Normal)
+            {
+                Debug.Log("Switched to normal");
+                rollState = RollState.Normal;
+
+                anim.SetBool("IsRolling", false);
+            }
+        }
+
+        physMat.bounciness = inFullRoll ? 1000f : 0;
+    }
+
+    public void SetRollTrue()
+    {
+        inFullRoll = true;
+    }
+    public void SetRollFalse()
+    {
+        inFullRoll = false;
+    }
+
     // used to stop sticking to walls
     void DoWallRay()
     {
         bool facedDir = moveDir > 0.1f ? true : false;
+        int endOffset = inFullRoll ? 4 : 0;
+        wallRayLength = inFullRoll ? 0.65f : 0.55f;
 
-        for (int i = 0; i < wallRayChecks.Length; i++)
+        for (int i = 0; i < wallRayChecks.Length - endOffset; i++)
         {
             if (Physics2D.Raycast(transform.position + new Vector3(0, wallRayChecks[i], 0), facedDir ? Vector2.right : Vector2.left, wallRayLength, collideLayer))
             {
