@@ -18,6 +18,8 @@ public class PlayerLookAt : NetworkBehaviour
 
     Quaternion eyeStoredRotation;
 
+    [HideInInspector] public float rotationSpeed;
+
     private void Start()
     {
         playerScript = GetComponent<PlayerMovement>();
@@ -52,32 +54,20 @@ public class PlayerLookAt : NetworkBehaviour
 
         if (playerScript.inFullRoll)
         {
-            if (Mathf.Abs(playerScript.moveDir) > 0) // if moving
-            {
-                eyeTransform.localPosition = eyePivot.localPosition;
-                eyesLocked = true;
+            eyeTransform.localPosition = eyePivot.localPosition;
+            eyesLocked = true;
 
-                playerScript.rotationSpeed += Time.deltaTime * -playerScript.moveDir;
-                playerScript.rotationSpeed = Mathf.Clamp(playerScript.rotationSpeed, -2f, 2f);
-
-                eyeTransform.rotation = eyeStoredRotation;
-                eyeTransform.rotation = Quaternion.Euler(0, 0, eyeTransform.rotation.eulerAngles.z + playerScript.rotationSpeed);
-                eyeStoredRotation = eyeTransform.rotation;
-
-            }
-            else
-            {
-                eyesLocked = false;
-                playerScript.rotationSpeed = 0;
-                eyeTransform.rotation = Quaternion.Euler(0, 0, 0);
-            }
+            eyeTransform.rotation = eyeStoredRotation;
+            eyeTransform.rotation = Quaternion.Euler(0, 0, eyeTransform.rotation.eulerAngles.z + rotationSpeed);
+            eyeStoredRotation = eyeTransform.rotation;
         }
         else
         {
             eyesLocked = false;
 
-            playerScript.rotationSpeed = 0;
+            rotationSpeed = 0;
             eyeTransform.rotation = Quaternion.Euler(0, 0, 0);
+            eyeStoredRotation = eyeTransform.rotation;
         }
     }
 

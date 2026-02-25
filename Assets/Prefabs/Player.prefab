@@ -204,7 +204,7 @@ MonoBehaviour:
   PositionLerpSmoothing: 1
   PositionMaxInterpolationTime: 0.01
   RotationLerpSmoothing: 1
-  RotationMaxInterpolationTime: 0.1
+  RotationMaxInterpolationTime: 0.01
   ScaleLerpSmoothing: 1
   ScaleMaxInterpolationTime: 0.1
   AuthorityMode: 1
@@ -215,7 +215,7 @@ MonoBehaviour:
   SyncPositionZ: 0
   SyncRotAngleX: 0
   SyncRotAngleY: 0
-  SyncRotAngleZ: 0
+  SyncRotAngleZ: 1
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
@@ -1229,7 +1229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1776018959
+  GlobalObjectIdHash: 1134355502
   InScenePlacedSourceGlobalObjectIdHash: 1134355502
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1344,12 +1344,15 @@ MonoBehaviour:
   - -0.5
   - 0
   - 0.5
+  ballModeWallRayChecks:
+  - 0.5
+  - 0
+  - -0.375
   isGrounded: 0
   canStopEarly: 0
   bufferTime: 0.5
   bufferTimer: 0
   playerId: null
-  fallThreshold: -3
   physMat: {fileID: 6200000, guid: ac2c39e82dec428458119ca3e0fc5179, type: 2}
 --- !u!114 &8428599949539066022
 MonoBehaviour:
@@ -1378,6 +1381,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLookAt
   ShowTopMostFoldoutHeaderGroup: 1
+  rotationSpeed: 0
 --- !u!1001 &2453994643041242444
 PrefabInstance:
   m_ObjectHideFlags: 0

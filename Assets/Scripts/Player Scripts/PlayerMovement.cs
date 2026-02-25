@@ -1,4 +1,3 @@
-using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,7 +11,6 @@ public enum RollState
 public class PlayerMovement : NetworkBehaviour
 {
     NetworkVariable<Vector2> position = new NetworkVariable<Vector2>(new Vector2(0, 5), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    NetworkVariable<float> zAngle = new NetworkVariable<float>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     [HideInInspector] public NetworkVariable<bool> isFlipped = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     InputAction moveAction;
@@ -23,6 +21,7 @@ public class PlayerMovement : NetworkBehaviour
     Rigidbody2D rb;
     Animator anim;
     SpriteRenderer sr;
+    PlayerLookAt playerVisualScript;
 
     [HideInInspector] public RollState rollState;
     public bool inFullRoll;
@@ -37,6 +36,7 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] float groundRayLength = 0.8f;
     [SerializeField] float wallRayLength = 0.6f;
     [SerializeField] float[] wallRayChecks;
+    [SerializeField] float[] ballModeWallRayChecks;
     [SerializeField] bool isGrounded;
     bool canBallHop;
     [SerializeField] bool canStopEarly;
@@ -46,16 +46,10 @@ public class PlayerMovement : NetworkBehaviour
 
     public string playerId;
 
-    [SerializeField] float fallThreshold = -3;
-
     [SerializeField] PhysicsMaterial2D physMat;
-
-    public float rotationSpeed;
 
     public override void OnNetworkSpawn()
     {
-        //position.OnValueChanged += (Vector2 previousPos, Vector2 nextPos) => ;
-
         if (!IsOwner)
         {
             if (rb != null)
@@ -80,6 +74,7 @@ public class PlayerMovement : NetworkBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
+        playerVisualScript = GetComponent<PlayerLookAt>();
 
         if (rbNotFound)
         {
@@ -96,11 +91,6 @@ public class PlayerMovement : NetworkBehaviour
             transform.position = Vector3.Lerp(transform.position, position.Value, Time.deltaTime * 40); // Keeps player movement smooth on other clients
         }
 
-        if (transform.rotation.z > zAngle.Value + 0.01f || transform.rotation.z < zAngle.Value - 0.01f)
-        {
-            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0, 0, zAngle.Value), Time.deltaTime * 40);
-        }
-
         sr.flipX = isFlipped.Value;
     }
 
@@ -112,12 +102,29 @@ public class PlayerMovement : NetworkBehaviour
             return;
         }
 
+        moveDir = moveAction.ReadValue<Vector2>().x;
+
+        if (PauseMenuScript.instance != null)
+        {
+            if (!PauseMenuScript.instance.isPaused)
+            {
+                JumpPreRegister();
+            }
+        }
+
+        RollCheck();
+        AnimationChecks();
+
+        position.Value = transform.position;
+    }
+
+    private void FixedUpdate()
+    {
         if (PauseMenuScript.instance != null)
         {
             if (!PauseMenuScript.instance.isPaused)
             {
                 Move();
-                JumpPreRegister();
             }
             else
             {
@@ -127,26 +134,28 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         JumpCheck();
-        RollCheck();
         DoWallRay();
         ClampVelocity();
-        AnimationChecks();
-
-        position.Value = transform.position;
-        zAngle.Value = transform.rotation.z;
     }
 
     void Move()
     {
-        moveDir = moveAction.ReadValue<Vector2>().x;
-
-        if (!inFullRoll)
+        if (rollState == RollState.Normal && Mathf.Abs(rb.linearVelocityX) < (moveSpeed * 1.2f))
         {
-            rb.linearVelocity = new Vector2(moveDir * moveSpeed, rb.linearVelocityY);
+            rb.linearVelocity = new Vector2(moveDir * moveSpeed, rb.linearVelocity.y);
         }
         else
         {
-            rb.linearVelocity = new Vector2(-rotationSpeed * moveSpeed, rb.linearVelocityY);
+            float modifiedSpeed = moveSpeed;
+
+            if (Mathf.Sign(moveDir) != Mathf.Sign(rb.linearVelocityX))
+            {
+                modifiedSpeed *= 3f;
+            }
+
+            rb.AddForce(moveDir * modifiedSpeed * Vector3.right);
+
+            playerVisualScript.rotationSpeed = -(rb.linearVelocityX / 2);
         }
     }
 
@@ -209,7 +218,7 @@ public class PlayerMovement : NetworkBehaviour
     void DoGroundRay()
     {
         groundRayLength = inFullRoll ? .7f : 2.35f;
-        float ballTransRayLength = 1.5f;
+        float ballTransRayLength = 1.8f;
 
         // Ground check ray
         if (Physics2D.Raycast(transform.position, Vector2.down, groundRayLength, collideLayer))
@@ -256,7 +265,7 @@ public class PlayerMovement : NetworkBehaviour
                 // if grounded or in an out transition state
                 if (isGrounded || canBallHop)
                 {
-                    // Small force added when switching back on groundto make transition smoother
+                    // Small force added when switching back on ground to make transition smoother
                     rb.linearVelocity = new Vector2(rb.linearVelocityX, 0);
                     rb.AddForce(jumpForce * 0.9f * Vector2.up, ForceMode2D.Impulse);
                 }
@@ -279,19 +288,23 @@ public class PlayerMovement : NetworkBehaviour
     void DoWallRay()
     {
         bool facedDir = moveDir > 0.1f ? true : false;
-        int endOffset = inFullRoll ? 4 : 0;
         wallRayLength = inFullRoll ? 0.65f : 0.55f;
+        float[] rayChecks = rollState == RollState.Balled ? ballModeWallRayChecks : wallRayChecks;
 
-        for (int i = 0; i < wallRayChecks.Length - endOffset; i++)
+        for (int i = 0; i < rayChecks.Length; i++)
         {
-            if (Physics2D.Raycast(transform.position + new Vector3(0, wallRayChecks[i], 0), facedDir ? Vector2.right : Vector2.left, wallRayLength, collideLayer))
+            if (Physics2D.Raycast(transform.position + new Vector3(0, rayChecks[i], 0), facedDir ? Vector2.right : Vector2.left, wallRayLength, collideLayer))
             {
-                Debug.DrawRay(transform.position + new Vector3(0, wallRayChecks[i], 0), (facedDir ? Vector2.right : Vector2.left) * wallRayLength, Color.green);
-                rb.linearVelocity = new Vector2(0, rb.linearVelocityY);
+                Debug.DrawRay(transform.position + new Vector3(0, rayChecks[i], 0), (facedDir ? Vector2.right : Vector2.left) * wallRayLength, Color.green);
+
+                if (Mathf.Sign(moveDir) == Mathf.Sign(rb.linearVelocity.x))
+                {
+                    rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+                }
             }
             else
             {
-                Debug.DrawRay(transform.position + new Vector3(0, wallRayChecks[i], 0), (facedDir ? Vector2.right : Vector2.left) * wallRayLength, Color.red);
+                Debug.DrawRay(transform.position + new Vector3(0, rayChecks[i], 0), (facedDir ? Vector2.right : Vector2.left) * wallRayLength, Color.red);
             }
         }
     }
@@ -317,23 +330,34 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (Mathf.Abs(moveDir) > 0.1f) // only update when moving
         {
-            //transform.rotation = Quaternion.Euler(0, moveDir < 0.1f ? 180 : 0, 0);
             sr.flipX = moveDir < 0.1f;
             isFlipped.Value = sr.flipX;
         }
 
         anim.SetBool("IsRunning", Mathf.Abs(moveDir) > 0);
-        anim.SetBool("IsFalling", IsFalling(fallThreshold));
+        anim.SetBool("IsFalling", IsFalling(-3));
         anim.SetBool("IsGrounded", isGrounded);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        // if hitting a wall and in ball mode then bounce
+        if (collision.gameObject.layer == collideLayer && inFullRoll)
+        {
+            if (Mathf.Abs(rb.linearVelocityX) > 1 || Mathf.Abs(rb.linearVelocityY) > 1)
+            {
+                rb.linearVelocity = -(rb.linearVelocity * 0.5f);
+            }
+        }
     }
 
     private void OnDrawGizmos()
     {
         bool facedDir = moveDir > 0.1f;
 
-        for (int i = 0; i < wallRayChecks.Length; i++)
+        for (int i = 0; i < ballModeWallRayChecks.Length; i++)
         {
-            Gizmos.DrawLine(transform.position + new Vector3(0, wallRayChecks[i], 0), transform.position + new Vector3(0, wallRayChecks[i], 0) + (facedDir ? Vector3.right : Vector3.left) * wallRayLength);
+            Gizmos.DrawLine(transform.position + new Vector3(0, ballModeWallRayChecks[i], 0), transform.position + new Vector3(0, ballModeWallRayChecks[i], 0) + (facedDir ? Vector3.right : Vector3.left) * wallRayLength);
         }
 
         Gizmos.DrawLine(transform.position, transform.position + (Vector3.down * groundRayLength));
