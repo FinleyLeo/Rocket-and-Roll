@@ -254,7 +254,7 @@ Transform:
   m_GameObject: {fileID: 373574421381391287}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.7, z: 0}
+  m_LocalPosition: {x: 0, y: -0.06099987, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -377,7 +377,7 @@ Transform:
   m_GameObject: {fileID: 1021966278408997526}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.875, z: 0}
+  m_LocalPosition: {x: 0, y: -0.8859999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -700,7 +700,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 2.8}
+  m_AnchoredPosition: {x: 0, y: 1.039}
   m_SizeDelta: {x: 1920, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &2351867964035726490
@@ -1019,7 +1019,7 @@ Transform:
   m_GameObject: {fileID: 8584484875828309913}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -1.7609999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1192,8 +1192,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.012647867, y: 0.892647}
-  m_Size: {x: 1.0134609, y: 2.7773662}
+  m_Offset: {x: 0.004151106, y: -0.86693394}
+  m_Size: {x: 0.99646735, y: 2.7687175}
   m_Direction: 0
 --- !u!95 &5629878446974966044
 Animator:
@@ -1229,7 +1229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1134355502
+  GlobalObjectIdHash: 1776018959
   InScenePlacedSourceGlobalObjectIdHash: 1134355502
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1334,16 +1334,16 @@ MonoBehaviour:
   collideLayer:
     serializedVersion: 2
     m_Bits: 8
-  groundRayLength: 0.52
+  groundRayLength: 2.35
   wallRayLength: 0.55
   wallRayChecks:
-  - -0.45
+  - -2.2
+  - -1.9
+  - -1.5
+  - -1
+  - -0.5
   - 0
   - 0.5
-  - 1
-  - 1.5
-  - 2
-  - 2.25
   isGrounded: 0
   canStopEarly: 0
   bufferTime: 0.5
@@ -1392,7 +1392,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1053723952303365562, guid: bdb300c768e218b478b6e02f08ce0a7b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.6
+      value: -1.1609999
       objectReference: {fileID: 0}
     - target: {fileID: 1053723952303365562, guid: bdb300c768e218b478b6e02f08ce0a7b, type: 3}
       propertyPath: m_LocalPosition.z

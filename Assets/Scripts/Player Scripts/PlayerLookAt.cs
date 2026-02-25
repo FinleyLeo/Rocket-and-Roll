@@ -16,6 +16,8 @@ public class PlayerLookAt : NetworkBehaviour
 
     bool eyesLocked;
 
+    Quaternion eyeStoredRotation;
+
     private void Start()
     {
         playerScript = GetComponent<PlayerMovement>();
@@ -31,7 +33,6 @@ public class PlayerLookAt : NetworkBehaviour
 
         rpgPivot = transform.GetChild(2);
         rpg = rpgPivot.GetChild(0);
-
     }
 
     void Update()
@@ -55,15 +56,28 @@ public class PlayerLookAt : NetworkBehaviour
             {
                 eyeTransform.localPosition = eyePivot.localPosition;
                 eyesLocked = true;
+
+                playerScript.rotationSpeed += Time.deltaTime * -playerScript.moveDir;
+                playerScript.rotationSpeed = Mathf.Clamp(playerScript.rotationSpeed, -2f, 2f);
+
+                eyeTransform.rotation = eyeStoredRotation;
+                eyeTransform.rotation = Quaternion.Euler(0, 0, eyeTransform.rotation.eulerAngles.z + playerScript.rotationSpeed);
+                eyeStoredRotation = eyeTransform.rotation;
+
             }
             else
             {
                 eyesLocked = false;
+                playerScript.rotationSpeed = 0;
+                eyeTransform.rotation = Quaternion.Euler(0, 0, 0);
             }
         }
         else
         {
             eyesLocked = false;
+
+            playerScript.rotationSpeed = 0;
+            eyeTransform.rotation = Quaternion.Euler(0, 0, 0);
         }
     }
 

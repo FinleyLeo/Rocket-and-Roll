@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -37,6 +38,7 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] float wallRayLength = 0.6f;
     [SerializeField] float[] wallRayChecks;
     [SerializeField] bool isGrounded;
+    bool canBallHop;
     [SerializeField] bool canStopEarly;
 
     [SerializeField] float bufferTime;
@@ -47,6 +49,8 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] float fallThreshold = -3;
 
     [SerializeField] PhysicsMaterial2D physMat;
+
+    public float rotationSpeed;
 
     public override void OnNetworkSpawn()
     {
@@ -122,8 +126,6 @@ public class PlayerMovement : NetworkBehaviour
             }
         }
 
-        
-
         JumpCheck();
         RollCheck();
         DoWallRay();
@@ -144,8 +146,7 @@ public class PlayerMovement : NetworkBehaviour
         }
         else
         {
-            rb.AddForce(moveSpeed * moveDir * Vector2.right);
-            rb.AddTorque(moveDir);
+            rb.linearVelocity = new Vector2(-rotationSpeed * moveSpeed, rb.linearVelocityY);
         }
     }
 
@@ -207,8 +208,10 @@ public class PlayerMovement : NetworkBehaviour
 
     void DoGroundRay()
     {
-        groundRayLength = inFullRoll ? 0.65f : 0.52f;
+        groundRayLength = inFullRoll ? .7f : 2.35f;
+        float ballTransRayLength = 1.5f;
 
+        // Ground check ray
         if (Physics2D.Raycast(transform.position, Vector2.down, groundRayLength, collideLayer))
         {
             Debug.DrawRay(transform.position, Vector2.down * groundRayLength, Color.green);
@@ -218,6 +221,16 @@ public class PlayerMovement : NetworkBehaviour
         {
             Debug.DrawRay(transform.position, Vector2.down * groundRayLength, Color.red);
             isGrounded = false;
+        }
+
+        // Ball transition check
+        if (Physics2D.Raycast(transform.position, Vector2.down, ballTransRayLength, collideLayer))
+        {
+            canBallHop = true;
+        }
+        else
+        {
+            canBallHop = false;
         }
     }
 
@@ -240,11 +253,17 @@ public class PlayerMovement : NetworkBehaviour
                 Debug.Log("Switched to normal");
                 rollState = RollState.Normal;
 
+                // if grounded or in an out transition state
+                if (isGrounded || canBallHop)
+                {
+                    // Small force added when switching back on groundto make transition smoother
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX, 0);
+                    rb.AddForce(jumpForce * 0.9f * Vector2.up, ForceMode2D.Impulse);
+                }
+
                 anim.SetBool("IsRolling", false);
             }
         }
-
-        physMat.bounciness = inFullRoll ? 1000f : 0;
     }
 
     public void SetRollTrue()
