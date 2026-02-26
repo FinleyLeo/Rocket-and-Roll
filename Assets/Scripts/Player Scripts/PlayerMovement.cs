@@ -155,7 +155,7 @@ public class PlayerMovement : NetworkBehaviour
 
             rb.AddForce(moveDir * modifiedSpeed * Vector3.right);
 
-            playerVisualScript.rotationSpeed = -(rb.linearVelocityX / 2);
+            playerVisualScript.rotationSpeed = -(rb.linearVelocityX / 8);
         }
     }
 
