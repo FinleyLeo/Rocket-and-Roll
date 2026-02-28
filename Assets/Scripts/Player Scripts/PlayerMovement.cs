@@ -153,9 +153,20 @@ public class PlayerMovement : NetworkBehaviour
                 modifiedSpeed *= 3f;
             }
 
-            rb.AddForce(moveDir * modifiedSpeed * Vector3.right);
+            if (Mathf.Abs(moveDir) > 0)
+            {
+                // Switch to rb.velocity so no issues
+                rb.AddForce(moveDir * modifiedSpeed * Vector3.right);
+            }
+            else
+            {
+                if (isGrounded)
+                {
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.98f, rb.linearVelocityY);
+                }
+            }
 
-            playerVisualScript.rotationSpeed = -(rb.linearVelocityX / 8);
+            playerVisualScript.rotationSpeed = -(rb.linearVelocityX * (Mathf.PI) * Time.deltaTime);
         }
     }
 
