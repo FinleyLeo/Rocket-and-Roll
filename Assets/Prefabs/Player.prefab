@@ -1147,7 +1147,7 @@ Rigidbody2D:
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 4
-  m_Material: {fileID: 6200000, guid: ac2c39e82dec428458119ca3e0fc5179, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1168,7 +1168,7 @@ CapsuleCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: ac2c39e82dec428458119ca3e0fc5179, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1229,7 +1229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1134355502
+  GlobalObjectIdHash: 1776018959
   InScenePlacedSourceGlobalObjectIdHash: 1134355502
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1335,25 +1335,16 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   groundRayLength: 2.35
-  wallRayLength: 0.55
-  wallRayChecks:
-  - -2.2
-  - -1.9
-  - -1.5
-  - -1
-  - -0.5
-  - 0
-  - 0.5
-  ballModeWallRayChecks:
-  - 0.5
-  - 0
-  - -0.375
   isGrounded: 0
+  groundCastOffset: {x: 0, y: -2.25, z: 0}
+  ballGroundCastOffset: {x: 0, y: -0.6, z: 0}
+  wallCastOffset: {x: 0.3, y: -0.78}
+  wallCastScale: {x: 0.425, y: 2.85}
+  ballWallCastScale: {x: 0.7, y: 0.8}
   canStopEarly: 0
-  bufferTime: 0.5
+  bufferTime: 0.2
   bufferTimer: 0
   playerId: null
-  physMat: {fileID: 6200000, guid: ac2c39e82dec428458119ca3e0fc5179, type: 2}
 --- !u!114 &8428599949539066022
 MonoBehaviour:
   m_ObjectHideFlags: 0

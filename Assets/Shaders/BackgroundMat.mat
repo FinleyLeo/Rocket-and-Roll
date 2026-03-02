@@ -42,7 +42,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _Radius: 0.986
-    - _Rotation: 35
+    - _Rotation: 140
     m_Colors:
     - White: {r: 1, g: 1, b: 1, a: 1}
     - _Background_Color: {r: 0.8632076, g: 0.9150025, b: 1, a: 1}
