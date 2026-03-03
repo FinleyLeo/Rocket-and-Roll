@@ -730,9 +730,9 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -1801.0,
-            "y": 1247.0001220703125,
-            "width": 125.9998779296875,
+            "x": -1202.0,
+            "y": 1307.9998779296875,
+            "width": 126.0,
             "height": 118.0
         }
     },
@@ -960,8 +960,8 @@
     "m_ObjectId": "0cb817a3d5614388ac852c0b8220285a",
     "m_Title": "Spiral",
     "m_Position": {
-        "x": -1825.9998779296875,
-        "y": 1166.0001220703125
+        "x": -1227.0001220703125,
+        "y": 1120.0
     }
 }
 
@@ -1171,8 +1171,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -1327.0,
-            "y": 1257.0001220703125,
+            "x": -955.0,
+            "y": 1179.0,
             "width": 209.0,
             "height": 423.0
         }
@@ -1297,8 +1297,8 @@
     "m_ObjectId": "1d20d805abbf43bcb9c3c4cf0d1e2be5",
     "m_Title": "Lines",
     "m_Position": {
-        "x": -1606.9998779296875,
-        "y": 313.0000305175781
+        "x": -1607.0001220703125,
+        "y": 313.0
     }
 }
 
@@ -1585,8 +1585,8 @@
     "m_ShaderOutputName": "_tiling",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 2.0,
-        "y": 2.0
+        "x": 1.2000000476837159,
+        "y": 1.2000000476837159
     },
     "m_DefaultValue": {
         "x": 0.0,
@@ -1675,10 +1675,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -271.0000305175781,
-            "y": 1225.0,
-            "width": 208.00003051757813,
-            "height": 374.0001220703125
+            "x": 26.999954223632814,
+            "y": 1219.0,
+            "width": 208.00022888183595,
+            "height": 374.0
         }
     },
     "m_Slots": [
@@ -2401,7 +2401,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "_width",
     "m_StageCapability": 3,
-    "m_Value": 0.6000000238418579,
+    "m_Value": 0.800000011920929,
     "m_DefaultValue": 0.0,
     "m_Labels": [],
     "m_LiteralMode": false
@@ -2467,8 +2467,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -338.0000915527344,
-            "y": 1314.0,
+            "x": -40.00007247924805,
+            "y": 1308.0,
             "width": 170.99998474121095,
             "height": 34.0
         }
@@ -2777,10 +2777,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -571.0000610351563,
-            "y": 1225.0,
-            "width": 207.99990844726563,
-            "height": 374.0001220703125
+            "x": -273.00006103515627,
+            "y": 1219.0,
+            "width": 208.000244140625,
+            "height": 374.0
         }
     },
     "m_Slots": [
@@ -3195,9 +3195,9 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -735.0000610351563,
-            "y": 1314.0,
-            "width": 105.00006103515625,
+            "x": -436.9998779296875,
+            "y": 1308.0,
+            "width": 105.00003051757813,
             "height": 34.0
         }
     },
@@ -3302,9 +3302,9 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -1056.0,
-            "y": 1257.0001220703125,
-            "width": 207.99993896484376,
+            "x": -660.0,
+            "y": 1241.0,
+            "width": 208.00009155273438,
             "height": 302.0
         }
     },
@@ -3491,8 +3491,8 @@
     "m_ShaderOutputName": "_position",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 1.0,
-        "y": 1.0
+        "x": 0.6000000238418579,
+        "y": 0.6000000238418579
     },
     "m_DefaultValue": {
         "x": 0.0,
@@ -5079,9 +5079,9 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -1485.0,
-            "y": 1487.0001220703125,
-            "width": 126.0,
+            "x": -1089.0,
+            "y": 1471.0,
+            "width": 125.99993896484375,
             "height": 34.0
         }
     },

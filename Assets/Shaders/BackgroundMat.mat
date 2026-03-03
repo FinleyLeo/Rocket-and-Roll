@@ -48,8 +48,8 @@ Material:
     - _Type: 1
     m_Colors:
     - White: {r: 1, g: 1, b: 1, a: 1}
-    - _Background_Color: {r: 0.20879315, g: 0.31557977, b: 0.8679245, a: 1}
-    - _Color: {r: 0.36196154, g: 0.4549476, b: 0.9245283, a: 1}
+    - _Background_Color: {r: 0.94509804, g: 0.9490196, b: 0.85490197, a: 1}
+    - _Color: {r: 1, g: 0.46666667, b: 0.46666667, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &7262520765866479880

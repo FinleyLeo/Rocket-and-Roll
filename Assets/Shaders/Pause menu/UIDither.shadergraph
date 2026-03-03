@@ -1665,6 +1665,9 @@
             "m_Id": "6822cebc3e6a45199863909daabde310"
         },
         {
+            "m_Id": "ae6cf17145ea4dac8dfa967aa41f94c0"
+        },
+        {
             "m_Id": "06d17732a3f746db9946a5403972e202"
         }
     ],
@@ -1678,10 +1681,12 @@
     },
     "m_SerializedSubGraph": "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"7aab9f2d08bbce947991756fb5c1df69\",\n        \"type\": 3\n    }\n}",
     "m_PropertyGuids": [
-        "1d89b35d-7ae1-48e8-8790-e5a7480be339"
+        "1d89b35d-7ae1-48e8-8790-e5a7480be339",
+        "bacf84a3-a79b-4824-903c-bba7a9f7a59a"
     ],
     "m_PropertyIds": [
-        -882421133
+        -882421133,
+        -805967871
     ],
     "m_Dropdowns": [],
     "m_DropdownSelectedEntries": []
@@ -3211,6 +3216,20 @@
     "m_Property": {
         "m_Id": "5fbd8a8a648c40d0b9430e7412ac6b1e"
     }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.BooleanMaterialSlot",
+    "m_ObjectId": "ae6cf17145ea4dac8dfa967aa41f94c0",
+    "m_Id": -805967871,
+    "m_DisplayName": "UseScreenPos",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "_UseScreenPos",
+    "m_StageCapability": 3,
+    "m_Value": false,
+    "m_DefaultValue": false
 }
 
 {
