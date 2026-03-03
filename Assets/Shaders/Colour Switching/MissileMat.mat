@@ -56,7 +56,8 @@ Material:
     m_Floats:
     - _UseOutline: 0
     m_Colors:
-    - _BaseColour: {r: 0.48393556, g: 0.64242166, b: 0.8207547, a: 1}
+    - White: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColour: {r: 0.3137255, g: 0.54901963, b: 0.77647066, a: 1}
     - _BaseIn: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColour: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineIn: {r: 0.6320754, g: 0.6320754, b: 0.6320754, a: 1}

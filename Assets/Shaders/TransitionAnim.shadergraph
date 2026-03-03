@@ -373,8 +373,8 @@
     "m_ShaderOutputName": "Offset",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": -0.8999999761581421,
-        "y": -0.5
+        "x": 0.0,
+        "y": 0.0
     },
     "m_DefaultValue": {
         "x": 0.0,
@@ -600,6 +600,20 @@
         "m_SerializableColors": []
     },
     "m_SerializedDescriptor": "SurfaceDescription.Emission"
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.BooleanMaterialSlot",
+    "m_ObjectId": "647315ecfae347f68ed57500734ac55d",
+    "m_Id": -805967871,
+    "m_DisplayName": "UseScreenPos",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "_UseScreenPos",
+    "m_StageCapability": 3,
+    "m_Value": false,
+    "m_DefaultValue": false
 }
 
 {
@@ -1010,7 +1024,7 @@
     "m_ShaderOutputName": "Tiling",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 1.850000023841858,
+        "x": 1.7999999523162842,
         "y": 1.0
     },
     "m_DefaultValue": {
@@ -1061,8 +1075,8 @@
     "m_ShaderOutputName": "B",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 0.0,
-        "y": 0.0,
+        "x": 0.8999999761581421,
+        "y": 0.5,
         "z": 0.0,
         "w": 0.0
     },
@@ -1112,15 +1126,18 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -1187.0,
-            "y": 346.0000305175781,
+            "x": -1277.0,
+            "y": 252.0,
             "width": 228.0,
-            "height": 95.0
+            "height": 119.0
         }
     },
     "m_Slots": [
         {
             "m_Id": "3d24204024654c1e9661711bbe5d3a48"
+        },
+        {
+            "m_Id": "647315ecfae347f68ed57500734ac55d"
         },
         {
             "m_Id": "23ecacaa18c9423eb5f61a537879b7d8"
@@ -1136,10 +1153,12 @@
     },
     "m_SerializedSubGraph": "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"7aab9f2d08bbce947991756fb5c1df69\",\n        \"type\": 3\n    }\n}",
     "m_PropertyGuids": [
-        "1d89b35d-7ae1-48e8-8790-e5a7480be339"
+        "1d89b35d-7ae1-48e8-8790-e5a7480be339",
+        "bacf84a3-a79b-4824-903c-bba7a9f7a59a"
     ],
     "m_PropertyIds": [
-        -882421133
+        -882421133,
+        -805967871
     ],
     "m_Dropdowns": [],
     "m_DropdownSelectedEntries": []
