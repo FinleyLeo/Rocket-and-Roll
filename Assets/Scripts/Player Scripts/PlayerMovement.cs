@@ -136,7 +136,6 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         JumpCheck();
-        DoWallRay();
         ClampVelocity();
     }
 
@@ -173,8 +172,6 @@ public class PlayerMovement : NetworkBehaviour
                     rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.98f, rb.linearVelocityY);
                 }
             }
-
-            playerVisualScript.rotationSpeed = -(rb.linearVelocityX * (Mathf.PI) * Time.deltaTime);
         }
 
         if (Mathf.Abs(moveDir) == 0)
@@ -248,15 +245,13 @@ public class PlayerMovement : NetworkBehaviour
         CapsuleCollider2D playerCol = GetComponent<CapsuleCollider2D>();
 
         // Ground check ray
-        if (Physics2D.BoxCast(transform.position + (rollState == RollState.Normal ? groundCastOffset : ballGroundCastOffset), new Vector3(GetComponent<CapsuleCollider2D>().bounds.size.x, 0.2f), 0, Vector2.down, 0.1f, collideLayer))
+        if (Physics2D.BoxCast(transform.position + (rollState == RollState.Normal ? groundCastOffset : ballGroundCastOffset), new Vector3(playerCol.bounds.size.x - 0.1f, 0.2f), 0, Vector2.down, 0.1f, collideLayer))
         {
             isGrounded = true;
-            Debug.Log("Hitting ground");
         }
         else
         {
             isGrounded = false;
-            Debug.Log("Not hitting ground");
         }
 
         float ballTransRayLength = 1.8f;
@@ -278,7 +273,6 @@ public class PlayerMovement : NetworkBehaviour
         {
             if (rollState != RollState.Balled)
             {
-                Debug.Log("Switched to balled");
                 rollState = RollState.Balled;
 
                 anim.SetBool("IsRolling", true);
@@ -288,7 +282,6 @@ public class PlayerMovement : NetworkBehaviour
         {
             if (rollState != RollState.Normal)
             {
-                Debug.Log("Switched to normal");
                 rollState = RollState.Normal;
 
                 // if grounded or in an out transition state
@@ -314,25 +307,19 @@ public class PlayerMovement : NetworkBehaviour
     }
 
     // used to stop sticking to walls
-    void DoWallRay()
-    {
-        bool facedDir = moveDir > 0.1f;
-        wallCastOffset.x = facedDir ? 0.25f: -0.25f;
+    //void DoWallRay()
+    //{
+    //    bool facedDir = moveDir > 0.1f;
+    //    wallCastOffset.x = facedDir ? 0.25f: -0.25f;
 
-        if (Physics2D.BoxCast(transform.position + new Vector3(wallCastOffset.x, rollState == RollState.Balled ? 0 : wallCastOffset.y), inFullRoll ? ballWallCastScale : wallCastScale, 0, Vector2.right, 0.1f, collideLayer))
-        {
-            if (Mathf.Sign(moveDir) == Mathf.Sign(rb.linearVelocity.x))
-            {
-                rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-            }
-
-            Debug.Log("Hitting wall");
-        }
-        else
-        {
-            Debug.Log("Not hitting nun");
-        }
-    }
+    //    if (Physics2D.BoxCast(transform.position + new Vector3(wallCastOffset.x, rollState == RollState.Balled ? 0 : wallCastOffset.y), inFullRoll ? ballWallCastScale : wallCastScale, 0, Vector2.right, 0.1f, collideLayer))
+    //    {
+    //        if (Mathf.Sign(moveDir) == Mathf.Sign(rb.linearVelocity.x))
+    //        {
+    //            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+    //        }
+    //    }
+    //}
 
     bool IsFalling()
     {
@@ -359,6 +346,8 @@ public class PlayerMovement : NetworkBehaviour
             isFlipped.Value = sr.flipX;
         }
 
+        playerVisualScript.rotationSpeed = -(rb.linearVelocityX * (Mathf.PI * 10) * Time.deltaTime);
+
         anim.SetBool("IsRunning", Mathf.Abs(moveDir) > 0);
         anim.SetBool("IsFalling", IsFalling(-3));
         anim.SetBool("IsGrounded", isGrounded);
@@ -368,7 +357,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         CapsuleCollider2D playerCol = GetComponent<CapsuleCollider2D>();
 
-        Gizmos.DrawCube(transform.position + new Vector3(wallCastOffset.x, rollState == RollState.Normal ? wallCastOffset.y : 0), rollState == RollState.Normal ? wallCastScale : ballWallCastScale);
-        Gizmos.DrawCube(transform.position + (rollState == RollState.Normal ? groundCastOffset : ballGroundCastOffset), new Vector3(playerCol.bounds.size.x, 0.2f));
+        Gizmos.DrawCube(transform.position + new Vector3(wallCastOffset.x, !inFullRoll ? wallCastOffset.y : 0), !inFullRoll ? wallCastScale : ballWallCastScale);
+        Gizmos.DrawCube(transform.position + (!inFullRoll ? groundCastOffset : ballGroundCastOffset), new Vector3(playerCol.bounds.size.x - 0.1f, 0.2f));
     }
 }

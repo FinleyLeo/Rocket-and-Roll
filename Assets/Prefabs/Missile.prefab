@@ -208,11 +208,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MissileScript
   ShowTopMostFoldoutHeaderGroup: 1
   velocityMulti: 5
-  velocity: 0
-  lifeTime: 5
+  constantVelocity: 0
+  startVelocity: {x: 0, y: 0}
   playerId: 
   explosion: {fileID: 2664842954057001165, guid: 5d95aaf9cd2c7b04fa24b70593c35f31, type: 3}
   rocketTrail: {fileID: 5389215527814467504}
+  sr: {fileID: 4699463647589228105}
+  col: {fileID: 3881919374266789048}
 --- !u!1001 &6910703437241985633
 PrefabInstance:
   m_ObjectHideFlags: 0

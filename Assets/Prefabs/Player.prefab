@@ -1337,9 +1337,9 @@ MonoBehaviour:
   isGrounded: 0
   groundCastOffset: {x: 0, y: -2.25, z: 0}
   ballGroundCastOffset: {x: 0, y: -0.6, z: 0}
-  wallCastOffset: {x: 0.3, y: -0.78}
+  wallCastOffset: {x: 0.45, y: -0.78}
   wallCastScale: {x: 0.425, y: 2.85}
-  ballWallCastScale: {x: 0.7, y: 0.8}
+  ballWallCastScale: {x: 0.35, y: 0.6}
   canStopEarly: 0
   bufferTime: 0.2
   bufferTimer: 0

@@ -39,9 +39,6 @@ public class PlayerLookAt : NetworkBehaviour
 
     void Update()
     {
-        // Makes sure rotation is always the same
-        //eyePivot.rotation = Quaternion.Euler(0, 0, 0);
-
         if (!IsOwner) return;
 
         if (PauseMenuScript.instance != null)

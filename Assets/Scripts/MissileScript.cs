@@ -6,6 +6,8 @@ public class MissileScript : NetworkBehaviour
 {
     NetworkVariable<Vector2> position = new NetworkVariable<Vector2>();
     NetworkVariable<bool> trailActive = new NetworkVariable<bool>(false);
+    NetworkVariable<bool> srActive = new NetworkVariable<bool>(false);
+    NetworkVariable<bool> colActive = new NetworkVariable<bool>(false);
 
     [SerializeField] float velocityMulti = 8f;
     [SerializeField] float constantVelocity;
@@ -16,10 +18,14 @@ public class MissileScript : NetworkBehaviour
 
     [SerializeField] ParticleSystem explosion;
     [SerializeField] GameObject rocketTrail;
+    [SerializeField] SpriteRenderer sr;
+    [SerializeField] BoxCollider2D col;
 
     public override void OnNetworkSpawn()
     {
         trailActive.OnValueChanged += (bool prev, bool next) => rocketTrail.SetActive(trailActive.Value);
+        srActive.OnValueChanged += (bool prev, bool next) => sr.enabled = srActive.Value;
+        colActive.OnValueChanged += (bool prev, bool next) => col.enabled = colActive.Value;
     }
 
     void Start()
@@ -29,12 +35,20 @@ public class MissileScript : NetworkBehaviour
         position.Value = transform.position;
         constantVelocity = 10;
 
-        StartCoroutine(TrailDelay());
+        StartCoroutine(CollisionDelay());
     }
 
-    IEnumerator TrailDelay()
+    IEnumerator CollisionDelay()
     {
-        yield return new WaitForSeconds(0.15f);
+        yield return new WaitForSeconds(0.025f);
+
+        srActive.Value = true;
+
+        yield return new WaitForSeconds(0.075f);
+
+        colActive.Value = true;
+
+        yield return new WaitForSeconds(0.05f);
 
         trailActive.Value = true;
     }
