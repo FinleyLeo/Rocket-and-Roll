@@ -1,3 +1,4 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -46,9 +47,11 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] bool canStopEarly;
 
     [SerializeField] float bufferTime;
-    [SerializeField] float bufferTimer;
+    float bufferTimer;
 
     public string playerId;
+
+    Vector2 storedBallVelocity;
 
     public override void OnNetworkSpawn()
     {
@@ -117,6 +120,35 @@ public class PlayerMovement : NetworkBehaviour
         RollCheck();
         AnimationChecks();
 
+        if (Mathf.Abs(moveDir) == 0)
+        {
+            if (inFullRoll)
+            {
+                if (isGrounded)
+                {
+                    // Decays when not moving on ground
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.99f, rb.linearVelocityY);
+                }
+            }
+            else
+            {
+                if (isGrounded)
+                {
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.95f, rb.linearVelocityY);
+                }
+                else
+                {
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.99f, rb.linearVelocityY);
+                }
+            }
+        }
+
+        // When dropping back into regular amount, set max clamp back to normal
+        if (Mathf.Abs(rb.linearVelocityX) < 15)
+        {
+            axisMaxClamps.x = 15f;
+        }
+
         position.Value = transform.position;
     }
 
@@ -141,45 +173,47 @@ public class PlayerMovement : NetworkBehaviour
 
     void Move()
     {
-        if (!inFullRoll && Mathf.Abs(rb.linearVelocityX) < (moveSpeed * 1.05f))
+        if (!inFullRoll)
         {
-            rb.linearVelocity = new Vector2(moveDir * moveSpeed, rb.linearVelocity.y);
+            if (Mathf.Abs(moveDir) > 0)
+            {
+                if (Mathf.Abs(rb.linearVelocityX) < moveSpeed)
+                {
+                    rb.linearVelocity = new Vector2(moveDir * moveSpeed, rb.linearVelocity.y);
+                }
+                else
+                {
+                    // if moving in same direction as input then decrease more gradually
+                    if (Mathf.Sign(moveDir) == Mathf.Sign(rb.linearVelocityX))
+                    {
+                        rb.linearVelocity = new Vector2(rb.linearVelocityX - (moveDir * 0.25f), rb.linearVelocity.y);
+                    }
+                    else
+                    {
+                        rb.linearVelocity = new Vector2(rb.linearVelocityX + (moveDir), rb.linearVelocity.y);
+                    }
+                }
+            }
         }
         else
         {
-            Vector2 storedVelocity = rb.linearVelocity;
+            storedBallVelocity = rb.linearVelocity;
+
             // Increase max X axis speed when in ball mode
             axisMaxClamps.x = 20f;
 
             float modifiedSpeed = moveSpeed;
+
             if (Mathf.Sign(moveDir) != Mathf.Sign(rb.linearVelocityX))
             {
                 modifiedSpeed *= 3f;
             }
 
-            float acceleration = modifiedSpeed * 0.04f;
+            float acceleration = modifiedSpeed * 0.06f;
 
             if (Mathf.Abs(moveDir) > 0)
             {
-                // Switch to rb.velocity so no issues
-                rb.linearVelocity = new Vector2(storedVelocity.x + (moveDir * acceleration), rb.linearVelocityY);
-            }
-            else
-            {
-                if (isGrounded)
-                {
-                    // Decays when not moving on ground
-                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.98f, rb.linearVelocityY);
-                }
-            }
-        }
-
-        if (Mathf.Abs(moveDir) == 0)
-        {
-            // When dropping back into regular amount, set max clamp back to normal
-            if (Mathf.Abs(rb.linearVelocityX) < 15)
-            {
-                axisMaxClamps.x = 15f;
+                rb.linearVelocity = new Vector2(storedBallVelocity.x + (moveDir * acceleration), rb.linearVelocityY);
             }
         }
     }
@@ -276,6 +310,11 @@ public class PlayerMovement : NetworkBehaviour
                 rollState = RollState.Balled;
 
                 anim.SetBool("IsRolling", true);
+
+                if (MathF.Abs(moveDir) > 0)
+                {
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX + (moveDir * moveSpeed), rb.linearVelocityY);
+                }
             }
         }
         else if (!rollAction.IsPressed()) // enter normal state
@@ -305,21 +344,6 @@ public class PlayerMovement : NetworkBehaviour
     {
         inFullRoll = false;
     }
-
-    // used to stop sticking to walls
-    //void DoWallRay()
-    //{
-    //    bool facedDir = moveDir > 0.1f;
-    //    wallCastOffset.x = facedDir ? 0.25f: -0.25f;
-
-    //    if (Physics2D.BoxCast(transform.position + new Vector3(wallCastOffset.x, rollState == RollState.Balled ? 0 : wallCastOffset.y), inFullRoll ? ballWallCastScale : wallCastScale, 0, Vector2.right, 0.1f, collideLayer))
-    //    {
-    //        if (Mathf.Sign(moveDir) == Mathf.Sign(rb.linearVelocity.x))
-    //        {
-    //            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-    //        }
-    //    }
-    //}
 
     bool IsFalling()
     {
@@ -357,7 +381,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         CapsuleCollider2D playerCol = GetComponent<CapsuleCollider2D>();
 
-        Gizmos.DrawCube(transform.position + new Vector3(wallCastOffset.x, !inFullRoll ? wallCastOffset.y : 0), !inFullRoll ? wallCastScale : ballWallCastScale);
-        Gizmos.DrawCube(transform.position + (!inFullRoll ? groundCastOffset : ballGroundCastOffset), new Vector3(playerCol.bounds.size.x - 0.1f, 0.2f));
+        //Gizmos.DrawCube(transform.position + (!inFullRoll ? groundCastOffset : ballGroundCastOffset), new Vector3(playerCol.bounds.size.x - 0.1f, 0.2f));
+        //Gizmos.DrawCube(transform.position + new Vector3(wallCastOffset.x, !inFullRoll ? wallCastOffset.y : 0), !inFullRoll ? wallCastScale : ballWallCastScale);
     }
 }
