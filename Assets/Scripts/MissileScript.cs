@@ -35,20 +35,17 @@ public class MissileScript : NetworkBehaviour
         position.Value = transform.position;
         constantVelocity = 10;
 
-        StartCoroutine(CollisionDelay());
+        StartCoroutine(SetupDelay());
     }
 
-    IEnumerator CollisionDelay()
+    IEnumerator SetupDelay()
     {
-        yield return new WaitForSeconds(0.025f);
+        yield return new WaitForSeconds(0.03f);
 
         srActive.Value = true;
-
-        yield return new WaitForSeconds(0.075f);
-
         colActive.Value = true;
 
-        yield return new WaitForSeconds(0.05f);
+        yield return new WaitForSeconds(0.07f);
 
         trailActive.Value = true;
     }
