@@ -37,7 +37,10 @@ public class InLobbyManager : NetworkBehaviour
 
     void UpdatePlayerLists()
     {
-        players = LobbyManager.Instance.currentLobby.Players;
+        if (LobbyManager.Instance.currentLobby != null)
+        {
+            players = LobbyManager.Instance.currentLobby.Players;
+        }
         netPlayers = (List<NetworkClient>)NetworkManager.Singleton.ConnectedClientsList;
     }
 

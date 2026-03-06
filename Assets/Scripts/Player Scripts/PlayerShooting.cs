@@ -1,4 +1,5 @@
 using Unity.Netcode;
+using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,29 +12,35 @@ public class PlayerShooting : NetworkBehaviour
     [SerializeField] float cooldown = 1.5f;
     public float cooldownTimer;
 
+    [SerializeField] float recoilStrength;
+
     PlayerMovement playerScript;
     Rigidbody2D playerRB;
+
 
     private void Start()
     {
         playerScript = GetComponentInParent<PlayerMovement>();
         playerRB = GetComponentInParent<Rigidbody2D>();
 
-        attackAction = InputSystem.actions.FindAction("Attack");
+        attackAction = InputSystem.actions.FindAction("Shoot");
     }
 
     private void Update()
     {
-        if (IsOwner && (PauseMenuScript.instance != null && !PauseMenuScript.instance.isPaused))
+        if (IsOwner)
         {
             cooldownTimer -= Time.deltaTime;
             cooldownTimer = Mathf.Clamp(cooldownTimer, 0, cooldown);
 
-            if (playerScript.rollState == RollState.Normal)
+            if ((PauseMenuScript.instance != null && !PauseMenuScript.instance.isPaused))
             {
-                if (attackAction.WasPressedThisFrame() && cooldownTimer <= 0)
+                if (playerScript.rollState == RollState.Normal)
                 {
-                    Shoot();
+                    if (attackAction.WasPressedThisFrame() && cooldownTimer <= 0)
+                    {
+                        Shoot();
+                    }
                 }
             }
         }
@@ -47,6 +54,9 @@ public class PlayerShooting : NetworkBehaviour
         float lookAngle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
 
         transform.rotation = Quaternion.Euler(0, 0, lookAngle);
+
+        Debug.DrawRay(transform.position, lookDir, Color.red);
+        ShootRecoil(-lookDir);
 
         if (IsHost)
         {
@@ -76,6 +86,22 @@ public class PlayerShooting : NetworkBehaviour
         missileScript.startVelocity = velocity * 0.001f;
 
         missile.GetComponent<NetworkObject>().Spawn(true);
+    }
+
+    void ShootRecoil(Vector3 recoilDir)
+    {
+        // run in air
+        if (!playerScript.isGrounded)
+        {
+            playerScript.canStopEarly = false;
+
+            playerScript.airDecayTimer = 0.5f;
+            playerRB.linearVelocity += (Vector2)recoilDir * recoilStrength;
+        }
+        else // run on ground
+        {
+            playerRB.linearVelocity += (Vector2)recoilDir / 2 * recoilStrength;
+        }
     }
 
     Vector3 GetMousePosition()

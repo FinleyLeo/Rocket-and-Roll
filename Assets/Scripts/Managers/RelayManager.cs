@@ -103,7 +103,7 @@ public class RelayManager : MonoBehaviour
                     return;
                 }
             }
-
+            
             NetworkManager.Singleton.Shutdown();
         }
         catch (RelayServiceException e)

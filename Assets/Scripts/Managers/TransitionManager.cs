@@ -8,10 +8,10 @@ public class TransitionManager : MonoBehaviour
     public static TransitionManager Instance { get; private set; }
 
     [SerializeField] Material transitionMat;
-    [HideInInspector] public float fillAmount;
+    public float fillAmount;
 
     [SerializeField] float transitionSpeed = 1;
-    bool loadingScene;
+    [SerializeField] bool loadingScene;
 
     private void Awake()
     {
@@ -30,7 +30,10 @@ public class TransitionManager : MonoBehaviour
 
     private void Start()
     {
-        //SceneManager.sceneLoaded += Test();
+        SceneManager.LoadScene("Main Menu");
+        loadingScene = true;
+        fillAmount = 1;
+
         SceneManager.activeSceneChanged += EndTransition;
     }
 
@@ -82,9 +85,9 @@ public class TransitionManager : MonoBehaviour
     {
         StartCoroutine(LoadSceneDelay(sceneIndex));
     }
-    public void LoadScene(string sceneName)
+    public void LoadScene(string sceneIndex)
     {
-        StartCoroutine(LoadSceneDelay(sceneName));
+        StartCoroutine(LoadSceneDelay(sceneIndex));
     }
 
     IEnumerator LoadSceneDelay(int sceneIndex)
@@ -95,12 +98,13 @@ public class TransitionManager : MonoBehaviour
 
         NetworkManager.Singleton.SceneManager.LoadScene(SceneManager.GetSceneByBuildIndex(sceneIndex).name, LoadSceneMode.Single);
     }
-    IEnumerator LoadSceneDelay(string sceneName)
+
+    IEnumerator LoadSceneDelay(string sceneIndex)
     {
         loadingScene = true;
 
         yield return new WaitForSeconds(transitionSpeed / 2);
 
-        NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+        NetworkManager.Singleton.SceneManager.LoadScene(sceneIndex, LoadSceneMode.Single);
     }
 }

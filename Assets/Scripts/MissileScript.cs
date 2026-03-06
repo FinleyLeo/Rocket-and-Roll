@@ -11,6 +11,7 @@ public class MissileScript : NetworkBehaviour
 
     [SerializeField] float velocityMulti = 8f;
     [SerializeField] float constantVelocity;
+    [SerializeField] float explosionForce = 5f;
     [HideInInspector] public Vector2 startVelocity;
     float lifeTime = 5;
 
@@ -20,6 +21,8 @@ public class MissileScript : NetworkBehaviour
     [SerializeField] GameObject rocketTrail;
     [SerializeField] SpriteRenderer sr;
     [SerializeField] BoxCollider2D col;
+
+    [SerializeField] LayerMask playerLayer;
 
     public override void OnNetworkSpawn()
     {
@@ -87,23 +90,34 @@ public class MissileScript : NetworkBehaviour
         // If host then explode and despawn
         if (IsServer)
         {
-            SendExplosionEffectRPC();
+            // Give explosion knockback to every player within radius
+            foreach (Collider2D playerCol in Physics2D.OverlapCircleAll(transform.position, 5f, playerLayer))
+            {
+                Vector2 knockDir = (playerCol.transform.position - transform.position);
+                Rigidbody2D playerRB = playerCol.attachedRigidbody;
+
+                //Vector2 modifiedKnockDir = explosionForce - knockDir.magnitude;
+
+                playerRB.linearVelocity += knockDir.normalized * explosionForce;
+
+                Debug.Log(playerCol.gameObject.name);
+            }
+
+            SendExplosionRPC();
             GetComponent<NetworkObject>().Despawn();
         }
     }
 
         [Rpc(SendTo.ClientsAndHost)]
-    void SendExplosionEffectRPC()
+    void SendExplosionRPC()
     {
         GameObject particleObj = Instantiate(explosion, transform.position, Quaternion.Euler(-90, 0, 0)).gameObject;
-        Destroy(particleObj, explosion.main.startLifetime.constant);
+        Destroy(particleObj, explosion.main.startLifetime.constant * 2);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!IsServer) return;
-
-        Debug.Log("Collided");
 
         // checks if collided with wall or player
         if (collision.gameObject.CompareTag("Player"))
@@ -111,8 +125,6 @@ public class MissileScript : NetworkBehaviour
             // Only collides if hitting someone other than the shooter and if the player id is set
             if (playerId != collision.gameObject.GetComponent<PlayerMovement>().playerId && !string.IsNullOrEmpty(playerId))
             {
-                Debug.Log("Collided with enemy player");
-
                 Explode();
             }
         }

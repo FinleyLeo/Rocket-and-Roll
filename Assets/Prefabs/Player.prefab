@@ -664,6 +664,7 @@ MonoBehaviour:
   missilePrefab: {fileID: 788531414899324624, guid: b645a1e553cb275448dc7008094f5e33, type: 3}
   cooldown: 1.5
   cooldownTimer: 0
+  recoilStrength: 8
 --- !u!1 &5331919449554707111
 GameObject:
   m_ObjectHideFlags: 0
@@ -1192,8 +1193,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.004151106, y: -0.86481726}
-  m_Size: {x: 0.99646735, y: 2.7644842}
+  m_Offset: {x: 0, y: -0.8756223}
+  m_Size: {x: 1, y: 2.7475443}
   m_Direction: 0
 --- !u!95 &5629878446974966044
 Animator:
@@ -1325,6 +1326,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   isFlipped:
     m_InternalValue: 0
+  playerId: null
   rollState: 0
   inFullRoll: 0
   jumpForce: 20
@@ -1342,8 +1344,8 @@ MonoBehaviour:
   ballWallCastScale: {x: 0.35, y: 0.6}
   canStopEarly: 0
   bufferTime: 0.2
-  bufferTimer: 0
-  playerId: null
+  airVelocityDecay: 0
+  airDecayTimer: 0
 --- !u!114 &8428599949539066022
 MonoBehaviour:
   m_ObjectHideFlags: 0

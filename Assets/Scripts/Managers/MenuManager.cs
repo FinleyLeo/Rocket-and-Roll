@@ -43,16 +43,6 @@ public class MenuManager : MonoBehaviour
     [SerializeField] Button createRoomButton;
     [SerializeField] Toggle isPrivateToggle;
 
-    //[Space(10)]
-    //[Header("Room Panel")]
-    //[SerializeField] GameObject roomPanel;
-    //[SerializeField] Button exitLobbyButton;
-    //[SerializeField] Button startGameButton;
-    //[SerializeField] TextMeshProUGUI roomName;
-    //[SerializeField] TextMeshProUGUI roomCode;
-    //[SerializeField] GameObject playerInfoPrefab;
-    //[SerializeField] GameObject playerInfoContent;
-
     [Space(10)]
     [Header("Join Room With Code")]
     [SerializeField] GameObject roomCodePanel;

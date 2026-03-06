@@ -14,6 +14,8 @@ public class PlayerMovement : NetworkBehaviour
     NetworkVariable<Vector2> position = new NetworkVariable<Vector2>(new Vector2(0, 5), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     [HideInInspector] public NetworkVariable<bool> isFlipped = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+    public string playerId;
+
     InputAction moveAction;
     InputAction jumpAction;
     InputAction rollAction;
@@ -34,7 +36,7 @@ public class PlayerMovement : NetworkBehaviour
     [HideInInspector] public float moveDir;
 
     [SerializeField] LayerMask collideLayer;
-    [SerializeField] bool isGrounded;
+    [HideInInspector] public bool isGrounded;
 
     [SerializeField] Vector3 groundCastOffset;
     [SerializeField] Vector3 ballGroundCastOffset;
@@ -44,14 +46,14 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] Vector2 ballWallCastScale;
 
     bool canBallHop;
-    [SerializeField] bool canStopEarly;
+    [SerializeField] public bool canStopEarly;
+    Vector2 storedBallVelocity;
 
     [SerializeField] float bufferTime;
     float bufferTimer;
 
-    public string playerId;
-
-    Vector2 storedBallVelocity;
+    [SerializeField] bool airVelocityDecay;
+    public float airDecayTimer;
 
     public override void OnNetworkSpawn()
     {
@@ -118,36 +120,8 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         RollCheck();
+        VelocityDecay();
         AnimationChecks();
-
-        if (Mathf.Abs(moveDir) == 0)
-        {
-            if (inFullRoll)
-            {
-                if (isGrounded)
-                {
-                    // Decays when not moving on ground
-                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.99f, rb.linearVelocityY);
-                }
-            }
-            else
-            {
-                if (isGrounded)
-                {
-                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.95f, rb.linearVelocityY);
-                }
-                else
-                {
-                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.99f, rb.linearVelocityY);
-                }
-            }
-        }
-
-        // When dropping back into regular amount, set max clamp back to normal
-        if (Mathf.Abs(rb.linearVelocityX) < 15)
-        {
-            axisMaxClamps.x = 15f;
-        }
 
         position.Value = transform.position;
     }
@@ -218,6 +192,54 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
+    void VelocityDecay()
+    {
+        if (airDecayTimer <= 0)
+        {
+            if (!airVelocityDecay)
+            {
+                airVelocityDecay = true;
+            }
+        }
+        else
+        {
+            airVelocityDecay = false;
+            airDecayTimer -= Time.deltaTime;
+        }
+
+        if (Mathf.Abs(moveDir) == 0)
+        {
+            if (inFullRoll)
+            {
+                if (isGrounded)
+                {
+                    // Decays when on ground
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.99f, rb.linearVelocityY);
+                }
+            }
+            else
+            {
+                if (isGrounded)
+                {
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.95f, rb.linearVelocityY);
+                }
+                else
+                {
+                    if (airVelocityDecay)
+                    {
+                        rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.99f, rb.linearVelocityY);
+                    }
+                }
+            }
+        }
+
+        // When dropping back into regular amount, set max clamp back to normal
+        if (Mathf.Abs(rb.linearVelocityX) < 15)
+        {
+            axisMaxClamps.x = 15f;
+        }
+    }
+
     void ClampVelocity()
     {
         if (Mathf.Abs(rb.linearVelocityY) > axisMaxClamps.y)
@@ -279,13 +301,24 @@ public class PlayerMovement : NetworkBehaviour
         CapsuleCollider2D playerCol = GetComponent<CapsuleCollider2D>();
 
         // Ground check ray
-        if (Physics2D.BoxCast(transform.position + (rollState == RollState.Normal ? groundCastOffset : ballGroundCastOffset), new Vector3(playerCol.bounds.size.x - 0.1f, 0.2f), 0, Vector2.down, 0.1f, collideLayer))
+        if (Physics2D.BoxCast(transform.position + (!inFullRoll ? groundCastOffset : ballGroundCastOffset), new Vector3(playerCol.bounds.size.x - 0.1f, 0.2f), 0, Vector2.down, 0.1f, collideLayer))
         {
-            isGrounded = true;
+            if (!isGrounded)
+            {
+                isGrounded = true;
+
+                if (inFullRoll)
+                {
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX, -(rb.linearVelocityY * 0.6f));
+                }
+            }
         }
         else
         {
-            isGrounded = false;
+            if (isGrounded)
+            {
+                isGrounded = false;
+            }
         }
 
         float ballTransRayLength = 1.8f;
@@ -381,7 +414,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         CapsuleCollider2D playerCol = GetComponent<CapsuleCollider2D>();
 
-        //Gizmos.DrawCube(transform.position + (!inFullRoll ? groundCastOffset : ballGroundCastOffset), new Vector3(playerCol.bounds.size.x - 0.1f, 0.2f));
+        Gizmos.DrawCube(transform.position + (!inFullRoll ? groundCastOffset : ballGroundCastOffset), new Vector3(playerCol.bounds.size.x - 0.1f, 0.2f));
         //Gizmos.DrawCube(transform.position + new Vector3(wallCastOffset.x, !inFullRoll ? wallCastOffset.y : 0), !inFullRoll ? wallCastScale : ballWallCastScale);
     }
 }

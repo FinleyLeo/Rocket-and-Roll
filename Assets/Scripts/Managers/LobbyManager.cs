@@ -102,7 +102,6 @@ public class LobbyManager : MonoBehaviour
 
             currentLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
 
-            //NetworkManager.Singleton.SceneManager.LoadScene("Lobby", LoadSceneMode.Single);
             TransitionManager.Instance.LoadScene("Lobby");
         }
         catch (LobbyServiceException e)
@@ -222,7 +221,11 @@ public class LobbyManager : MonoBehaviour
     {
         try
         {
-            await LobbyService.Instance.RemovePlayerAsync(currentLobby.Id, playerId);
+            if (currentLobby != null)
+            {
+                await LobbyService.Instance.RemovePlayerAsync(currentLobby.Id, playerId);
+                currentLobby = null;
+            }
 
             RelayManager.Instance.LeaveRelay();
         }
