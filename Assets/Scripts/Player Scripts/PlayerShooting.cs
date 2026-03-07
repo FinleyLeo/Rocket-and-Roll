@@ -94,13 +94,13 @@ public class PlayerShooting : NetworkBehaviour
         if (!playerScript.isGrounded)
         {
             playerScript.canStopEarly = false;
-
             playerScript.airDecayTimer = 0.5f;
-            playerRB.linearVelocity += (Vector2)recoilDir * recoilStrength;
+
+            playerRB.linearVelocity = (Vector2)recoilDir * recoilStrength;
         }
         else // run on ground
         {
-            playerRB.linearVelocity += (Vector2)recoilDir / 2 * recoilStrength;
+            playerRB.linearVelocity = (Vector2)recoilDir / 2 * recoilStrength;
         }
     }
 

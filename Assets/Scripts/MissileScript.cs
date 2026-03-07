@@ -91,14 +91,19 @@ public class MissileScript : NetworkBehaviour
         if (IsServer)
         {
             // Give explosion knockback to every player within radius
-            foreach (Collider2D playerCol in Physics2D.OverlapCircleAll(transform.position, 5f, playerLayer))
+            foreach (Collider2D playerCol in Physics2D.OverlapCircleAll(transform.position, 4f, playerLayer))
             {
-                Vector2 knockDir = (playerCol.transform.position - transform.position);
+                PlayerMovement playerScript = playerCol.GetComponent<PlayerMovement>();
                 Rigidbody2D playerRB = playerCol.attachedRigidbody;
 
+                Vector2 knockDir = (playerCol.transform.position - transform.position);
                 //Vector2 modifiedKnockDir = explosionForce - knockDir.magnitude;
 
-                playerRB.linearVelocity += knockDir.normalized * explosionForce;
+                playerScript.canStopEarly = false;
+                // set timer based on distance from explosion, closer means longer time for further knockback distance
+                playerScript.airDecayTimer = 0.5f;
+
+                playerRB.linearVelocity = knockDir.normalized * explosionForce;
 
                 Debug.Log(playerCol.gameObject.name);
             }
