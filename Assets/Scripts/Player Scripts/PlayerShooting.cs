@@ -56,7 +56,12 @@ public class PlayerShooting : NetworkBehaviour
         transform.rotation = Quaternion.Euler(0, 0, lookAngle);
 
         Debug.DrawRay(transform.position, lookDir, Color.red);
-        ShootRecoil(-lookDir);
+
+        // Recoil only if midair
+        if (!playerScript.isGrounded)
+        {
+            ShootRecoil(-lookDir);
+        }
 
         if (IsHost)
         {
@@ -90,18 +95,10 @@ public class PlayerShooting : NetworkBehaviour
 
     void ShootRecoil(Vector3 recoilDir)
     {
-        // run in air
-        if (!playerScript.isGrounded)
-        {
-            playerScript.canStopEarly = false;
-            playerScript.airDecayTimer = 0.5f;
+        playerScript.canStopEarly = false;
+        playerScript.airDecayTimer = 0.5f;
 
-            playerRB.linearVelocity = (Vector2)recoilDir * recoilStrength;
-        }
-        else // run on ground
-        {
-            playerRB.linearVelocity = (Vector2)recoilDir / 2 * recoilStrength;
-        }
+        playerRB.linearVelocity = (Vector2)recoilDir * recoilStrength;
     }
 
     Vector3 GetMousePosition()
