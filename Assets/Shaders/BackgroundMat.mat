@@ -41,6 +41,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _IsPixelated: 0
     - _Pixelation: 200
     - _Radius: 0.668
     - _Rotation: 135

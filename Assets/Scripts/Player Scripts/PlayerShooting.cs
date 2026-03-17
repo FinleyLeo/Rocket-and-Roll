@@ -1,5 +1,4 @@
 using Unity.Netcode;
-using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -49,19 +48,6 @@ public class PlayerShooting : NetworkBehaviour
     void Shoot()
     {
         cooldownTimer = cooldown;
-
-        Vector3 lookDir = (GetMousePosition() - transform.position).normalized;
-        float lookAngle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
-
-        transform.rotation = Quaternion.Euler(0, 0, lookAngle);
-
-        Debug.DrawRay(transform.position, lookDir, Color.red);
-
-        // Recoil only if midair
-        if (!playerScript.isGrounded)
-        {
-            ShootRecoil(-lookDir);
-        }
 
         if (IsHost)
         {

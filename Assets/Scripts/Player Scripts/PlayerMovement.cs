@@ -55,6 +55,8 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] bool airVelocityDecay;
     public float airDecayTimer;
 
+    [SerializeField] ParticleSystem smokeTrail;
+
     public override void OnNetworkSpawn()
     {
         if (!IsOwner)
@@ -198,12 +200,18 @@ public class PlayerMovement : NetworkBehaviour
         {
             if (!airVelocityDecay)
             {
+                smokeTrail.Stop();
                 airVelocityDecay = true;
             }
         }
         else
         {
-            airVelocityDecay = false;
+            if (airVelocityDecay)
+            {
+                smokeTrail.Play();
+                airVelocityDecay = false;
+            }
+
             airDecayTimer -= Time.deltaTime;
         }
 

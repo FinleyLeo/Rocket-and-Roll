@@ -101,7 +101,7 @@ public class MissileScript : NetworkBehaviour
 
                 playerScript.canStopEarly = false;
                 // set timer based on distance from explosion, closer means longer time for further knockback distance
-                playerScript.airDecayTimer = 0.5f;
+                playerScript.airDecayTimer = 0.75f;
 
                 playerRB.linearVelocity = knockDir.normalized * explosionForce;
 

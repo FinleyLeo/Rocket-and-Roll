@@ -142,9 +142,9 @@ TextureImporter:
       name: player eyes_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 1
         y: 0
-        width: 8
+        width: 6
         height: 3
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -164,9 +164,9 @@ TextureImporter:
       name: player eyes_1
       rect:
         serializedVersion: 2
-        x: 7
+        x: 8
         y: 0
-        width: 9
+        width: 7
         height: 3
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -186,9 +186,9 @@ TextureImporter:
       name: player eyes_2
       rect:
         serializedVersion: 2
-        x: 16
+        x: 17
         y: 0
-        width: 8
+        width: 6
         height: 3
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -208,9 +208,9 @@ TextureImporter:
       name: player eyes_3
       rect:
         serializedVersion: 2
-        x: 24
+        x: 25
         y: 0
-        width: 9
+        width: 7
         height: 3
       alignment: 9
       pivot: {x: 0.5, y: 0.33333334}
@@ -230,9 +230,9 @@ TextureImporter:
       name: player eyes_4
       rect:
         serializedVersion: 2
-        x: 32
+        x: 33
         y: 0
-        width: 8
+        width: 6
         height: 3
       alignment: 9
       pivot: {x: 0.5, y: 0.33333334}
