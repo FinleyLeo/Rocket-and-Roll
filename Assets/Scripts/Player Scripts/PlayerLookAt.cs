@@ -20,6 +20,8 @@ public class PlayerLookAt : NetworkBehaviour
 
     [HideInInspector] public float rotationSpeed;
 
+    InputAction lookAction;
+
     private void Start()
     {
         playerScript = GetComponent<PlayerMovement>();
@@ -29,6 +31,8 @@ public class PlayerLookAt : NetworkBehaviour
         {
             Debug.Log("Player script not found");
         }
+
+        lookAction = InputSystem.actions.FindAction("Look");
 
         eyePivot = transform.GetChild(1);
         eyeTransform = eyePivot.GetChild(0);
@@ -63,8 +67,8 @@ public class PlayerLookAt : NetworkBehaviour
             eyesLocked = false;
 
             rotationSpeed = 0;
-            eyeTransform.rotation = Quaternion.Euler(0, 0, 0);
             eyeStoredRotation = eyeTransform.rotation;
+            eyeTransform.rotation = Quaternion.Euler(0, 0, 0);
         }
     }
 

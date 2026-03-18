@@ -662,7 +662,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerShooting
   ShowTopMostFoldoutHeaderGroup: 1
   missilePrefab: {fileID: 788531414899324624, guid: b645a1e553cb275448dc7008094f5e33, type: 3}
-  cooldown: 1.5
+  cooldown: 1
   cooldownTimer: 0
   recoilStrength: 8
 --- !u!1 &5331919449554707111
@@ -1230,7 +1230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1776018959
+  GlobalObjectIdHash: 1134355502
   InScenePlacedSourceGlobalObjectIdHash: 1134355502
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1330,7 +1330,7 @@ MonoBehaviour:
   rollState: 0
   inFullRoll: 0
   jumpForce: 20
-  moveSpeed: 10
+  moveSpeed: 8
   axisMaxClamps: {x: 15, y: 20}
   moveDir: 0
   collideLayer:

@@ -153,9 +153,11 @@ public class PlayerMovement : NetworkBehaviour
         {
             if (Mathf.Abs(moveDir) > 0)
             {
+                float modifiedSpeed = !airVelocityDecay ? 2 : moveSpeed;
+
                 if (Mathf.Abs(rb.linearVelocityX) < moveSpeed)
                 {
-                    rb.linearVelocity = new Vector2(moveDir * moveSpeed, rb.linearVelocity.y);
+                    rb.linearVelocity += new Vector2(moveDir * modifiedSpeed, 0);
                 }
                 else
                 {
@@ -235,7 +237,11 @@ public class PlayerMovement : NetworkBehaviour
                 {
                     if (airVelocityDecay)
                     {
-                        rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.99f, rb.linearVelocityY);
+                        rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.975f, rb.linearVelocityY);
+                    }
+                    else
+                    {
+                        rb.linearVelocity = new Vector2(rb.linearVelocityX * Mathf.Clamp(0.985f + airDecayTimer, 0.5f, 1f), rb.linearVelocityY);
                     }
                 }
             }
@@ -250,14 +256,16 @@ public class PlayerMovement : NetworkBehaviour
 
     void ClampVelocity()
     {
+        float modifiedXClamp = !airVelocityDecay ? 10 : axisMaxClamps.x;
+
         if (Mathf.Abs(rb.linearVelocityY) > axisMaxClamps.y)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocityX, Mathf.Clamp(rb.linearVelocityY, -axisMaxClamps.y, axisMaxClamps.y));
         }
 
-        if (Mathf.Abs(rb.linearVelocityX) > axisMaxClamps.x)
+        if (Mathf.Abs(rb.linearVelocityX) > modifiedXClamp)
         {
-            rb.linearVelocity = new Vector2(Mathf.Clamp(rb.linearVelocityX, -axisMaxClamps.x, axisMaxClamps.x), rb.linearVelocityY);
+            rb.linearVelocity = new Vector2(Mathf.Clamp(rb.linearVelocityX, -modifiedXClamp, modifiedXClamp), rb.linearVelocityY);
         }
     }
 
@@ -269,6 +277,8 @@ public class PlayerMovement : NetworkBehaviour
         {
             Jump();
         }
+
+        
 
         // Stops jump early if not already falling
         if (!jumpAction.IsPressed() && canStopEarly && !isGrounded && !IsFalling(3f))
