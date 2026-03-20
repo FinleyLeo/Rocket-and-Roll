@@ -10,7 +10,7 @@ public class MissileScript : NetworkBehaviour
     NetworkVariable<bool> colActive = new NetworkVariable<bool>(false);
 
     [SerializeField] float velocityMulti = 8f;
-    [SerializeField] float constantVelocity;
+    float constantVelocity;
     [SerializeField] float explosionForce = 5f;
     [HideInInspector] public Vector2 startVelocity;
     float lifeTime = 5;
@@ -97,15 +97,12 @@ public class MissileScript : NetworkBehaviour
                 Rigidbody2D playerRB = playerCol.attachedRigidbody;
 
                 Vector2 knockDir = (playerCol.transform.position - transform.position);
-                //Vector2 modifiedKnockDir = explosionForce - knockDir.magnitude;
+                float modifiedForce = explosionForce - ((knockDir.magnitude - 2) * 5);
 
-                playerScript.canStopEarly = false;
-                // set timer based on distance from explosion, closer means longer time for further knockback distance
-                playerScript.airDecayTimer = 0.75f;
+                Vector3 knockVelocity = (knockDir.normalized * modifiedForce + Vector2.up * 2); // Add slight up bias to explosion
 
-                playerRB.linearVelocity = knockDir.normalized * explosionForce;
-
-                Debug.Log(playerCol.gameObject.name);
+                // Change force strength based on distance from explosion
+                SendExplosionKnockbackRPC(knockVelocity, playerRB, playerScript);
             }
 
             SendExplosionRPC();
@@ -113,11 +110,21 @@ public class MissileScript : NetworkBehaviour
         }
     }
 
-        [Rpc(SendTo.ClientsAndHost)]
+    [Rpc(SendTo.ClientsAndHost)]
     void SendExplosionRPC()
     {
         GameObject particleObj = Instantiate(explosion, transform.position, Quaternion.Euler(-90, 0, 0)).gameObject;
         Destroy(particleObj, explosion.main.startLifetime.constant * 2);
+    }
+
+    [Rpc(SendTo.SpecifiedInParams)]
+    void SendExplosionKnockbackRPC(Vector3 knockDir, Rigidbody2D rb, PlayerMovement playerScript)
+    {
+        // set timer based on distance from explosion, closer means longer time for further knockback distance
+        playerScript.airDecayTimer = 1f;
+        playerScript.canStopEarly = false;
+
+        rb.linearVelocity = knockDir;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

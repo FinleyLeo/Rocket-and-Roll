@@ -208,8 +208,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MissileScript
   ShowTopMostFoldoutHeaderGroup: 1
   velocityMulti: 5
-  constantVelocity: 0
-  explosionForce: 50
+  explosionForce: 75
   startVelocity: {x: 0, y: 0}
   playerId: 
   explosion: {fileID: 2664842954057001165, guid: 5d95aaf9cd2c7b04fa24b70593c35f31, type: 3}

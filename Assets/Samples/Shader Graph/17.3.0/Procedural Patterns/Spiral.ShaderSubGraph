@@ -1887,7 +1887,7 @@
     "m_ObjectId": "5845d322dc6a485a950a202e193eff43",
     "m_Title": "Determine Width and draw smooth edge",
     "m_Position": {
-        "x": 721.000244140625,
+        "x": 721.0,
         "y": -388.0
     }
 }
@@ -3376,7 +3376,7 @@
     "m_ObjectId": "a4e5cd2b2c5d4beabe11417194a98749",
     "m_Title": "Create radial UVs",
     "m_Position": {
-        "x": -3853.999755859375,
+        "x": -3854.0,
         "y": -471.0
     }
 }

@@ -153,16 +153,14 @@ public class PlayerMovement : NetworkBehaviour
         {
             if (Mathf.Abs(moveDir) > 0)
             {
-                float modifiedSpeed = !airVelocityDecay ? 2 : moveSpeed;
-
-                if (Mathf.Abs(rb.linearVelocityX) < moveSpeed)
+                if (Mathf.Abs(rb.linearVelocityX) < moveSpeed && airVelocityDecay)
                 {
-                    rb.linearVelocity += new Vector2(moveDir * modifiedSpeed, 0);
+                    rb.linearVelocity = new Vector2(moveDir * moveSpeed, rb.linearVelocity.y);
                 }
                 else
                 {
                     // if moving in same direction as input then decrease more gradually
-                    if (Mathf.Sign(moveDir) == Mathf.Sign(rb.linearVelocityX))
+                    if (Mathf.Sign(moveDir) == Mathf.Sign(rb.linearVelocityX) && airVelocityDecay)
                     {
                         rb.linearVelocity = new Vector2(rb.linearVelocityX - (moveDir * 0.25f), rb.linearVelocity.y);
                     }
@@ -256,16 +254,14 @@ public class PlayerMovement : NetworkBehaviour
 
     void ClampVelocity()
     {
-        float modifiedXClamp = !airVelocityDecay ? 10 : axisMaxClamps.x;
-
         if (Mathf.Abs(rb.linearVelocityY) > axisMaxClamps.y)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocityX, Mathf.Clamp(rb.linearVelocityY, -axisMaxClamps.y, axisMaxClamps.y));
         }
 
-        if (Mathf.Abs(rb.linearVelocityX) > modifiedXClamp)
+        if (Mathf.Abs(rb.linearVelocityX) > axisMaxClamps.x)
         {
-            rb.linearVelocity = new Vector2(Mathf.Clamp(rb.linearVelocityX, -modifiedXClamp, modifiedXClamp), rb.linearVelocityY);
+            rb.linearVelocity = new Vector2(Mathf.Clamp(rb.linearVelocityX, -axisMaxClamps.x, axisMaxClamps.x), rb.linearVelocityY);
         }
     }
 
@@ -277,8 +273,6 @@ public class PlayerMovement : NetworkBehaviour
         {
             Jump();
         }
-
-        
 
         // Stops jump early if not already falling
         if (!jumpAction.IsPressed() && canStopEarly && !isGrounded && !IsFalling(3f))
@@ -433,6 +427,5 @@ public class PlayerMovement : NetworkBehaviour
         CapsuleCollider2D playerCol = GetComponent<CapsuleCollider2D>();
 
         Gizmos.DrawCube(transform.position + (!inFullRoll ? groundCastOffset : ballGroundCastOffset), new Vector3(playerCol.bounds.size.x - 0.1f, 0.2f));
-        //Gizmos.DrawCube(transform.position + new Vector3(wallCastOffset.x, !inFullRoll ? wallCastOffset.y : 0), !inFullRoll ? wallCastScale : ballWallCastScale);
     }
 }
