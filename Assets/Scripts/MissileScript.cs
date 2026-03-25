@@ -102,7 +102,7 @@ public class MissileScript : NetworkBehaviour
                 Vector3 knockVelocity = (knockDir.normalized * modifiedForce + Vector2.up * 2); // Add slight up bias to explosion
 
                 // Change force strength based on distance from explosion
-                SendExplosionKnockbackRPC(knockVelocity, playerRB, playerScript);
+                //SendExplosionKnockbackRPC(knockVelocity, playerRB, playerScript);
             }
 
             SendExplosionRPC();
@@ -117,15 +117,15 @@ public class MissileScript : NetworkBehaviour
         Destroy(particleObj, explosion.main.startLifetime.constant * 2);
     }
 
-    [Rpc(SendTo.SpecifiedInParams)]
-    void SendExplosionKnockbackRPC(Vector3 knockDir, Rigidbody2D rb, PlayerMovement playerScript)
-    {
-        // set timer based on distance from explosion, closer means longer time for further knockback distance
-        playerScript.airDecayTimer = 1f;
-        playerScript.canStopEarly = false;
+    //[Rpc(SendTo.ClientsAndHost)]
+    //void SendExplosionKnockbackRPC(Vector3 knockDir, Rigidbody2D rb, PlayerMovement playerScript)
+    //{
+    //    // set timer based on distance from explosion, closer means longer time for further knockback distance
+    //    playerScript.airDecayTimer = 1f;
+    //    playerScript.canStopEarly = false;
 
-        rb.linearVelocity = knockDir;
-    }
+    //    rb.linearVelocity = knockDir;
+    //}
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
