@@ -99,7 +99,7 @@ public class InLobbyManager : NetworkBehaviour
                 SetOrder(childObj, clientOrder, 5);
             }
 
-            #endregion
+            #endregion layerOrdering
         }
     }
 

@@ -229,7 +229,7 @@ public class PlayerMovement : NetworkBehaviour
             {
                 if (isGrounded)
                 {
-                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.95f, rb.linearVelocityY);
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.925f, rb.linearVelocityY);
                 }
                 else
                 {
@@ -281,7 +281,7 @@ public class PlayerMovement : NetworkBehaviour
 
             // stops y velocity and adds extra force to make it seem more like an arc rather than an instant stop
             rb.linearVelocity = new Vector2(rb.linearVelocityX, 0);
-            rb.AddForce(Vector2.up * (jumpForce * 0.3f), ForceMode2D.Impulse);
+            rb.AddForce(Vector2.up * (jumpForce * 0.3f), ForceMode2D.Impulse); // Added to remove "headhitting" effect
         }
     }
     void Jump()
@@ -318,11 +318,6 @@ public class PlayerMovement : NetworkBehaviour
             if (!isGrounded)
             {
                 isGrounded = true;
-
-                if (inFullRoll)
-                {
-                    rb.linearVelocity = new Vector2(rb.linearVelocityX, -(rb.linearVelocityY * 0.6f));
-                }
             }
         }
         else
