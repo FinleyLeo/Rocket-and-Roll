@@ -91,15 +91,29 @@ public class MissileScript : NetworkBehaviour
         if (IsServer)
         {
             // Give explosion knockback to every player within radius
-            foreach (Collider2D playerCol in Physics2D.OverlapCircleAll(transform.position, 4f, playerLayer))
+            foreach (Collider2D playerCol in Physics2D.OverlapCircleAll(transform.position, 5f, playerLayer))
             {
                 PlayerMovement playerScript = playerCol.GetComponent<PlayerMovement>();
                 Rigidbody2D playerRB = playerCol.attachedRigidbody;
 
                 Vector2 knockDir = (playerCol.transform.position - transform.position);
-                float modifiedForce = explosionForce - ((knockDir.magnitude - 2) * 5);
+                float distanceFromExp = Vector2.Distance(transform.position, playerCol.transform.position);
+                float reversedDistance = explosionForce - (distanceFromExp * 7);
+                reversedDistance = Mathf.Clamp(reversedDistance, 0, explosionForce);
 
-                Vector3 knockVelocity = (knockDir.normalized * modifiedForce + Vector2.up * 2); // Add slight up bias to explosion
+                playerScript.airDecayTimer = 0.5f;
+                playerScript.canStopEarly = false;
+
+                playerRB.linearVelocity = (knockDir * reversedDistance);
+
+                Debug.Log("Max force: " + explosionForce);
+                Debug.Log("Amount reduced: " + distanceFromExp * 8);
+                Debug.Log("final amount: " + reversedDistance);
+
+
+                //float modifiedForce = explosionForce - ((knockDir.magnitude - 2) * 5);
+
+                //Vector3 knockVelocity = (knockDir.normalized * modifiedForce);
 
                 // Change force strength based on distance from explosion
                 //SendExplosionKnockbackRPC(knockVelocity, playerRB, playerScript);
@@ -121,10 +135,7 @@ public class MissileScript : NetworkBehaviour
     //void SendExplosionKnockbackRPC(Vector3 knockDir, Rigidbody2D rb, PlayerMovement playerScript)
     //{
     //    // set timer based on distance from explosion, closer means longer time for further knockback distance
-    //    playerScript.airDecayTimer = 1f;
-    //    playerScript.canStopEarly = false;
-
-    //    rb.linearVelocity = knockDir;
+    //    
     //}
 
     private void OnTriggerEnter2D(Collider2D collision)

@@ -11,6 +11,8 @@ public enum RollState
 
 public class PlayerMovement : NetworkBehaviour
 {
+    #region variables
+
     NetworkVariable<Vector2> position = new NetworkVariable<Vector2>(new Vector2(0, 5), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     [HideInInspector] public NetworkVariable<bool> isFlipped = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -29,34 +31,38 @@ public class PlayerMovement : NetworkBehaviour
     [HideInInspector] public RollState rollState;
     public bool inFullRoll;
 
-    // Movement values
+    [Header("Movement")]
     [SerializeField] float jumpForce = 16f;
     [SerializeField] float moveSpeed = 8f;
     [SerializeField] Vector2 axisMaxClamps;
     [HideInInspector] public float moveDir;
 
+    [Space(10)]
+    [Header("Raycasts")]
     [SerializeField] LayerMask collideLayer;
-    [HideInInspector] public bool isGrounded;
+    public bool isGrounded;
 
     [SerializeField] Vector3 groundCastOffset;
     [SerializeField] Vector3 ballGroundCastOffset;
+    [SerializeField] float[] groundCastWidth;
 
-    [SerializeField] Vector2 wallCastOffset;
-    [SerializeField] Vector2 wallCastScale;
-    [SerializeField] Vector2 ballWallCastScale;
-
-    bool canBallHop;
-    [SerializeField] public bool canStopEarly;
-    Vector2 storedBallVelocity;
-
+    [Space(10)]
+    [Header("Misc Values")]
+    public bool canStopEarly;
     [SerializeField] float bufferTime;
-    float bufferTimer;
-
     [SerializeField] bool airVelocityDecay;
     public float airDecayTimer;
+    
+    Vector2 storedBallVelocity;
+    bool canBallHop;
+    float bufferTimer;
+
+    [Space(10)]
+    [Header("External References")]
 
     [SerializeField] ParticleSystem smokeTrail;
 
+    #endregion variables
     public override void OnNetworkSpawn()
     {
         if (!IsOwner)
@@ -212,7 +218,7 @@ public class PlayerMovement : NetworkBehaviour
                 airVelocityDecay = false;
             }
 
-            airDecayTimer -= Time.deltaTime;
+            airDecayTimer -= Time.deltaTime * (isGrounded ? 5 : 1);
         }
 
         if (Mathf.Abs(moveDir) == 0)
@@ -254,6 +260,8 @@ public class PlayerMovement : NetworkBehaviour
 
     void ClampVelocity()
     {
+        axisMaxClamps = airVelocityDecay ? new Vector2(15, 20) : new Vector2(20, 30);
+
         if (Mathf.Abs(rb.linearVelocityY) > axisMaxClamps.y)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocityX, Mathf.Clamp(rb.linearVelocityY, -axisMaxClamps.y, axisMaxClamps.y));
@@ -313,11 +321,16 @@ public class PlayerMovement : NetworkBehaviour
         CapsuleCollider2D playerCol = GetComponent<CapsuleCollider2D>();
 
         // Ground check ray
-        if (Physics2D.BoxCast(transform.position + (!inFullRoll ? groundCastOffset : ballGroundCastOffset), new Vector3(playerCol.bounds.size.x - 0.1f, 0.2f), 0, Vector2.down, 0.1f, collideLayer))
+        if (Physics2D.BoxCast(transform.position + (!inFullRoll ? groundCastOffset : ballGroundCastOffset), new Vector3(!inFullRoll ? groundCastWidth[0] : groundCastWidth[1], 0.2f), 0, Vector2.down, 0.1f, collideLayer))
         {
             if (!isGrounded)
             {
                 isGrounded = true;
+
+                if (inFullRoll)
+                {
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX, -(rb.linearVelocityY * 0.6f));
+                }
             }
         }
         else
@@ -421,6 +434,6 @@ public class PlayerMovement : NetworkBehaviour
     {
         CapsuleCollider2D playerCol = GetComponent<CapsuleCollider2D>();
 
-        Gizmos.DrawCube(transform.position + (!inFullRoll ? groundCastOffset : ballGroundCastOffset), new Vector3(playerCol.bounds.size.x - 0.1f, 0.2f));
+        Gizmos.DrawCube(transform.position + (!inFullRoll ? groundCastOffset : ballGroundCastOffset), new Vector3(!inFullRoll ? groundCastWidth[0] : groundCastWidth[1], 0.2f));
     }
 }

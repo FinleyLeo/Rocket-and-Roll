@@ -59,7 +59,7 @@ Material:
     - White: {r: 1, g: 1, b: 1, a: 1}
     - _BaseColour: {r: 1, g: 1, b: 1, a: 1}
     - _BaseIn: {r: 0.9960785, g: 0.9960785, b: 0.9960785, a: 1}
-    - _OutlineColour: {r: 0.31394625, g: 0.5487052, b: 0.7830189, a: 1}
+    - _OutlineColour: {r: 0.5514357, g: 0.31372553, b: 0.78431374, a: 1}
     - _OutlineIn: {r: 0.7960785, g: 0.7960785, b: 0.7960785, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

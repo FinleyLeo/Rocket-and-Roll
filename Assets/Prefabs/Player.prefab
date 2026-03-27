@@ -1230,7 +1230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1134355502
+  GlobalObjectIdHash: 1776018959
   InScenePlacedSourceGlobalObjectIdHash: 1134355502
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1339,12 +1339,12 @@ MonoBehaviour:
   isGrounded: 0
   groundCastOffset: {x: 0, y: -2.25, z: 0}
   ballGroundCastOffset: {x: 0, y: -0.6, z: 0}
-  wallCastOffset: {x: 0.45, y: -0.78}
-  wallCastScale: {x: 0.425, y: 2.85}
-  ballWallCastScale: {x: 0.35, y: 0.6}
+  groundCastWidth:
+  - 0.8
+  - 1
   canStopEarly: 0
   bufferTime: 0.2
-  airVelocityDecay: 0
+  airVelocityDecay: 1
   airDecayTimer: 0
   smokeTrail: {fileID: 2347120553096682415}
 --- !u!114 &8428599949539066022
