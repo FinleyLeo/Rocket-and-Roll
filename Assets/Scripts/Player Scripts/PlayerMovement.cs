@@ -159,14 +159,14 @@ public class PlayerMovement : NetworkBehaviour
         {
             if (Mathf.Abs(moveDir) > 0)
             {
-                if (Mathf.Abs(rb.linearVelocityX) < moveSpeed && airVelocityDecay)
+                if (Mathf.Abs(rb.linearVelocityX) < moveSpeed)
                 {
                     rb.linearVelocity = new Vector2(moveDir * moveSpeed, rb.linearVelocity.y);
                 }
                 else
                 {
                     // if moving in same direction as input then decrease more gradually
-                    if (Mathf.Sign(moveDir) == Mathf.Sign(rb.linearVelocityX) && airVelocityDecay)
+                    if (Mathf.Sign(moveDir) == Mathf.Sign(rb.linearVelocityX))
                     {
                         rb.linearVelocity = new Vector2(rb.linearVelocityX - (moveDir * 0.25f), rb.linearVelocity.y);
                     }
@@ -260,7 +260,7 @@ public class PlayerMovement : NetworkBehaviour
 
     void ClampVelocity()
     {
-        axisMaxClamps = airVelocityDecay ? new Vector2(15, 20) : new Vector2(20, 30);
+        axisMaxClamps = airVelocityDecay ? new Vector2(15, 20) : new Vector2(20, 25);
 
         if (Mathf.Abs(rb.linearVelocityY) > axisMaxClamps.y)
         {
@@ -329,7 +329,7 @@ public class PlayerMovement : NetworkBehaviour
 
                 if (inFullRoll)
                 {
-                    rb.linearVelocity = new Vector2(rb.linearVelocityX, -(rb.linearVelocityY * 0.6f));
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX, (rb.linearVelocityY * 0.6f));
                 }
             }
         }
