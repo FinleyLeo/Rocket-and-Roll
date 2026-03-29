@@ -90,37 +90,9 @@ public class MissileScript : NetworkBehaviour
         // If host then explode and despawn
         if (IsServer)
         {
-            // Give explosion knockback to every player within radius
-            foreach (Collider2D playerCol in Physics2D.OverlapCircleAll(transform.position, 5f, playerLayer))
-            {
-                PlayerMovement playerScript = playerCol.GetComponent<PlayerMovement>();
-                Rigidbody2D playerRB = playerCol.attachedRigidbody;
-
-                Vector2 knockDir = (playerCol.transform.position - transform.position);
-                float distanceFromExp = Vector2.Distance(transform.position, playerCol.transform.position);
-                float reversedDistance = explosionForce - (distanceFromExp * 7);
-                reversedDistance = Mathf.Clamp(reversedDistance, 0, explosionForce);
-
-                playerScript.airDecayTimer = 0.5f;
-                playerScript.canStopEarly = false;
-
-                playerRB.linearVelocity = (knockDir * reversedDistance);
-
-                Debug.Log("Max force: " + explosionForce);
-                Debug.Log("Amount reduced: " + distanceFromExp * 8);
-                Debug.Log("final amount: " + reversedDistance);
-
-
-                //float modifiedForce = explosionForce - ((knockDir.magnitude - 2) * 5);
-
-                //Vector3 knockVelocity = (knockDir.normalized * modifiedForce);
-
-                // Change force strength based on distance from explosion
-                //SendExplosionKnockbackRPC(knockVelocity, playerRB, playerScript);
-            }
-
             SendExplosionRPC();
-            GetComponent<NetworkObject>().Despawn();
+            SendExplosionKnockbackRPC();
+            Destroy(gameObject);
         }
     }
 
@@ -131,12 +103,36 @@ public class MissileScript : NetworkBehaviour
         Destroy(particleObj, explosion.main.startLifetime.constant * 2);
     }
 
-    //[Rpc(SendTo.ClientsAndHost)]
-    //void SendExplosionKnockbackRPC(Vector3 knockDir, Rigidbody2D rb, PlayerMovement playerScript)
-    //{
-    //    // set timer based on distance from explosion, closer means longer time for further knockback distance
-    //    
-    //}
+    [Rpc(SendTo.ClientsAndHost)]
+    void SendExplosionKnockbackRPC()
+    {
+        foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClients.Values)
+        {
+            // checks if the object is owned by the client
+            if (client.PlayerObject.IsOwner)
+            {
+                // component references
+                NetworkObject player = client.PlayerObject;
+                PlayerMovement playerScript = player.GetComponent<PlayerMovement>();
+                Rigidbody2D playerRB = player.GetComponent<Rigidbody2D>();
+
+                // calculations for knockback angle and strength based on distance from explosion
+                Vector2 knockDir = (player.transform.position - transform.position);
+                float distanceFromExp = Vector2.Distance(transform.position, player.transform.position);
+                float reversedDistance = explosionForce - (distanceFromExp * 7f);
+                reversedDistance = Mathf.Clamp(reversedDistance, 0, explosionForce);
+
+                // only adds knockback effects if the knockback strength is above the threshold
+                if (reversedDistance > 1)
+                {
+                    playerScript.airDecayTimer = 0.5f;
+                    playerScript.canStopEarly = false;
+
+                    playerRB.linearVelocity = (knockDir * reversedDistance);
+                }
+            }
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

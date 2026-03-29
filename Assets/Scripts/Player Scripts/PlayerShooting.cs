@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class PlayerShooting : NetworkBehaviour
 {
@@ -51,7 +52,7 @@ public class PlayerShooting : NetworkBehaviour
 
         if (IsHost)
         {
-            var missile = Instantiate(missilePrefab, transform.position, transform.rotation);
+            var missile = Instantiate(missilePrefab, transform.position, Quaternion.Euler(RotationAlignment(transform.rotation.eulerAngles)));
 
             MissileScript missileScript = missile.GetComponent<MissileScript>();
 
@@ -69,7 +70,8 @@ public class PlayerShooting : NetworkBehaviour
     [Rpc(SendTo.Server)]
     void SpawnMissileRPC(Vector2 velocity)
     {
-        var missile = Instantiate(missilePrefab, transform.position, transform.rotation);
+        //var missile = Instantiate(missilePrefab, transform.position, transform.rotation);
+        var missile = Instantiate(missilePrefab, transform.position, Quaternion.Euler(RotationAlignment(transform.rotation.eulerAngles)));
 
         MissileScript missileScript = missile.GetComponent<MissileScript>();
 
@@ -79,19 +81,33 @@ public class PlayerShooting : NetworkBehaviour
         missile.GetComponent<NetworkObject>().Spawn(true);
     }
 
-    void ShootRecoil(Vector3 recoilDir)
+    // used to reduce visual artifacts from pixel art upscaling as missiles rotate a lot
+    Vector3 RotationAlignment(Vector3 rotation)
     {
-        playerScript.canStopEarly = false;
-        playerScript.airDecayTimer = 0.5f;
+        Vector3 modifiedRotation = rotation;
 
-        playerRB.linearVelocity = (Vector2)recoilDir * recoilStrength;
-    }
+        //modifiedRotation.z = Mathf.CeilToInt(rotation.z / 45);
+        //modifiedRotation.z *= 45;
 
-    Vector3 GetMousePosition()
-    {
-        Vector3 mousePos = Mouse.current.position.ReadValue();
-        Vector3 convertedMousePos = Camera.main.ScreenToWorldPoint(mousePos);
-        convertedMousePos.z = Camera.main.nearClipPlane;
-        return convertedMousePos;
+        float absXAngle = Mathf.Abs(rotation.z);
+
+        if (absXAngle < 10)
+        {
+            modifiedRotation.z = 0;
+        }
+        else if (absXAngle < 100 && absXAngle > 80)
+        {
+            modifiedRotation.z = 90;
+        }
+        else if (absXAngle < 190 && absXAngle > 170)
+        {
+            modifiedRotation.z = 180;
+        }
+        else if (absXAngle < 280 && absXAngle > 260)
+        {
+            modifiedRotation.z = 270;
+        }
+
+        return modifiedRotation;
     }
 }

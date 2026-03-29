@@ -15,6 +15,7 @@ public class PlayerMovement : NetworkBehaviour
 
     NetworkVariable<Vector2> position = new NetworkVariable<Vector2>(new Vector2(0, 5), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     [HideInInspector] public NetworkVariable<bool> isFlipped = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    NetworkVariable<bool> knockBacked = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     public string playerId;
 
@@ -78,6 +79,8 @@ public class PlayerMovement : NetworkBehaviour
                 rbNotFound = true;
             }
         }
+
+        knockBacked.OnValueChanged += (bool prev, bool next) => UpdateSmokeTrail();
     }
 
     void Start()
@@ -128,7 +131,6 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         RollCheck();
-        VelocityDecay();
         AnimationChecks();
 
         position.Value = transform.position;
@@ -150,6 +152,7 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         JumpCheck();
+        VelocityDecay();
         ClampVelocity();
     }
 
@@ -206,16 +209,16 @@ public class PlayerMovement : NetworkBehaviour
         {
             if (!airVelocityDecay)
             {
-                smokeTrail.Stop();
                 airVelocityDecay = true;
+                knockBacked.Value = !airVelocityDecay;
             }
         }
         else
         {
             if (airVelocityDecay)
             {
-                smokeTrail.Play();
                 airVelocityDecay = false;
+                knockBacked.Value = !airVelocityDecay;
             }
 
             airDecayTimer -= Time.deltaTime * (isGrounded ? 5 : 1);
@@ -228,24 +231,24 @@ public class PlayerMovement : NetworkBehaviour
                 if (isGrounded)
                 {
                     // Decays when on ground
-                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.99f, rb.linearVelocityY);
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.9f, rb.linearVelocityY);
                 }
             }
             else
             {
                 if (isGrounded)
                 {
-                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.925f, rb.linearVelocityY);
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.75f, rb.linearVelocityY);
                 }
                 else
                 {
                     if (airVelocityDecay)
                     {
-                        rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.975f, rb.linearVelocityY);
+                        rb.linearVelocity = new Vector2(rb.linearVelocityX * 0.8f, rb.linearVelocityY);
                     }
                     else
                     {
-                        rb.linearVelocity = new Vector2(rb.linearVelocityX * Mathf.Clamp(0.985f + airDecayTimer, 0.5f, 1f), rb.linearVelocityY);
+                        rb.linearVelocity = new Vector2(rb.linearVelocityX * Mathf.Clamp(0.85f + airDecayTimer, 0.5f, 1f), rb.linearVelocityY);
                     }
                 }
             }
@@ -428,6 +431,18 @@ public class PlayerMovement : NetworkBehaviour
         anim.SetBool("IsRunning", Mathf.Abs(moveDir) > 0);
         anim.SetBool("IsFalling", IsFalling(-3));
         anim.SetBool("IsGrounded", isGrounded);
+    }
+
+    void UpdateSmokeTrail()
+    {
+        if (knockBacked.Value)
+        {
+            smokeTrail.Play();
+        }
+        else
+        {
+            smokeTrail.Stop();
+        }
     }
 
     private void OnDrawGizmos()
