@@ -1070,7 +1070,7 @@ MonoBehaviour:
   settingsMenuPanel: {fileID: 0}
   closePausebutton: {fileID: 540437702}
   quitToMenuButton: {fileID: 1090425029}
-  quitGameButton: {fileID: 0}
+  quitGameButton: {fileID: 91423610}
   openSettingsButton: {fileID: 1648575}
   closeSettingsButton: {fileID: 0}
   openCustomisationButton: {fileID: 0}

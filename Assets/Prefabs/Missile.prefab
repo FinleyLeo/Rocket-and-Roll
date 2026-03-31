@@ -181,7 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3347206467
+  GlobalObjectIdHash: 3598352466
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -207,7 +207,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MissileScript
   ShowTopMostFoldoutHeaderGroup: 1
-  velocityMulti: 5
+  velocityMulti: 0.005
   explosionForce: 30
   startVelocity: {x: 0, y: 0}
   playerId: 

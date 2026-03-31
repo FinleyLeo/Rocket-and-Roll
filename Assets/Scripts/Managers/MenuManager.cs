@@ -68,6 +68,8 @@ public class MenuManager : MonoBehaviour
         openCreateLobbyButton.onClick.AddListener(OpenCreateLobbyMenu);
         exitCreateLobbyButton.onClick.AddListener(CloseCreateLobbyMenu);
 
+        quitButton.onClick.AddListener(QuitGame);
+
         playerNameInput.onEndEdit.AddListener(delegate
         {
             if (string.IsNullOrEmpty(playerNameInput.text))
@@ -104,6 +106,11 @@ public class MenuManager : MonoBehaviour
 
         joinLobbyButton.interactable = false;
         createRoomButton.interactable = false;
+
+        if (LobbyManager.Instance.IsInLobby())
+        {
+            LobbyManager.Instance.LeaveLobby();
+        }
     }
 
     void Update()
@@ -142,6 +149,11 @@ public class MenuManager : MonoBehaviour
     {
         settingsPanel.SetActive(false);
         mainMenuPanel.GetComponent<CanvasGroup>().interactable = true;
+    }
+
+    void QuitGame()
+    {
+        Application.Quit();
     }
 
     void OpenLobbyList()

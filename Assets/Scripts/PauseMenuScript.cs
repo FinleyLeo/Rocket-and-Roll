@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Globalization;
 using TMPro;
 using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
@@ -47,6 +46,7 @@ public class PauseMenuScript : NetworkBehaviour
 
         closePausebutton.onClick.AddListener(ResumeGame);
         quitToMenuButton.onClick.AddListener(QuitToMenu);
+        quitGameButton.onClick.AddListener(QuitGame);
         //openSettingsButton.onClick.AddListener(OpenSettings);
         //closeSettingsButton.onClick.AddListener(CloseSettings);
 
@@ -112,6 +112,11 @@ public class PauseMenuScript : NetworkBehaviour
         LobbyManager.Instance.LeaveLobby();
 
         StartCoroutine(DelayLeave());
+    }
+
+    void QuitGame()
+    {
+        Application.Quit();
     }
 
     IEnumerator DelayLeave()

@@ -11,6 +11,7 @@ public class InLobbyManager : NetworkBehaviour
 
     List<Player> players;
     List<NetworkClient> netPlayers;
+
     void Start()
     {
         players = new List<Player>();
@@ -132,5 +133,10 @@ public class InLobbyManager : NetworkBehaviour
                 _ps.sortingOrder += orderIncrement;
             }
         }
+    }
+
+    private void OnApplicationQuit()
+    {
+        LobbyManager.Instance.LeaveLobby();
     }
 }

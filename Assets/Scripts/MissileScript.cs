@@ -36,7 +36,8 @@ public class MissileScript : NetworkBehaviour
         if (!IsServer) return;
 
         position.Value = transform.position;
-        constantVelocity = 10;
+        constantVelocity = 0.15f;
+        startVelocity *= 3;
 
         StartCoroutine(SetupDelay());
     }
@@ -68,19 +69,27 @@ public class MissileScript : NetworkBehaviour
         {
             Explode();
         }
+    }
+
+    private void FixedUpdate()
+    {
+        if (!IsServer) return;
 
         MissileMovement();
     }
 
     void MissileMovement()
     {
-        constantVelocity += Time.deltaTime * velocityMulti;
-        constantVelocity = Mathf.Clamp(constantVelocity, 0, 40);
+        constantVelocity += velocityMulti;
+        constantVelocity = Mathf.Clamp(constantVelocity, 0, 3);
 
-        transform.position += (Time.deltaTime * constantVelocity * transform.right);
-        transform.position += (Vector3)startVelocity;
+        transform.position += (constantVelocity * transform.right);
 
-        startVelocity *= 0.98f;
+        if (startVelocity.magnitude > 0.001f)
+        {
+            transform.position += (Vector3)startVelocity;
+            startVelocity *= 0.95f;
+        }
 
         position.Value = transform.position;
     }
@@ -119,7 +128,7 @@ public class MissileScript : NetworkBehaviour
                 // calculations for knockback angle and strength based on distance from explosion
                 Vector2 knockDir = (player.transform.position - transform.position);
                 float distanceFromExp = Vector2.Distance(transform.position, player.transform.position);
-                float reversedDistance = explosionForce - (distanceFromExp * 7f);
+                float reversedDistance = explosionForce - (distanceFromExp * 6f);
                 reversedDistance = Mathf.Clamp(reversedDistance, 0, explosionForce);
 
                 // only adds knockback effects if the knockback strength is above the threshold

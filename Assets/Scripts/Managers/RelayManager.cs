@@ -1,8 +1,6 @@
 using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
-using Unity.Services.Authentication;
-using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
@@ -25,13 +23,6 @@ public class RelayManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    }
-    private void Start()
-    {
-        //NetworkManager.Singleton.OnServerStarted += () =>
-        //{
-        //    NetworkManager.Singleton.SceneManager.LoadScene("Lobby", UnityEngine.SceneManagement.LoadSceneMode.Single);
-        //};
     }
 
     public async Task<string> CreateRelay(int maxPlayers)

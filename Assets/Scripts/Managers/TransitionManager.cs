@@ -45,11 +45,6 @@ public class TransitionManager : MonoBehaviour
         fillAmount = Mathf.Clamp01(fillAmount);
 
         transitionMat.SetFloat("_FillAmount", fillAmount);
-
-        //if (loadingScene && fillAmount >= 1)
-        //{
-        //    LoadScene();
-        //}
     }
 
     void EndTransition(Scene scene, Scene _scene)
@@ -66,8 +61,6 @@ public class TransitionManager : MonoBehaviour
 
     IEnumerator EndTransDelay()
     {
-        //yield return new WaitForSeconds(transitionSpeed / 2);
-
         while (fillAmount < 1)
         {
             yield return null;

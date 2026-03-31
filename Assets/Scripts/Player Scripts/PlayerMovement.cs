@@ -53,7 +53,7 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] float bufferTime;
     [SerializeField] bool airVelocityDecay;
     public float airDecayTimer;
-    
+
     Vector2 storedBallVelocity;
     bool canBallHop;
     float bufferTimer;
@@ -332,7 +332,7 @@ public class PlayerMovement : NetworkBehaviour
 
                 if (inFullRoll)
                 {
-                    rb.linearVelocity = new Vector2(rb.linearVelocityX, (rb.linearVelocityY * 0.6f));
+                    rb.linearVelocity = new Vector2(rb.linearVelocityX, Mathf.Abs(rb.linearVelocityY * 0.6f));
                 }
             }
         }
