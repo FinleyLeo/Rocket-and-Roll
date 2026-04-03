@@ -7,6 +7,8 @@ TagManager:
   - Missile
   - Wall
   - Breakable
+  - Spawn
+  - Spawn-Used
   layers:
   - Default
   - TransparentFX

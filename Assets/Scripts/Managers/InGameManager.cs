@@ -1,16 +1,20 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class InLobbyManager : NetworkBehaviour
+public class InGameManager : NetworkBehaviour
 {
     [SerializeField] TextMeshProUGUI roomNameText;
     [SerializeField] TextMeshProUGUI roomCodeText;
 
     List<Player> players;
     List<NetworkClient> netPlayers;
+
+    [SerializeField] GameObject[] spawnPoints;
 
     void Start()
     {
@@ -19,21 +23,85 @@ public class InLobbyManager : NetworkBehaviour
 
         UpdatePlayerLists();
 
-        // Set up lobby visuals
-        roomNameText.text = LobbyManager.Instance.currentLobby.Name;
-        roomCodeText.text = LobbyManager.Instance.currentLobby.LobbyCode;
-
-        // Sets up player positions when joining the scene
-        for (int i = 0; i < LobbyManager.Instance.currentLobby.Players.Count; i++)
+        if (SceneManager.GetActiveScene().name == "Lobby")
         {
-            GameObject clientObj = netPlayers[i].PlayerObject.gameObject;
-
-            clientObj.transform.position = new Vector2(Random.Range(-5f, 5f), -6);
+            // Set up lobby visuals
+            roomNameText.text = LobbyManager.Instance.currentLobby.Name;
+            roomCodeText.text = LobbyManager.Instance.currentLobby.LobbyCode;
         }
+
+        StartCoroutine(FindSpawnPoints());
 
         UpdatePlayerInfo();
 
         NetworkManager.Singleton.OnClientConnectedCallback += (ulong clientId) => UpdatePlayerInfo();
+    }
+
+    IEnumerator FindSpawnPoints()
+    {
+        // checks for spawn points until found (atleast one spawn point)
+        while (spawnPoints.Length == 0)
+        {
+            Debug.Log("Looking for spawn points");
+
+            spawnPoints = GameObject.FindGameObjectsWithTag("Spawn");
+
+            yield return null;
+        }
+
+        Debug.Log("found spawn points");
+
+        // Sets up player positions when joining the scene if spawn points are found
+        for (int i = 0; i < LobbyManager.Instance.currentLobby.Players.Count; i++)
+        {
+            NetworkObject clientObj = netPlayers[i].PlayerObject;
+
+            if (clientObj.IsOwner) // only sets the position of the owned object, clients handle their own spawns
+            {
+                bool allPointsUsed = true;
+
+                for (int j = 0; j < spawnPoints.Length; j++) // Iterates through every spawn point to make sure not all are already used
+                {
+                    if (spawnPoints[j].tag != "Spawn-Used")
+                    {
+                        allPointsUsed = false;
+                    }
+                }
+
+                if (!allPointsUsed)
+                {
+                    for (int j = 0; j < spawnPoints.Length; j++)
+                    {
+                        if (spawnPoints[j].tag != "Spawn-Used") // if spawnpoint not already used
+                        {
+                            clientObj.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // reset velocity before teleporting
+                            clientObj.transform.position = spawnPoints[j].transform.position;
+
+                            // sets the spawn point to "used" to avoid spawn overlap
+                            spawnPoints[j].tag = "Spawn-Used";
+                            spawnPoints[j].name += " - Used";
+
+                            Debug.Log("Spawned at: " + spawnPoints[j].transform.position);
+
+                            break;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                }
+                else
+                {
+                    int ranIndex = Random.Range(0, spawnPoints.Length);
+
+                    clientObj.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // reset velocity before teleporting
+                    clientObj.transform.position = spawnPoints[ranIndex].transform.position;
+
+                    Debug.Log("No spots left, Randomly spawned at: " + spawnPoints[ranIndex].transform.position);
+                }
+            }
+        }
     }
 
     void UpdatePlayerLists()
@@ -59,7 +127,7 @@ public class InLobbyManager : NetworkBehaviour
 
             #region layerOrdering
 
-            int clientOrder = 0;
+            int clientOrder;
 
             if (clientObj.GetComponent<PlayerMovement>().IsOwner)
             {
@@ -137,6 +205,9 @@ public class InLobbyManager : NetworkBehaviour
 
     private void OnApplicationQuit()
     {
-        LobbyManager.Instance.LeaveLobby();
+        if (LobbyManager.Instance != null)
+        {
+            LobbyManager.Instance.LeaveLobby();
+        }
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MissileScript : NetworkBehaviour
 {
-    NetworkVariable<Vector2> position = new NetworkVariable<Vector2>();
+    //NetworkVariable<Vector2> position = new NetworkVariable<Vector2>();
     NetworkVariable<bool> trailActive = new NetworkVariable<bool>(false);
     NetworkVariable<bool> srActive = new NetworkVariable<bool>(false);
     NetworkVariable<bool> colActive = new NetworkVariable<bool>(false);
@@ -35,7 +35,7 @@ public class MissileScript : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        position.Value = transform.position;
+        //position.Value = transform.position;
         constantVelocity = 0.15f;
         startVelocity *= 3;
 
@@ -58,7 +58,7 @@ public class MissileScript : NetworkBehaviour
     {
         if (!IsServer)
         {
-            transform.position = position.Value;
+            //transform.position = position.Value;
             return;
         }
 
@@ -91,7 +91,7 @@ public class MissileScript : NetworkBehaviour
             startVelocity *= 0.95f;
         }
 
-        position.Value = transform.position;
+        //position.Value = transform.position;
     }
 
     void Explode()

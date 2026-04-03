@@ -8,7 +8,7 @@ public class PlayerShooting : NetworkBehaviour
 
     InputAction attackAction;
 
-    [SerializeField] float cooldown = 1.5f;
+    [SerializeField] float cooldown = 1;
     public float cooldownTimer;
 
     [SerializeField] float recoilStrength;
@@ -23,6 +23,11 @@ public class PlayerShooting : NetworkBehaviour
         playerRB = GetComponentInParent<Rigidbody2D>();
 
         attackAction = InputSystem.actions.FindAction("Shoot");
+
+        if (!IsHost)
+        {
+            cooldown = 0.95f; // slightly reduces cooldown for clients as host has slight shooting advantage
+        }
     }
 
     private void Update()
@@ -84,9 +89,6 @@ public class PlayerShooting : NetworkBehaviour
     Vector3 RotationAlignment(Vector3 rotation)
     {
         Vector3 modifiedRotation = rotation;
-
-        //modifiedRotation.z = Mathf.CeilToInt(rotation.z / 45);
-        //modifiedRotation.z *= 45;
 
         float absXAngle = Mathf.Abs(rotation.z);
 

@@ -25,7 +25,12 @@ public class TilemapGen : MonoBehaviour
     Camera cam;
 
     [SerializeField] LayerMask wallLayer;
-    [SerializeField] List<Vector3> spawnPoints;
+    [SerializeField] HashSet<Vector2> spawnPoints;
+
+    private void Awake()
+    {
+        spawnPoints = new HashSet<Vector2>();
+    }
 
     private void Start()
     {
@@ -148,26 +153,62 @@ public class TilemapGen : MonoBehaviour
                 {
                     Debug.Log("Spot found with enough space, checking floor...");
 
-                    spawnPoints.Add(new Vector3(x, y, 0));
-
-                    // check if ground is below
-                    // if ground, add to spawn points list
-                    if (Physics2D.Raycast(new Vector2(x, y), Vector2.down, 10, wallLayer))
-                    {
-                        Debug.Log("Point found at: " + x + "X, " + y + "Y");
-                        //spawnPoints.Add(new Vector3(x, y, 0));
-                    }
+                    CheckForGroundBelowPoint(new Vector2Int(x, y));
                 }
             }
+
+        SetSpawnPoints();
+    }
+
+    void CheckForGroundBelowPoint(Vector2Int pointPos)
+    {
+        // checks for a maximum of 50 cells below the point before stopping if nothing is found
+        for (int y = pointPos.y; y > pointPos.y - 50; y--)
+        {
+            // if the current checked cell is a wall then end the loop as that is the floor, else continue checking
+            if (y <= height && y >= 0)
+            {
+                if (cellGrid[pointPos.x, y] == 1)
+                {
+                    Debug.Log("Point found at: " + pointPos.x + "X, " + y + "Y");
+                    spawnPoints.Add(new Vector2(pointPos.x + 0.5f, y + 1)); // adds 1 unit to Y axis to be above the ground and not in it
+                    break;
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                Debug.Log("No more cells left to check");
+                break;
+            }
+        }
+    }
+
+    void SetSpawnPoints()
+    {
+        if (spawnPoints != null)
+        {
+            foreach (Vector2 point in spawnPoints)
+            {
+                GameObject spawnObj = new GameObject();
+                spawnObj.transform.position = point;
+
+                spawnObj.name = $"Spawn point - ({point.x}X, {point.y}Y)";
+                spawnObj.tag = "Spawn";
+            }
+        }
     }
 
     private void OnDrawGizmos()
     {
         if (spawnPoints != null)
         {
-            foreach (Vector3 point in spawnPoints)
+            foreach (Vector2 point in spawnPoints)
             {
-                Gizmos.DrawSphere(point, 2f);
+                Gizmos.DrawSphere(point, 0.5f);
             }
         }
     }

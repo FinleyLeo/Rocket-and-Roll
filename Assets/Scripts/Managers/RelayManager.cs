@@ -95,7 +95,11 @@ public class RelayManager : MonoBehaviour
                 }
             }
             
-            NetworkManager.Singleton.Shutdown();
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsConnectedClient)
+            {
+                Debug.Log("Left relay");
+                NetworkManager.Singleton.Shutdown();
+            }
         }
         catch (RelayServiceException e)
         {
