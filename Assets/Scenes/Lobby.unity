@@ -12408,7 +12408,7 @@ GameObject:
   - component: {fileID: 1793440851}
   - component: {fileID: 1793440850}
   m_Layer: 0
-  m_Name: Lobby Setup
+  m_Name: In Game Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12444,7 +12444,6 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   roomNameText: {fileID: 1850720644}
   roomCodeText: {fileID: 1469827008}
-  spawnPoints: []
 --- !u!114 &1793440851
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -11,8 +11,6 @@ public class PlayerShooting : NetworkBehaviour
     [SerializeField] float cooldown = 1;
     public float cooldownTimer;
 
-    [SerializeField] float recoilStrength;
-
     PlayerMovement playerScript;
     Rigidbody2D playerRB;
 
