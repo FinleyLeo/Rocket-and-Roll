@@ -5,18 +5,21 @@ using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class InGameManager : NetworkBehaviour
 {
-    [SerializeField] TextMeshProUGUI roomNameText;
-    [SerializeField] TextMeshProUGUI roomCodeText;
-
     List<Player> players;
     List<NetworkClient> netPlayers;
 
     NetworkList<SpawnPoint> spawnPoints = new NetworkList<SpawnPoint>();
     NetworkVariable<bool> allPointsUsed = new NetworkVariable<bool>(false);
     NetworkVariable<bool> pointsReady = new NetworkVariable<bool>();
+
+    [SerializeField] TextMeshProUGUI roomNameText;
+    [SerializeField] TextMeshProUGUI roomCodeText;
+
+    [SerializeField] Button startGameButton;
 
     void Start()
     {
@@ -30,13 +33,28 @@ public class InGameManager : NetworkBehaviour
             // Set up lobby visuals
             roomNameText.text = LobbyManager.Instance.currentLobby.Name;
             roomCodeText.text = LobbyManager.Instance.currentLobby.LobbyCode;
+
+            if (IsHost)
+            {
+                startGameButton.interactable = true;
+                startGameButton.onClick.AddListener(StartGame);
+            }
         }
 
         if (IsHost)
         {
             allPointsUsed.Value = true;
-
             StartCoroutine(FindSpawnPoints());
+
+            NetworkManager.Singleton.OnClientConnectedCallback += (ulong clientId) =>
+            {
+                UpdatePlayerInfo();
+
+                if (pointsReady.Value)
+                {
+                    SpawnSingleClientRPC(clientId); // spawn just the newly joined player
+                }
+            };
         }
 
         UpdatePlayerInfo();
@@ -60,6 +78,11 @@ public class InGameManager : NetworkBehaviour
         }
 
         allPointsUsed.Value = !anyFree;
+    }
+
+    void StartGame()
+    {
+        NetworkManager.Singleton.SceneManager.LoadScene("RanGen", LoadSceneMode.Single);
     }
 
     IEnumerator FindSpawnPoints()
@@ -111,41 +134,71 @@ public class InGameManager : NetworkBehaviour
                     {
                         spawnPos = spawnPoints[j].position;
 
-                        #region set to used
-
                         SpawnPoint point = spawnPoints[j];
                         point.used = true;
                         spawnPoints[j] = point;
-
-                        Debug.Log("======================");
-                        Debug.Log("Spawn point states");
-
-                        for (int k = 0; k < spawnPoints.Count; k++)
-                        {
-                            Debug.Log("Point - " + k + ":" + spawnPoints[k].used);
-                        }
-
-                        Debug.Log("======================");
-
-                        #endregion
 
                         Debug.Log("Assigned point " + j + " to client " + clientId);
 
                         // tell client where to spawn
                         TeleportClientRPC(spawnPos, RpcTarget.Single(clientId, RpcTargetUse.Temp));
-                        break;
+                        return;
                     }
                 }
             }
-            else
-            {
-                int ranIndex = Random.Range(0, spawnPoints.Count);
-                spawnPos = spawnPoints[ranIndex].position;
 
-                Debug.Log("No spots left, Randomly spawned at: " + spawnPoints[ranIndex].position);
-                TeleportClientRPC(spawnPos, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+            int ranIndex = Random.Range(0, spawnPoints.Count);
+            spawnPos = spawnPoints[ranIndex].position;
+
+            Debug.Log("No spots left, Randomly spawned at: " + spawnPoints[ranIndex].position);
+            TeleportClientRPC(spawnPos, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+        }
+    }
+
+    [Rpc(SendTo.Server)]
+    void SpawnSingleClientRPC(ulong clientId)
+    {
+        Vector2 spawnPos;
+
+        if (!allPointsUsed.Value)
+        {
+            for (int j = 0; j < spawnPoints.Count; j++)
+            {
+                if (!spawnPoints[j].used)
+                {
+                    spawnPos = spawnPoints[j].position;
+
+                    SpawnPoint point = spawnPoints[j];
+                    point.used = true;
+                    spawnPoints[j] = point;
+
+                    TeleportClientRPC(spawnPos, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+                    return;
+                }
             }
         }
+
+        // if all points used
+        int ranIndex = Random.Range(0, spawnPoints.Count);
+        spawnPos = spawnPoints[ranIndex].position;
+        TeleportClientRPC(spawnPos, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+    }
+
+    [Rpc(SendTo.Server)]
+    public void StartNewRoundRPC()
+    {
+        // Reset all spawn points
+        for (int i = 0; i < spawnPoints.Count; i++)
+        {
+            SpawnPoint point = spawnPoints[i];
+            point.used = false;
+            spawnPoints[i] = point;
+        }
+
+        pointsReady.Value = false;
+        allPointsUsed.Value = false;
+
+        StartCoroutine(FindSpawnPoints());
     }
 
     [Rpc(SendTo.SpecifiedInParams)]

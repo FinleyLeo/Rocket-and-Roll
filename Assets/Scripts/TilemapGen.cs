@@ -151,8 +151,6 @@ public class TilemapGen : MonoBehaviour
 
                 if (wallCount <= 1)
                 {
-                    Debug.Log("Spot found with enough space, checking floor...");
-
                     CheckForGroundBelowPoint(new Vector2Int(x, y));
                 }
             }
@@ -170,7 +168,6 @@ public class TilemapGen : MonoBehaviour
             {
                 if (cellGrid[pointPos.x, y] == 1)
                 {
-                    Debug.Log("Point found at: " + pointPos.x + "X, " + y + "Y");
                     spawnPoints.Add(new Vector2(pointPos.x + 0.5f, y + 1)); // adds 1 unit to Y axis to be above the ground and not in it
                     break;
                 }
@@ -181,7 +178,6 @@ public class TilemapGen : MonoBehaviour
             }
             else
             {
-                Debug.Log("No more cells left to check");
                 break;
             }
         }
@@ -198,6 +194,7 @@ public class TilemapGen : MonoBehaviour
 
                 spawnObj.name = $"Spawn point - ({point.x}X, {point.y}Y)";
                 spawnObj.tag = "Spawn";
+                spawnObj.transform.parent = transform;
             }
         }
     }
