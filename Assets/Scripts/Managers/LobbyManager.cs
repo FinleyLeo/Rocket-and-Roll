@@ -53,18 +53,10 @@ public class LobbyManager : MonoBehaviour
 
     public Player GetPlayer()
     {
-        string playerName = PlayerPrefs.GetString("Username");
-
-        if (playerName == null || playerName == "")
-        {
-            playerName = playerId;
-        }
-
         Player player = new Player
         {
             Data = new Dictionary<string, PlayerDataObject>
             {
-                {"PlayerName", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, playerName) },
                 {"Username", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, PlayerPrefs.GetString("Username", "Unknown")) }
             }
         };
@@ -309,8 +301,6 @@ public class LobbyManager : MonoBehaviour
                 };
 
                 currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, updateOptions);
-
-                EnterGame();
             }
             catch (LobbyServiceException e)
             {
@@ -320,8 +310,12 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
-    public void EnterGame()
+    private void OnApplicationQuit()
     {
+        if (currentLobby != null)
+        {
+            LeaveLobby();
+        }
     }
 
     // NOT NEEDED YET, REWORK FOR INGAME LOBBY LATER
