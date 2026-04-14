@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
-public class TilemapGen : MonoBehaviour
+public class TilemapGen : NetworkBehaviour
 {
     int[,] cellGrid;
 
@@ -32,24 +33,32 @@ public class TilemapGen : MonoBehaviour
         spawnPoints = new HashSet<Vector2>();
     }
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
         cam = Camera.main;
 
-        GenerateMap();
-
-        for (int i = 0; i < autoSmoothStepAmount; i++)
+        if (IsHost)
         {
-            SmoothMap();
+            Debug.Log("Generating tilemap");
+
+            GenerateMap();
+
+            for (int i = 0; i < autoSmoothStepAmount; i++)
+                SmoothMap();
+
+            RenderTileMap();
+            GetViableSpawnPoints();
         }
-
-        RenderTileMap();
-
-        GetViableSpawnPoints();
+        else
+        {
+            Debug.Log("Not the host");
+        }
     }
 
     private void Update()
     {
+        if (!IsServer) return;
+
         if (Keyboard.current.gKey.wasPressedThisFrame)
         {
             GenerateAutoSmooth();
@@ -85,6 +94,25 @@ public class TilemapGen : MonoBehaviour
 
     void RenderTileMap()
     {
+        // Clear old tiles
+        mainTileMap.ClearAllTiles();
+
+        // Set new tiles
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+            {
+                if (cellGrid[x, y] == 1)
+                    mainTileMap.SetTile(new Vector3Int(x, y), wallTile);
+            }
+
+        SendMapToClientRPC(width, height, cellGrid);
+    }
+
+    [Rpc(SendTo.NotServer)]
+    void SendMapToClientRPC(int width, int height, int[,] cellGrid)
+    {
+        cam.transform.position = new Vector3(width / 2, height / 2, -10);
+
         // Clear old tiles
         mainTileMap.ClearAllTiles();
 
@@ -141,6 +169,8 @@ public class TilemapGen : MonoBehaviour
 
         return neighbourCount;
     }
+
+    #region Spawn points
 
     void GetViableSpawnPoints()
     {
@@ -209,4 +239,6 @@ public class TilemapGen : MonoBehaviour
             }
         }
     }
+
+    #endregion
 }

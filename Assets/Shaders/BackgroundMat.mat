@@ -46,7 +46,7 @@ Material:
     - _Radius: 0.668
     - _Rotation: 135
     - _TYPE: 0
-    - _Type: 1
+    - _Type: 0
     m_Colors:
     - White: {r: 1, g: 1, b: 1, a: 1}
     - _Background_Color: {r: 0.94509804, g: 0.9490196, b: 0.85490197, a: 1}
