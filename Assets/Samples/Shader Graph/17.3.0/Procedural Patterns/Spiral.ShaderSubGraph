@@ -702,7 +702,7 @@
     "m_Title": "Create repeating radial line from center",
     "m_Position": {
         "x": -805.0,
-        "y": -545.0
+        "y": -544.9998779296875
     }
 }
 
@@ -1562,8 +1562,8 @@
     "m_ObjectId": "5845d322dc6a485a950a202e193eff43",
     "m_Title": "Determine Width and draw smooth edge",
     "m_Position": {
-        "x": 721.0,
-        "y": -388.0
+        "x": 720.9999389648438,
+        "y": -387.99993896484377
     }
 }
 
@@ -2880,7 +2880,7 @@
     "m_Title": "Create radial UVs",
     "m_Position": {
         "x": -2396.0,
-        "y": -443.0
+        "y": -442.9999694824219
     }
 }
 

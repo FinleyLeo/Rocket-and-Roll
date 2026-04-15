@@ -1030,7 +1030,7 @@
     "m_ObjectId": "0cb817a3d5614388ac852c0b8220285a",
     "m_Title": "Spiral",
     "m_Position": {
-        "x": -1629.000244140625,
+        "x": -1629.0,
         "y": 1120.0
     }
 }
@@ -1345,7 +1345,7 @@
     "m_ObjectId": "1d20d805abbf43bcb9c3c4cf0d1e2be5",
     "m_Title": "Lines",
     "m_Position": {
-        "x": -2009.00048828125,
+        "x": -2009.0,
         "y": 313.0
     }
 }
@@ -1589,8 +1589,8 @@
     "m_ShaderOutputName": "_tiling",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 1.2000000476837159,
-        "y": 1.2000000476837159
+        "x": 1.600000023841858,
+        "y": 1.600000023841858
     },
     "m_DefaultValue": {
         "x": 0.0,
@@ -1726,8 +1726,8 @@
     "m_ShaderOutputName": "Tiling",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 30.0,
-        "y": 30.0
+        "x": 40.0,
+        "y": 40.0
     },
     "m_DefaultValue": {
         "x": 1.0,
@@ -3693,8 +3693,8 @@
     "m_ShaderOutputName": "_position",
     "m_StageCapability": 3,
     "m_Value": {
-        "x": 0.6000000238418579,
-        "y": 0.6000000238418579
+        "x": 0.800000011920929,
+        "y": 0.800000011920929
     },
     "m_DefaultValue": {
         "x": 0.0,

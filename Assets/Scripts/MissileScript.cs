@@ -35,7 +35,6 @@ public class MissileScript : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        //position.Value = transform.position;
         constantVelocity = 0.15f;
         startVelocity *= 3;
 
@@ -56,11 +55,7 @@ public class MissileScript : NetworkBehaviour
 
     void Update()
     {
-        if (!IsServer)
-        {
-            //transform.position = position.Value;
-            return;
-        }
+        if (!IsServer) return;
 
         // If still alive after x seconds, destroy
         lifeTime -= Time.deltaTime;
@@ -90,8 +85,6 @@ public class MissileScript : NetworkBehaviour
             transform.position += (Vector3)startVelocity;
             startVelocity *= 0.95f;
         }
-
-        //position.Value = transform.position;
     }
 
     void Explode()
