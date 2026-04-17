@@ -116,6 +116,7 @@ public class MissileScript : NetworkBehaviour
                 // component references
                 NetworkObject player = client.PlayerObject;
                 PlayerMovement playerScript = player.GetComponent<PlayerMovement>();
+                PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
                 Rigidbody2D playerRB = player.GetComponent<Rigidbody2D>();
 
                 // calculations for knockback angle and strength based on distance from explosion
@@ -125,12 +126,14 @@ public class MissileScript : NetworkBehaviour
                 reversedDistance = Mathf.Clamp(reversedDistance, 0, explosionForce);
 
                 // only adds knockback effects if the knockback strength is above the threshold
-                if (reversedDistance > 1)
+                if (reversedDistance > 0.5f)
                 {
                     playerScript.airDecayTimer = 0.5f;
                     playerScript.canStopEarly = false;
 
                     playerRB.linearVelocity = (knockDir * reversedDistance);
+
+                    playerHealth.TakeDamageRPC(1);
                 }
             }
         }

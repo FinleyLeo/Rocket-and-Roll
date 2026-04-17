@@ -1,9 +1,10 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerHealth : MonoBehaviour
+public class PlayerHealth : NetworkBehaviour
 {
-    public int maxHealth = 2;
+    public int maxHealth = 1;
     public int health;
     public bool isAlive;
 
@@ -12,7 +13,8 @@ public class PlayerHealth : MonoBehaviour
     Animator anim;
 
     [SerializeField] Sprite ghostSprite;
-    [SerializeField] TrailRenderer ghostTrail;
+    [SerializeField] ParticleSystem ghostTrail, outlineTrail;
+    [SerializeField] ParticleSystem smokeTrail;
 
     [SerializeField] GameObject rpgObj, eyesObj, emptyHandsObj;
 
@@ -25,7 +27,9 @@ public class PlayerHealth : MonoBehaviour
         anim = GetComponent<Animator>();
 
         isAlive = true;
-        ghostTrail.enabled = false;
+
+        outlineTrail = ghostTrail.transform.GetChild(0).GetComponent<ParticleSystem>();
+        ghostTrail.Stop();
     }
 
     private void Start()
@@ -37,14 +41,6 @@ public class PlayerHealth : MonoBehaviour
 
     private void Update()
     {
-        // Debug death
-        if (Keyboard.current.vKey.wasPressedThisFrame)
-        {
-            isAlive = !isAlive;
-
-            SwitchAliveState();
-        }
-
         if (!isAlive)
         {
             GhostVisual();
@@ -55,62 +51,51 @@ public class PlayerHealth : MonoBehaviour
             if (sr.color.a != 1f)
             {
                 SetAlpha(alphaAmount);
-
-                Debug.Log("Set alpha to max");
             }
         }
-
-        Debug.Log(alphaAmount);
     }
 
-    public void TakeDamage(int damage)
+    [Rpc(SendTo.Server)]
+    public void TakeDamageRPC(int damage)
     {
         health -= damage;
 
-        Debug.Log($"Took {damage} Damage, {health} health left");
-
         if (health <= 0)
         {
-            isAlive = false;
-
-            SwitchAliveState();
+            SendDieRPC();
         }
     }
 
-    void SwitchAliveState()
+    [Rpc(SendTo.ClientsAndHost)]
+    void SendDieRPC()
     {
-        // specific to death scenario
-        if (!isAlive)
-        {
-            Debug.Log("Died");
-            rb.linearVelocity = Vector3.zero;
-            sr.sprite = ghostSprite;
-        }
-        else
-        {
-            alphaAmount = 1f;
-        }
+        isAlive = false;
+
+        Debug.Log("Died");
+        rb.linearVelocity = Vector3.zero;
+        sr.sprite = ghostSprite;
 
         // Disable components
-        rb.simulated = isAlive;
-        GetComponent<Collider2D>().enabled = isAlive;
-        anim.enabled = isAlive;
+        rb.simulated = false;
+        GetComponent<Collider2D>().enabled = false;
+        anim.enabled = false;
 
         // Switch visuals
-        eyesObj.SetActive(isAlive);
-        rpgObj.SetActive(isAlive);
-        emptyHandsObj.SetActive(!isAlive);
+        eyesObj.SetActive(false);
+        rpgObj.SetActive(false);
+        emptyHandsObj.SetActive(true);
 
-        ghostTrail.enabled = !isAlive;
+        smokeTrail.Stop();
+        ghostTrail.Play();
     }
 
     void GhostVisual()
     {
-        // Add wispy ghost movement upwards
+        // Adds wispy ghost movement upwards
         Vector2 moveDir = new Vector2(Mathf.Sin(Time.time * 5) * 2f, 2f);
         transform.Translate(moveDir * Time.deltaTime);
 
-        // Gradually fade out player sprite
+        // Gradually fades out the players sprite
         alphaAmount -= Time.deltaTime * 0.75f;
         alphaAmount = Mathf.Clamp01(alphaAmount);
 
@@ -126,6 +111,11 @@ public class PlayerHealth : MonoBehaviour
             child.color = new Color(1, 1, 1, alpha);
         }
 
-        ghostTrail.startColor = new Color(1, 1, 1, alpha);
+        // Set alpha values of ghost trail
+        ParticleSystem.MainModule ma = ghostTrail.main;
+        ParticleSystem.MainModule _ma = outlineTrail.main;
+
+        ma.startColor = new Color(1, 1, 1, Mathf.Clamp01((alpha * 0.5f) - 0.3f));
+        _ma.startColor = new Color(1, 1, 1, Mathf.Clamp01((alpha * 0.5f) - 0.5f));
     }
 }

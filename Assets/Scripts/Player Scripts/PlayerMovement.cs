@@ -144,7 +144,7 @@ public class PlayerMovement : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (playerHealth.isAlive)
+        if (IsOwner && playerHealth.isAlive)
         {
             if (PauseMenuScript.instance != null)
             {
