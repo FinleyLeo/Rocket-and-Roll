@@ -12,12 +12,13 @@ public class PlayerShooting : NetworkBehaviour
     public float cooldownTimer;
 
     PlayerMovement playerScript;
+    PlayerHealth playerHealth;
     Rigidbody2D playerRB;
-
 
     private void Start()
     {
         playerScript = GetComponentInParent<PlayerMovement>();
+        playerHealth = GetComponentInParent<PlayerHealth>();
         playerRB = GetComponentInParent<Rigidbody2D>();
 
         attackAction = InputSystem.actions.FindAction("Shoot");
@@ -35,13 +36,16 @@ public class PlayerShooting : NetworkBehaviour
             cooldownTimer -= Time.deltaTime;
             cooldownTimer = Mathf.Clamp(cooldownTimer, 0, cooldown);
 
-            if ((PauseMenuScript.instance != null && !PauseMenuScript.instance.isPaused))
+            if (playerHealth.isAlive)
             {
-                if (playerScript.rollState == RollState.Normal)
+                if ((PauseMenuScript.instance != null && !PauseMenuScript.instance.isPaused))
                 {
-                    if (attackAction.WasPressedThisFrame() && cooldownTimer <= 0)
+                    if (playerScript.rollState == RollState.Normal)
                     {
-                        Shoot();
+                        if (attackAction.WasPressedThisFrame() && cooldownTimer <= 0)
+                        {
+                            Shoot();
+                        }
                     }
                 }
             }

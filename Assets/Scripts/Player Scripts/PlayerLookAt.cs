@@ -8,8 +8,10 @@ public class PlayerLookAt : NetworkBehaviour
     Transform rpgPivot;
     Transform rpg;
     Transform eyeTransform;
-    PlayerMovement playerScript;
-    PlayerShooting playerShootScript;
+
+    PlayerMovement moveScript;
+    PlayerShooting shootScript;
+    PlayerHealth healthScript;
 
     readonly float clampDistance = 0.35f;
 
@@ -23,10 +25,11 @@ public class PlayerLookAt : NetworkBehaviour
 
     private void Start()
     {
-        playerScript = GetComponent<PlayerMovement>();
-        playerShootScript = GetComponentInChildren<PlayerShooting>();
+        moveScript = GetComponent<PlayerMovement>();
+        healthScript = GetComponent<PlayerHealth>();
+        shootScript = GetComponentInChildren<PlayerShooting>();
 
-        if (playerScript == null)
+        if (moveScript == null)
         {
             Debug.Log("Player script not found");
         }
@@ -44,30 +47,33 @@ public class PlayerLookAt : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        if (PauseMenuScript.instance != null)
+        if (healthScript.isAlive)
         {
-            if (!PauseMenuScript.instance.isPaused)
+            if (PauseMenuScript.instance != null)
             {
-                LookAtMouse();
+                if (!PauseMenuScript.instance.isPaused)
+                {
+                    LookAtMouse();
+                }
             }
-        }
 
-        if (playerScript.inFullRoll)
-        {
-            eyeTransform.localPosition = eyePivot.localPosition;
-            eyesLocked = true;
+            if (moveScript.inFullRoll)
+            {
+                eyeTransform.localPosition = eyePivot.localPosition;
+                eyesLocked = true;
 
-            eyeTransform.rotation = eyeStoredRotation;
-            eyeTransform.rotation = Quaternion.Euler(0, 0, eyeTransform.rotation.eulerAngles.z + rotationSpeed);
-            eyeStoredRotation = eyeTransform.rotation;
-        }
-        else
-        {
-            eyesLocked = false;
+                eyeTransform.rotation = eyeStoredRotation;
+                eyeTransform.rotation = Quaternion.Euler(0, 0, eyeTransform.rotation.eulerAngles.z + rotationSpeed);
+                eyeStoredRotation = eyeTransform.rotation;
+            }
+            else
+            {
+                eyesLocked = false;
 
-            rotationSpeed = 0;
-            eyeStoredRotation = eyeTransform.rotation;
-            eyeTransform.rotation = Quaternion.Euler(0, 0, 0);
+                rotationSpeed = 0;
+                eyeStoredRotation = eyeTransform.rotation;
+                eyeTransform.rotation = Quaternion.Euler(0, 0, 0);
+            }
         }
     }
 
@@ -109,6 +115,6 @@ public class PlayerLookAt : NetworkBehaviour
         }
 
         // Visualises cooldown through rpg recoil
-        rpg.localPosition = rpglookDir * (-playerShootScript.cooldownTimer * 0.45f);
+        rpg.localPosition = rpglookDir * (-shootScript.cooldownTimer * 0.45f);
     }
 }

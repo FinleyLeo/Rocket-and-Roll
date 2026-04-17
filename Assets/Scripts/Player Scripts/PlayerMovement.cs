@@ -28,6 +28,7 @@ public class PlayerMovement : NetworkBehaviour
     Animator anim;
     SpriteRenderer sr;
     PlayerLookAt playerVisualScript;
+    PlayerHealth playerHealth;
 
     [HideInInspector] public RollState rollState;
     public bool inFullRoll;
@@ -92,7 +93,9 @@ public class PlayerMovement : NetworkBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
+
         playerVisualScript = GetComponent<PlayerLookAt>();
+        playerHealth = GetComponent<PlayerHealth>();
 
         if (rbNotFound)
         {
@@ -122,38 +125,44 @@ public class PlayerMovement : NetworkBehaviour
 
         moveDir = moveAction.ReadValue<Vector2>().x;
 
-        if (PauseMenuScript.instance != null)
+        if (playerHealth.isAlive)
         {
-            if (!PauseMenuScript.instance.isPaused)
+            if (PauseMenuScript.instance != null)
             {
-                JumpPreRegister();
+                if (!PauseMenuScript.instance.isPaused)
+                {
+                    JumpPreRegister();
+                }
             }
-        }
 
-        RollCheck();
-        AnimationChecks();
+            RollCheck();
+            AnimationChecks();
+        }
 
         position.Value = transform.position;
     }
 
     private void FixedUpdate()
     {
-        if (PauseMenuScript.instance != null)
+        if (playerHealth.isAlive)
         {
-            if (!PauseMenuScript.instance.isPaused)
+            if (PauseMenuScript.instance != null)
             {
-                Move();
+                if (!PauseMenuScript.instance.isPaused)
+                {
+                    Move();
+                }
+                else
+                {
+                    moveDir = 0;
+                    bufferTimer = 0;
+                }
             }
-            else
-            {
-                moveDir = 0;
-                bufferTimer = 0;
-            }
-        }
 
-        JumpCheck();
-        VelocityDecay();
-        ClampVelocity();
+            JumpCheck();
+            VelocityDecay();
+            ClampVelocity();
+        }
     }
 
     void Move()

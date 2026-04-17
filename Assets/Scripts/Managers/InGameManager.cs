@@ -147,6 +147,16 @@ public class InGameManager : NetworkBehaviour
                 _ps.sortingOrder += orderIncrement;
             }
         }
+
+        // switch out for current system at some point, more efficient and covers all children
+        //SpriteRenderer[] children = GetComponentsInChildren<SpriteRenderer>();
+
+        //foreach (SpriteRenderer child in children)
+        //{
+        //    child.color = new Color(1, 1, 1, alpha);
+        //}
+
+        //ghostTrail.startColor = new Color(1, 1, 1, alpha);
     }
 }
 
