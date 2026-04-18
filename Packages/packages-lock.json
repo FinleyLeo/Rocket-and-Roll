@@ -126,7 +126,7 @@
       "dependencies": {}
     },
     "com.unity.ide.rider": {
-      "version": "3.0.39",
+      "version": "3.0.40",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -176,7 +176,7 @@
       }
     },
     "com.unity.netcode.gameobjects": {
-      "version": "2.9.2",
+      "version": "2.11.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -379,7 +379,7 @@
       }
     },
     "com.unity.visualscripting": {
-      "version": "1.9.10",
+      "version": "1.9.11",
       "depth": 0,
       "source": "registry",
       "dependencies": {

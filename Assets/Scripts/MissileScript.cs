@@ -1,6 +1,7 @@
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MissileScript : NetworkBehaviour
 {
@@ -133,7 +134,10 @@ public class MissileScript : NetworkBehaviour
 
                     playerRB.linearVelocity = (knockDir * reversedDistance);
 
-                    playerHealth.TakeDamageRPC(1);
+                    if (playerId != playerScript.playerId && SceneManager.GetActiveScene().name != "Lobby")
+                    {
+                        playerHealth.TakeDamageRPC(1);
+                    }
                 }
             }
         }

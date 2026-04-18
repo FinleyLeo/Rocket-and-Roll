@@ -11,10 +11,10 @@ public class PlayerHealth : NetworkBehaviour
     Rigidbody2D rb;
     SpriteRenderer sr;
     Animator anim;
+    PlayerMovement moveScript;
 
     [SerializeField] Sprite ghostSprite;
-    [SerializeField] ParticleSystem ghostTrail, outlineTrail;
-    [SerializeField] ParticleSystem smokeTrail;
+    [SerializeField] TrailRenderer ghostTrail;
 
     [SerializeField] GameObject rpgObj, eyesObj, emptyHandsObj;
 
@@ -25,11 +25,11 @@ public class PlayerHealth : NetworkBehaviour
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        moveScript = GetComponent<PlayerMovement>();
 
         isAlive = true;
 
-        outlineTrail = ghostTrail.transform.GetChild(0).GetComponent<ParticleSystem>();
-        ghostTrail.Stop();
+        ghostTrail.enabled = false;
     }
 
     private void Start()
@@ -85,15 +85,22 @@ public class PlayerHealth : NetworkBehaviour
         rpgObj.SetActive(false);
         emptyHandsObj.SetActive(true);
 
-        smokeTrail.Stop();
-        ghostTrail.Play();
+        if (IsOwner)
+        {
+            moveScript.knockBacked.Value = false;
+        }
+
+        ghostTrail.enabled = true;
     }
 
     void GhostVisual()
     {
         // Adds wispy ghost movement upwards
-        Vector2 moveDir = new Vector2(Mathf.Sin(Time.time * 5) * 2f, 2f);
-        transform.Translate(moveDir * Time.deltaTime);
+        if (IsOwner)
+        {
+            Vector2 moveDir = new Vector2(Mathf.Sin(Time.time * 5) * 2f, 2f);
+            transform.Translate(moveDir * Time.deltaTime);
+        }
 
         // Gradually fades out the players sprite
         alphaAmount -= Time.deltaTime * 0.75f;
@@ -112,10 +119,6 @@ public class PlayerHealth : NetworkBehaviour
         }
 
         // Set alpha values of ghost trail
-        ParticleSystem.MainModule ma = ghostTrail.main;
-        ParticleSystem.MainModule _ma = outlineTrail.main;
-
-        ma.startColor = new Color(1, 1, 1, Mathf.Clamp01((alpha * 0.5f) - 0.3f));
-        _ma.startColor = new Color(1, 1, 1, Mathf.Clamp01((alpha * 0.5f) - 0.5f));
+        ghostTrail.startColor = new Color(1, 1, 1, alpha);
     }
 }
