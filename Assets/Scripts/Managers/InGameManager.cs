@@ -4,20 +4,32 @@ using TMPro;
 using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class InGameManager : NetworkBehaviour
 {
+    public static InGameManager Instance;
+
     List<Player> players;
     List<NetworkClient> netPlayers;
-
-    NetworkVariable<bool> roundStarted = new NetworkVariable<bool>(false);
+    public NetworkVariable<int> playersAlive = new();
 
     [SerializeField] TextMeshProUGUI roomNameText;
     [SerializeField] TextMeshProUGUI roomCodeText;
 
     [SerializeField] Button startGameButton;
+
+    bool canStartGame;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+    }
 
     void Start()
     {
@@ -32,11 +44,7 @@ public class InGameManager : NetworkBehaviour
             roomNameText.text = LobbyManager.Instance.currentLobby.Name;
             roomCodeText.text = LobbyManager.Instance.currentLobby.LobbyCode;
 
-            if (IsHost)
-            {
-                startGameButton.interactable = true;
-                startGameButton.onClick.AddListener(StartGame);
-            }
+            startGameButton.onClick.AddListener(StartGame);
         }
 
         UpdatePlayerInfo();
@@ -44,9 +52,53 @@ public class InGameManager : NetworkBehaviour
         NetworkManager.Singleton.OnClientConnectedCallback += (ulong clientId) => UpdatePlayerInfo();
     }
 
+    private void Update()
+    {
+        if (SceneManager.GetActiveScene().name == "Lobby")
+        {
+            if (IsHost && !canStartGame && netPlayers.Count > 1)
+            {
+                canStartGame = true;
+
+                startGameButton.interactable = true;
+            }
+        }
+
+        if (SceneManager.GetActiveScene().name == "RanGen")
+        {
+            Debug.Log(playersAlive.Value + " / " + netPlayers.Count + " players alive");
+        }
+
+        if (Keyboard.current.gKey.wasPressedThisFrame)
+        {
+            StartNewRound();
+        }
+    }
+
     void StartGame()
     {
         NetworkManager.Singleton.SceneManager.LoadScene("RanGen", LoadSceneMode.Single);
+    }
+
+    public void StartNewRound()
+    {
+        if (SceneManager.GetActiveScene().name == "RanGen")
+        {
+            playersAlive.Value = netPlayers.Count;
+
+            TilemapGen.Instance.GenerateAutoSmooth();
+
+            Debug.Log("Generated map");
+            return;
+        }
+
+        Debug.Log("Not in gameplay scene");
+    }
+
+    [Rpc(SendTo.Server)]
+    public void ModifyPlayersAliveRPC(int addAmount)
+    {
+        playersAlive.Value += addAmount;
     }
 
     void UpdatePlayerLists()
@@ -118,7 +170,7 @@ public class InGameManager : NetworkBehaviour
 
             foreach (Renderer childRend in children)
             {
-                if (childRend.sortingOrder < 6)
+                if (childRend.sortingOrder < 5)
                 {
                     childRend.sortingOrder += clientOrder;
                 }

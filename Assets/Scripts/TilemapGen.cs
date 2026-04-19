@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -46,13 +47,7 @@ public class TilemapGen : NetworkBehaviour
 
         if (IsHost)
         {
-            GenerateMap();
-
-            for (int i = 0; i < autoSmoothStepAmount; i++)
-                SmoothMap();
-
-            RenderTileMap();
-            GetViableSpawnPoints();
+            StartCoroutine(DelayRoundStart());
         }
     }
 
@@ -66,9 +61,16 @@ public class TilemapGen : NetworkBehaviour
         }
     }
 
+    IEnumerator DelayRoundStart()
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        InGameManager.Instance.StartNewRound();
+    }
+
     #region Generation
 
-    void GenerateAutoSmooth()
+    public void GenerateAutoSmooth()
     {
         GenerateMap();
 

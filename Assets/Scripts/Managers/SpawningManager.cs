@@ -49,7 +49,6 @@ public class SpawningManager : NetworkBehaviour
 
         else
         {
-            Debug.Log($"Points not finished generating, client: ({clientId}) added to queue");
             pendingClients.Enqueue(clientId);
         }
     }
@@ -92,8 +91,6 @@ public class SpawningManager : NetworkBehaviour
         // checks for spawn points until found (atleast one spawn point)
         while (spawnPoints.Count == 0)
         {
-            Debug.Log("Looking for spawn points");
-
             GameObject[] temp = GameObject.FindGameObjectsWithTag("Spawn");
 
             if (temp.Length > 0)
@@ -113,8 +110,6 @@ public class SpawningManager : NetworkBehaviour
         }
 
         pointsReady.Value = true;
-
-        Debug.Log("found spawn points");
 
         SpawnPlayersRPC();
 
@@ -171,8 +166,6 @@ public class SpawningManager : NetworkBehaviour
             yield return null;
         }
 
-        Debug.Log("Assigned point at " + spawnPos + " to client " + clientId);
-
         // tell client where to spawn
         TeleportClientRPC(spawnPos, RpcTarget.Single(clientId, RpcTargetUse.Temp));
     }
@@ -188,12 +181,18 @@ public class SpawningManager : NetworkBehaviour
         foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
         {
             NetworkObject obj = client.PlayerObject;
+            PlayerHealth clientHealth = obj.GetComponent<PlayerHealth>();
 
             if (obj.IsOwner)
             {
+                // Respawns player if previously killed
+                if (!clientHealth.isAlive)
+                {
+                    clientHealth.SendRespawnRPC();
+                }
+
                 obj.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
                 obj.transform.position = position;
-                Debug.Log("Teleported to: " + position);
                 break;
             }
         }

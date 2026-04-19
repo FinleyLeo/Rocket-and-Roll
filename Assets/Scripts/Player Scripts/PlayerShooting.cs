@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -62,29 +63,29 @@ public class PlayerShooting : NetworkBehaviour
 
             MissileScript missileScript = missile.GetComponent<MissileScript>();
 
-            missileScript.playerId = playerScript.playerId;
             missileScript.startVelocity = playerRB.linearVelocity * 0.002f;
 
             missile.GetComponent<NetworkObject>().Spawn(true);
+            missileScript.playerId.Value = playerScript.playerId;
         }
         else
         {
-            SpawnMissileRPC(playerRB.linearVelocity);
+            SpawnMissileRPC(playerRB.linearVelocity, playerScript.playerId);
         }
     }
 
     [Rpc(SendTo.Server)]
-    void SpawnMissileRPC(Vector2 velocity)
+    void SpawnMissileRPC(Vector2 velocity, string playerId)
     {
         //var missile = Instantiate(missilePrefab, transform.position, transform.rotation);
         var missile = Instantiate(missilePrefab, transform.position, Quaternion.Euler(RotationAlignment(transform.rotation.eulerAngles)));
 
         MissileScript missileScript = missile.GetComponent<MissileScript>();
 
-        missileScript.playerId = playerScript.playerId;
         missileScript.startVelocity = velocity * 0.001f;
 
         missile.GetComponent<NetworkObject>().Spawn(true);
+        missileScript.playerId.Value = playerId;
     }
 
     // used to reduce visual artifacts from pixel art upscaling as missiles rotate a lot

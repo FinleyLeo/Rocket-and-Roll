@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -16,7 +17,8 @@ public class MissileScript : NetworkBehaviour
     [HideInInspector] public Vector2 startVelocity;
     float lifeTime = 5;
 
-    public string playerId;
+    //public string playerId;
+    public NetworkVariable<FixedString64Bytes> playerId = new();
 
     [SerializeField] ParticleSystem explosion;
     [SerializeField] GameObject rocketTrail;
@@ -134,7 +136,7 @@ public class MissileScript : NetworkBehaviour
 
                     playerRB.linearVelocity = (knockDir * reversedDistance);
 
-                    if (playerId != playerScript.playerId && SceneManager.GetActiveScene().name != "Lobby")
+                    if (playerId.Value != playerScript.playerId && SceneManager.GetActiveScene().name != "Lobby")
                     {
                         playerHealth.TakeDamageRPC(1);
                     }
@@ -151,7 +153,7 @@ public class MissileScript : NetworkBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             // Only collides if hitting someone other than the shooter and if the player id is set
-            if (playerId != collision.gameObject.GetComponent<PlayerMovement>().playerId && !string.IsNullOrEmpty(playerId))
+            if (playerId.Value != collision.gameObject.GetComponent<PlayerMovement>().playerId && !string.IsNullOrEmpty(playerId.ToString()))
             {
                 Explode();
             }

@@ -8,6 +8,8 @@ public class PlayerHealth : NetworkBehaviour
     public int health;
     public bool isAlive;
 
+    public NetworkVariable<int> points = new NetworkVariable<int>();
+
     Rigidbody2D rb;
     SpriteRenderer sr;
     Animator anim;
@@ -53,6 +55,18 @@ public class PlayerHealth : NetworkBehaviour
                 SetAlpha(alphaAmount);
             }
         }
+
+        if (Keyboard.current.rKey.wasPressedThisFrame && IsOwner)
+        {
+            if (!isAlive)
+            {
+                SendRespawnRPC();
+            }
+            else
+            {
+                SendDieRPC();
+            }
+        }
     }
 
     [Rpc(SendTo.Server)]
@@ -71,7 +85,7 @@ public class PlayerHealth : NetworkBehaviour
     {
         isAlive = false;
 
-        Debug.Log("Died");
+        Debug.Log("Player " + moveScript.playerId + " Died");
         rb.linearVelocity = Vector3.zero;
         sr.sprite = ghostSprite;
 
@@ -80,7 +94,7 @@ public class PlayerHealth : NetworkBehaviour
         GetComponent<Collider2D>().enabled = false;
         anim.enabled = false;
 
-        // Switch visuals
+        // Switch to death visuals
         eyesObj.SetActive(false);
         rpgObj.SetActive(false);
         emptyHandsObj.SetActive(true);
@@ -88,9 +102,35 @@ public class PlayerHealth : NetworkBehaviour
         if (IsOwner)
         {
             moveScript.knockBacked.Value = false;
+
+            if (InGameManager.Instance.playersAlive.Value > 0)
+            {
+                InGameManager.Instance.ModifyPlayersAliveRPC(-1);
+            }
         }
 
         ghostTrail.enabled = true;
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void SendRespawnRPC()
+    {
+        isAlive = true;
+
+        Debug.Log("Player " + moveScript.playerId + " Revived");
+
+        // Enable components
+        rb.simulated = true;
+        GetComponent<Collider2D>().enabled = true;
+        anim.enabled = true;
+
+        // Revert visuals
+        alphaAmount = 1f;
+        eyesObj.SetActive(true);
+        rpgObj.SetActive(true);
+        emptyHandsObj.SetActive(false);
+
+        ghostTrail.enabled = false;
     }
 
     void GhostVisual()
