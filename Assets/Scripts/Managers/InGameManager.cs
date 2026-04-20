@@ -15,11 +15,15 @@ public class InGameManager : NetworkBehaviour
     List<Player> players;
     List<NetworkClient> netPlayers;
     public NetworkVariable<int> playersAlive = new();
+    public bool gameStarted, roundEnding;
 
     [SerializeField] TextMeshProUGUI roomNameText;
     [SerializeField] TextMeshProUGUI roomCodeText;
 
     [SerializeField] Button startGameButton;
+    [SerializeField] GameObject pointsInfoPrefab, pointsDisplay;
+
+    List<PointsDisplayScript> pointsDisplays;
 
     bool canStartGame;
 
@@ -64,20 +68,53 @@ public class InGameManager : NetworkBehaviour
             }
         }
 
-        if (SceneManager.GetActiveScene().name == "RanGen")
+        // Win condition for rounds
+        if (playersAlive.Value <= 1 && IsHost && gameStarted && !roundEnding)
         {
-            Debug.Log(playersAlive.Value + " / " + netPlayers.Count + " players alive");
+            roundEnding = true;
+            StartCoroutine(RoundEndDelay());
         }
 
-        if (Keyboard.current.gKey.wasPressedThisFrame)
+        #region testing
+
+        if (SceneManager.GetActiveScene().name == "RanGen")
+        {
+            //Debug.Log(playersAlive.Value + " / " + netPlayers.Count + " players alive");
+        }
+
+        if (Keyboard.current.gKey.wasPressedThisFrame && IsHost)
         {
             StartNewRound();
         }
+
+        #endregion
     }
 
     void StartGame()
     {
         NetworkManager.Singleton.SceneManager.LoadScene("RanGen", LoadSceneMode.Single);
+    }
+
+    IEnumerator RoundEndDelay()
+    {
+        Debug.Log("Round Finished! Starting next round...");
+
+        for (int i = 0; i < netPlayers.Count; i++)
+        {
+            PlayerMovement moveScript = netPlayers[i].PlayerObject.GetComponent<PlayerMovement>();
+            PlayerHealth healthScript = moveScript.GetComponent<PlayerHealth>();
+
+            if (healthScript.isAlive)
+            {
+                // Last player alive awarded one point
+                moveScript.ModifyPointsRPC(1);
+            }
+        }
+
+        yield return new WaitForSeconds(3);
+
+        StartNewRound();
+        roundEnding = false;
     }
 
     public void StartNewRound()
@@ -89,10 +126,7 @@ public class InGameManager : NetworkBehaviour
             TilemapGen.Instance.GenerateAutoSmooth();
 
             Debug.Log("Generated map");
-            return;
         }
-
-        Debug.Log("Not in gameplay scene");
     }
 
     [Rpc(SendTo.Server)]
@@ -115,6 +149,8 @@ public class InGameManager : NetworkBehaviour
     {
         // Loads values of every player to get new joiner up to date and old joiners to track new player
         UpdatePlayerLists();
+
+        CreatePlayerDisplay();
 
         for (int i = 0; i < netPlayers.Count; i++)
         {
@@ -179,6 +215,49 @@ public class InGameManager : NetworkBehaviour
             #endregion layerOrdering
         }
     }
+
+    #region Points Display
+
+    void CreatePlayerDisplay()
+    {
+        // Used to create all displays for players currently in the game
+        for (int i = 0; i < netPlayers.Count; i++)
+        {
+            PlayerMovement clientObj = netPlayers[i].PlayerObject.GetComponent<PlayerMovement>();
+
+            // Assign player id
+            clientObj.playerId = players[i].Id;
+
+            CreatePointsInfo(clientObj);
+        }
+    }
+
+    void CreatePointsInfo(PlayerMovement clientObj)
+    {
+        PointsDisplayScript pointsInfo = Instantiate(pointsInfoPrefab, Vector3.zero, Quaternion.identity, pointsDisplay.transform).GetComponent<PointsDisplayScript>();
+
+        pointsInfo.playerId = clientObj.playerId;
+        pointsInfo.UpdatePointCount(clientObj.ReadPoints());
+    }
+
+    void ModifyExistingDisplay(List<PointsDisplayScript> pointsDisplays, PlayerMovement clientObj)
+    {
+        foreach (PointsDisplayScript pointsDisplay in pointsDisplays)
+        {
+            if (clientObj.playerId == pointsDisplay.playerId)
+            {
+
+            }
+        }
+    }
+
+    // run when new player joins the game
+    void AddNewDisplay()
+    {
+        
+    }
+
+    #endregion
 
     //void SetOrder(GameObject obj, int orderIncrement, int maxOrder)
     //{

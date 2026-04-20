@@ -129,8 +129,10 @@ public class MissileScript : NetworkBehaviour
                 reversedDistance = Mathf.Clamp(reversedDistance, 0, explosionForce);
 
                 // only adds knockback effects if the knockback strength is above the threshold
-                if (reversedDistance > 0.5f)
+                if (reversedDistance > 2f)
                 {
+                    playerRB.linearVelocity = Vector2.zero;
+
                     playerScript.airDecayTimer = 0.5f;
                     playerScript.canStopEarly = false;
 
@@ -159,7 +161,7 @@ public class MissileScript : NetworkBehaviour
             }
         }
 
-        if (collision.gameObject.CompareTag("Wall"))
+        if (collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Missile"))
         {
             Explode();
         }

@@ -45,19 +45,9 @@ public class TilemapGen : NetworkBehaviour
     {
         cam = Camera.main;
 
-        if (IsHost)
+        if (IsHost && !InGameManager.Instance.gameStarted)
         {
             StartCoroutine(DelayRoundStart());
-        }
-    }
-
-    private void Update()
-    {
-        if (!IsServer) return;
-
-        if (Keyboard.current.gKey.wasPressedThisFrame)
-        {
-            GenerateAutoSmooth();
         }
     }
 
@@ -66,6 +56,7 @@ public class TilemapGen : NetworkBehaviour
         yield return new WaitForSeconds(0.1f);
 
         InGameManager.Instance.StartNewRound();
+        InGameManager.Instance.gameStarted = true;
     }
 
     #region Generation

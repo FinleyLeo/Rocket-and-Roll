@@ -85,7 +85,6 @@ public class PlayerHealth : NetworkBehaviour
     {
         isAlive = false;
 
-        Debug.Log("Player " + moveScript.playerId + " Died");
         rb.linearVelocity = Vector3.zero;
         sr.sprite = ghostSprite;
 
@@ -116,8 +115,7 @@ public class PlayerHealth : NetworkBehaviour
     public void SendRespawnRPC()
     {
         isAlive = true;
-
-        Debug.Log("Player " + moveScript.playerId + " Revived");
+        health = maxHealth;
 
         // Enable components
         rb.simulated = true;

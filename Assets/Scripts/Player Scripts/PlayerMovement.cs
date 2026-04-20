@@ -2,6 +2,7 @@ using System;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.Rendering.DebugUI;
 
 public enum RollState
 {
@@ -16,6 +17,7 @@ public class PlayerMovement : NetworkBehaviour
     NetworkVariable<Vector2> position = new NetworkVariable<Vector2>(new Vector2(0, 5), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     [HideInInspector] public NetworkVariable<bool> isFlipped = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     [HideInInspector] public NetworkVariable<bool> knockBacked = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    NetworkVariable<int> points = new NetworkVariable<int>();
 
     public string playerId;
 
@@ -65,6 +67,7 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] ParticleSystem smokeTrail;
 
     #endregion variables
+
     public override void OnNetworkSpawn()
     {
         if (!IsOwner)
@@ -82,6 +85,8 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         knockBacked.OnValueChanged += (bool prev, bool next) => UpdateSmokeTrail();
+        points.OnValueChanged += (int prev, int next) => Debug.Log($"Client: {playerId} currently has {points.Value} point(s)");
+
     }
 
     void Start()
@@ -452,6 +457,24 @@ public class PlayerMovement : NetworkBehaviour
         {
             smokeTrail.Stop();
         }
+    }
+
+    [Rpc(SendTo.Server)]
+    public void ModifyPointsRPC(int value)
+    {
+        points.Value += value;
+
+        TempPointDisplayRPC(value);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void TempPointDisplayRPC(int value)
+    {
+        Debug.Log($"Client: {playerId} won the round! {value} point(s) awarded");
+    }
+    public int ReadPoints()
+    {
+        return points.Value;
     }
 
     private void OnDrawGizmos()
