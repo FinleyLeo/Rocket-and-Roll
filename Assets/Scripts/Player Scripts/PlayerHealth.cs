@@ -6,8 +6,9 @@ public class PlayerHealth : NetworkBehaviour
 {
     public int maxHealth = 1;
     public int health;
-    public bool isAlive;
+    //public bool isAlive;
 
+    public NetworkVariable<bool> isAlive = new NetworkVariable<bool>();
     public NetworkVariable<int> points = new NetworkVariable<int>();
 
     Rigidbody2D rb;
@@ -29,8 +30,6 @@ public class PlayerHealth : NetworkBehaviour
         anim = GetComponent<Animator>();
         moveScript = GetComponent<PlayerMovement>();
 
-        isAlive = true;
-
         ghostTrail.enabled = false;
     }
 
@@ -43,7 +42,7 @@ public class PlayerHealth : NetworkBehaviour
 
     private void Update()
     {
-        if (!isAlive)
+        if (!isAlive.Value)
         {
             GhostVisual();
         }
@@ -52,13 +51,13 @@ public class PlayerHealth : NetworkBehaviour
             // Reset all ghost visuals
             if (sr.color.a != 1f)
             {
-                SetAlpha(alphaAmount);
+                SetAlpha(1);
             }
         }
 
         if (Keyboard.current.rKey.wasPressedThisFrame && IsOwner)
         {
-            if (!isAlive)
+            if (!isAlive.Value)
             {
                 SendRespawnRPC();
             }
@@ -83,7 +82,10 @@ public class PlayerHealth : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     void SendDieRPC()
     {
-        isAlive = false;
+        if (IsHost)
+        {
+            ModifyAliveStateRPC(false);
+        }
 
         rb.linearVelocity = Vector3.zero;
         sr.sprite = ghostSprite;
@@ -114,7 +116,11 @@ public class PlayerHealth : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     public void SendRespawnRPC()
     {
-        isAlive = true;
+        if (IsHost)
+        {
+            ModifyAliveStateRPC(true);
+        }
+
         health = maxHealth;
 
         // Enable components
@@ -129,6 +135,12 @@ public class PlayerHealth : NetworkBehaviour
         emptyHandsObj.SetActive(false);
 
         ghostTrail.enabled = false;
+    }
+
+    [Rpc(SendTo.Server)]
+    public void ModifyAliveStateRPC(bool state)
+    {
+        isAlive.Value = state;
     }
 
     void GhostVisual()

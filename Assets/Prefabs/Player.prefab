@@ -1400,6 +1400,11 @@ MonoBehaviour:
   maxHealth: 1
   health: 1
   isAlive: 0
+  points:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
   ghostSprite: {fileID: 7193426204462787812, guid: 108672b11ee07f5488f9c86e6b1a5156, type: 3}
   ghostTrail: {fileID: 7335451232995978839}
   rpgObj: {fileID: 2553373157500969636}

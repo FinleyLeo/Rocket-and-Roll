@@ -47,7 +47,7 @@ public class PlayerLookAt : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        if (healthScript.isAlive)
+        if (healthScript.isAlive.Value)
         {
             if (PauseMenuScript.instance != null)
             {

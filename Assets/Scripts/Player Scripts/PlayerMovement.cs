@@ -130,7 +130,7 @@ public class PlayerMovement : NetworkBehaviour
 
         moveDir = moveAction.ReadValue<Vector2>().x;
 
-        if (playerHealth.isAlive)
+        if (playerHealth.isAlive.Value)
         {
             if (PauseMenuScript.instance != null)
             {
@@ -149,7 +149,7 @@ public class PlayerMovement : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (IsOwner && playerHealth.isAlive)
+        if (IsOwner && playerHealth.isAlive.Value)
         {
             if (PauseMenuScript.instance != null)
             {

@@ -92,6 +92,13 @@ public class InGameManager : NetworkBehaviour
 
     void StartGame()
     {
+        for (int i = 0; i < netPlayers.Count; i++)
+        {
+            PlayerHealth healthScript = netPlayers[i].PlayerObject.GetComponent<PlayerHealth>();
+
+            healthScript.ModifyAliveStateRPC(false);
+        }
+
         NetworkManager.Singleton.SceneManager.LoadScene("RanGen", LoadSceneMode.Single);
     }
 
@@ -104,7 +111,7 @@ public class InGameManager : NetworkBehaviour
             PlayerMovement moveScript = netPlayers[i].PlayerObject.GetComponent<PlayerMovement>();
             PlayerHealth healthScript = moveScript.GetComponent<PlayerHealth>();
 
-            if (healthScript.isAlive)
+            if (healthScript.isAlive.Value)
             {
                 // Last player alive awarded one point
                 moveScript.ModifyPointsRPC(1);
@@ -149,8 +156,6 @@ public class InGameManager : NetworkBehaviour
     {
         // Loads values of every player to get new joiner up to date and old joiners to track new player
         UpdatePlayerLists();
-
-        CreatePlayerDisplay();
 
         for (int i = 0; i < netPlayers.Count; i++)
         {
@@ -218,43 +223,14 @@ public class InGameManager : NetworkBehaviour
 
     #region Points Display
 
-    void CreatePlayerDisplay()
+    void UpdateDisplay()
     {
-        // Used to create all displays for players currently in the game
-        for (int i = 0; i < netPlayers.Count; i++)
-        {
-            PlayerMovement clientObj = netPlayers[i].PlayerObject.GetComponent<PlayerMovement>();
 
-            // Assign player id
-            clientObj.playerId = players[i].Id;
-
-            CreatePointsInfo(clientObj);
-        }
     }
 
-    void CreatePointsInfo(PlayerMovement clientObj)
+    void ModifyPointDisplay()
     {
-        PointsDisplayScript pointsInfo = Instantiate(pointsInfoPrefab, Vector3.zero, Quaternion.identity, pointsDisplay.transform).GetComponent<PointsDisplayScript>();
 
-        pointsInfo.playerId = clientObj.playerId;
-        pointsInfo.UpdatePointCount(clientObj.ReadPoints());
-    }
-
-    void ModifyExistingDisplay(List<PointsDisplayScript> pointsDisplays, PlayerMovement clientObj)
-    {
-        foreach (PointsDisplayScript pointsDisplay in pointsDisplays)
-        {
-            if (clientObj.playerId == pointsDisplay.playerId)
-            {
-
-            }
-        }
-    }
-
-    // run when new player joins the game
-    void AddNewDisplay()
-    {
-        
     }
 
     #endregion

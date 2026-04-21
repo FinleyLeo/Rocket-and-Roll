@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 public class SpawningManager : NetworkBehaviour
 {
@@ -40,17 +41,24 @@ public class SpawningManager : NetworkBehaviour
         if (SceneManager.GetActiveScene().name == "RanGen")
         {
             TilemapGen.Instance.SendMapToClient(clientId);
-        }
 
-        if (pointsReady.Value)
-        {
-            SpawnSingleClient(clientId); // spawn just the newly joined player
+            // if joining mid game, keep player dead and off screen
+            TeleportClientRPC(new Vector2(0, -200), RpcTarget.Single(clientId, RpcTargetUse.Temp));
+            KillOnJoinRPC(RpcTarget.Single(clientId, RpcTargetUse.Temp));
         }
-
         else
         {
-            pendingClients.Enqueue(clientId);
+            if (pointsReady.Value)
+            {
+                SpawnSingleClient(clientId); // spawn just the newly joined player
+            }
+
+            else
+            {
+                pendingClients.Enqueue(clientId);
+            }
         }
+        
     }
 
     public override void OnDestroy()
@@ -186,13 +194,31 @@ public class SpawningManager : NetworkBehaviour
             if (obj.IsOwner)
             {
                 // Respawns player if previously killed
-                if (!clientHealth.isAlive)
+                if (!clientHealth.isAlive.Value)
                 {
                     clientHealth.SendRespawnRPC();
                 }
 
                 obj.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
                 obj.transform.position = position;
+                break;
+            }
+        }
+    }
+
+    [Rpc(SendTo.SpecifiedInParams)]
+    void KillOnJoinRPC(RpcParams rpcParams = default)
+    {
+        foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            NetworkObject obj = client.PlayerObject;
+            PlayerHealth clientHealth = obj.GetComponent<PlayerHealth>();
+
+            if (obj.IsOwner)
+            {
+                Debug.Log("Killed on spawn");
+
+                clientHealth.ModifyAliveStateRPC(false);
                 break;
             }
         }
