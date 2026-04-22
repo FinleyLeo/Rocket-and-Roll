@@ -1342,6 +1342,7 @@ MonoBehaviour:
   moveSpeed: 10
   axisMaxClamps: {x: 15, y: 20}
   moveDir: 0
+  canMove: 1
   collideLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -1399,7 +1400,11 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   maxHealth: 1
   health: 1
-  isAlive: 0
+  isAlive:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
   points:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0

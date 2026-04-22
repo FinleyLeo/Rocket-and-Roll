@@ -37,7 +37,7 @@ public class PlayerShooting : NetworkBehaviour
             cooldownTimer -= Time.deltaTime;
             cooldownTimer = Mathf.Clamp(cooldownTimer, 0, cooldown);
 
-            if (playerHealth.isAlive.Value)
+            if (playerScript.canMove.Value)
             {
                 if ((PauseMenuScript.instance != null && !PauseMenuScript.instance.isPaused))
                 {

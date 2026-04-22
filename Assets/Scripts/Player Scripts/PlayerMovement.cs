@@ -2,7 +2,6 @@ using System;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEngine.Rendering.DebugUI;
 
 public enum RollState
 {
@@ -18,6 +17,7 @@ public class PlayerMovement : NetworkBehaviour
     [HideInInspector] public NetworkVariable<bool> isFlipped = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     [HideInInspector] public NetworkVariable<bool> knockBacked = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     NetworkVariable<int> points = new NetworkVariable<int>();
+    public NetworkVariable<bool> canMove = new NetworkVariable<bool>();
 
     public string playerId;
 
@@ -128,10 +128,16 @@ public class PlayerMovement : NetworkBehaviour
             return;
         }
 
-        moveDir = moveAction.ReadValue<Vector2>().x;
-
-        if (playerHealth.isAlive.Value)
+        // if not alive then set canMove to false once
+        if (canMove.Value && !playerHealth.isAlive.Value)
         {
+            ModifyCanMoveRPC(false);
+        }
+
+        if (canMove.Value)
+        {
+            moveDir = moveAction.ReadValue<Vector2>().x;
+
             if (PauseMenuScript.instance != null)
             {
                 if (!PauseMenuScript.instance.isPaused)
@@ -143,13 +149,17 @@ public class PlayerMovement : NetworkBehaviour
             RollCheck();
             AnimationChecks();
         }
+        else
+        {
+            moveDir = 0;
+        }
 
         position.Value = transform.position;
     }
 
     private void FixedUpdate()
     {
-        if (IsOwner && playerHealth.isAlive.Value)
+        if (IsOwner && canMove.Value)
         {
             if (PauseMenuScript.instance != null)
             {
@@ -442,9 +452,18 @@ public class PlayerMovement : NetworkBehaviour
 
         playerVisualScript.rotationSpeed = -(rb.linearVelocityX * (Mathf.PI * 10) * Time.deltaTime);
 
-        anim.SetBool("IsRunning", Mathf.Abs(moveDir) > 0);
-        anim.SetBool("IsFalling", IsFalling(-3));
-        anim.SetBool("IsGrounded", isGrounded);
+        if (canMove.Value)
+        {
+            anim.SetBool("IsRunning", canMove.Value && Mathf.Abs(moveDir) > 0);
+            anim.SetBool("IsFalling", canMove.Value && IsFalling(-3));
+            anim.SetBool("IsGrounded", canMove.Value && isGrounded);
+        }
+        else
+        {
+            anim.SetBool("IsRunning", false);
+            anim.SetBool("IsFalling", false);
+            anim.SetBool("IsGrounded", false);
+        }       
     }
 
     void UpdateSmokeTrail()
@@ -465,6 +484,11 @@ public class PlayerMovement : NetworkBehaviour
         points.Value += value;
 
         TempPointDisplayRPC(value);
+    }
+    [Rpc(SendTo.Server)]
+    public void ModifyCanMoveRPC(bool state)
+    {
+        canMove.Value = state;
     }
 
     [Rpc(SendTo.ClientsAndHost)]

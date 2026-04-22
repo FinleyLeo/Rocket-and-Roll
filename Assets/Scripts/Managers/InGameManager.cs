@@ -14,7 +14,8 @@ public class InGameManager : NetworkBehaviour
 
     List<Player> players;
     List<NetworkClient> netPlayers;
-    public NetworkVariable<int> playersAlive = new();
+    public NetworkVariable<int> playersAlive = new NetworkVariable<int>();
+    NetworkVariable<int> playersReady = new NetworkVariable<int>();
     public bool gameStarted, roundEnding;
 
     [SerializeField] TextMeshProUGUI roomNameText;
@@ -24,6 +25,7 @@ public class InGameManager : NetworkBehaviour
     [SerializeField] GameObject pointsInfoPrefab, pointsDisplay;
 
     List<PointsDisplayScript> pointsDisplays;
+
 
     bool canStartGame;
 
@@ -49,6 +51,12 @@ public class InGameManager : NetworkBehaviour
             roomCodeText.text = LobbyManager.Instance.currentLobby.LobbyCode;
 
             startGameButton.onClick.AddListener(StartGame);
+
+            SwitchAllPlayerMovementRPC(true, 0.25f);
+        }
+        else
+        {
+            SwitchAllPlayerMovementRPC(false, 0.25f);
         }
 
         UpdatePlayerInfo();
@@ -116,8 +124,8 @@ public class InGameManager : NetworkBehaviour
                 // Last player alive awarded one point
                 moveScript.ModifyPointsRPC(1);
             }
-        }
 
+        }
         yield return new WaitForSeconds(3);
 
         StartNewRound();
@@ -126,20 +134,64 @@ public class InGameManager : NetworkBehaviour
 
     public void StartNewRound()
     {
-        if (SceneManager.GetActiveScene().name == "RanGen")
+        playersAlive.Value = netPlayers.Count;
+
+        SwitchAllPlayerMovementRPC(false, 0.1f);
+
+        TilemapGen.Instance.GenerateAutoSmooth();
+
+        Debug.Log("Generated map");
+
+        StartCoroutine(RoundStartCountdown());
+    }
+
+    IEnumerator RoundStartCountdown()
+    {
+        // first countdown sprite
+        yield return new WaitForSeconds(1);
+        // second countdown sprite
+        yield return new WaitForSeconds(1);
+        // third countdown sprite
+        yield return new WaitForSeconds(1);
+
+        // allow players to move
+        SwitchAllPlayerMovementRPC(true, 0.1f);
+    }
+
+    [Rpc(SendTo.Server)]
+    public void SwitchAllPlayerMovementRPC(bool state, float delay)
+    {
+        StartCoroutine(DelayMovementEnabling(state, delay));
+    }
+    IEnumerator DelayMovementEnabling(bool state, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (IsHost)
         {
-            playersAlive.Value = netPlayers.Count;
+            for (int i = 0; i < netPlayers.Count; i++)
+            {
+                PlayerMovement moveScript = netPlayers[i].PlayerObject.gameObject.GetComponent<PlayerMovement>();
 
-            TilemapGen.Instance.GenerateAutoSmooth();
-
-            Debug.Log("Generated map");
+                moveScript.ModifyCanMoveRPC(state);
+            }
         }
+        else
+        {
+            Debug.Log("Not host, ");
+        }
+        
     }
 
     [Rpc(SendTo.Server)]
     public void ModifyPlayersAliveRPC(int addAmount)
     {
         playersAlive.Value += addAmount;
+    }
+    [Rpc(SendTo.Server)]
+    public void ModifyPlayersReadyRPC(int addAmount)
+    {
+        playersReady.Value += addAmount;
     }
 
     void UpdatePlayerLists()
