@@ -95,19 +95,19 @@ public class PlayerShooting : NetworkBehaviour
 
         float absXAngle = Mathf.Abs(rotation.z);
 
-        if (absXAngle < 10)
+        if (absXAngle < 5)
         {
             modifiedRotation.z = 0;
         }
-        else if (absXAngle < 100 && absXAngle > 80)
+        else if (absXAngle < 95 && absXAngle > 85)
         {
             modifiedRotation.z = 90;
         }
-        else if (absXAngle < 190 && absXAngle > 170)
+        else if (absXAngle < 185 && absXAngle > 175)
         {
             modifiedRotation.z = 180;
         }
-        else if (absXAngle < 280 && absXAngle > 260)
+        else if (absXAngle < 275 && absXAngle > 265)
         {
             modifiedRotation.z = 270;
         }
