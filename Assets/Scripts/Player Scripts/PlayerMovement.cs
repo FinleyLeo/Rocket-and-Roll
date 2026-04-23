@@ -16,7 +16,7 @@ public class PlayerMovement : NetworkBehaviour
     NetworkVariable<Vector2> position = new NetworkVariable<Vector2>(new Vector2(0, 5), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     [HideInInspector] public NetworkVariable<bool> isFlipped = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     [HideInInspector] public NetworkVariable<bool> knockBacked = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    NetworkVariable<int> points = new NetworkVariable<int>();
+    //NetworkVariable<int> points = new NetworkVariable<int>();
     public NetworkVariable<bool> canMove = new NetworkVariable<bool>();
 
     public string playerId;
@@ -85,8 +85,6 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         knockBacked.OnValueChanged += (bool prev, bool next) => UpdateSmokeTrail();
-        points.OnValueChanged += (int prev, int next) => Debug.Log($"Client: {playerId} currently has {points.Value} point(s)");
-
     }
 
     void Start()
@@ -152,6 +150,11 @@ public class PlayerMovement : NetworkBehaviour
         else
         {
             moveDir = 0;
+
+            anim.SetBool("IsRunning", false);
+            anim.SetBool("IsFalling", false);
+            anim.SetBool("IsRolling", false);
+            anim.SetBool("IsGrounded", true);
         }
 
         position.Value = transform.position;
@@ -159,24 +162,32 @@ public class PlayerMovement : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (IsOwner && canMove.Value)
+        if (canMove.Value)
         {
-            if (PauseMenuScript.instance != null)
+            if (IsOwner)
             {
-                if (!PauseMenuScript.instance.isPaused)
+                if (PauseMenuScript.instance != null)
                 {
-                    Move();
+                    if (!PauseMenuScript.instance.isPaused)
+                    {
+                        Move();
+                    }
+                    else
+                    {
+                        moveDir = 0;
+                        bufferTimer = 0;
+                    }
                 }
-                else
-                {
-                    moveDir = 0;
-                    bufferTimer = 0;
-                }
-            }
 
-            JumpCheck();
-            VelocityDecay();
-            ClampVelocity();
+                JumpCheck();
+                VelocityDecay();
+                ClampVelocity();
+            }   
+        }
+
+        else
+        {
+            rb.linearVelocity = Vector2.zero;
         }
     }
 
@@ -452,18 +463,9 @@ public class PlayerMovement : NetworkBehaviour
 
         playerVisualScript.rotationSpeed = -(rb.linearVelocityX * (Mathf.PI * 10) * Time.deltaTime);
 
-        if (canMove.Value)
-        {
-            anim.SetBool("IsRunning", canMove.Value && Mathf.Abs(moveDir) > 0);
-            anim.SetBool("IsFalling", canMove.Value && IsFalling(-3));
-            anim.SetBool("IsGrounded", canMove.Value && isGrounded);
-        }
-        else
-        {
-            anim.SetBool("IsRunning", false);
-            anim.SetBool("IsFalling", false);
-            anim.SetBool("IsGrounded", false);
-        }       
+        anim.SetBool("IsRunning", canMove.Value && Mathf.Abs(moveDir) > 0);
+        anim.SetBool("IsFalling", canMove.Value && IsFalling(-3));
+        anim.SetBool("IsGrounded", canMove.Value && isGrounded);
     }
 
     void UpdateSmokeTrail()
@@ -479,26 +481,9 @@ public class PlayerMovement : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server)]
-    public void ModifyPointsRPC(int value)
-    {
-        points.Value += value;
-
-        TempPointDisplayRPC(value);
-    }
-    [Rpc(SendTo.Server)]
     public void ModifyCanMoveRPC(bool state)
     {
         canMove.Value = state;
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    void TempPointDisplayRPC(int value)
-    {
-        Debug.Log($"Client: {playerId} won the round! {value} point(s) awarded");
-    }
-    public int ReadPoints()
-    {
-        return points.Value;
     }
 
     private void OnDrawGizmos()

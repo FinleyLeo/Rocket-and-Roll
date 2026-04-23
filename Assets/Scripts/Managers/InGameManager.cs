@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -15,7 +16,9 @@ public class InGameManager : NetworkBehaviour
     List<Player> players;
     List<NetworkClient> netPlayers;
     public NetworkVariable<int> playersAlive = new NetworkVariable<int>();
-    NetworkVariable<int> playersReady = new NetworkVariable<int>();
+    private HashSet<ulong> readyClients = new HashSet<ulong>();
+    public NetworkList<PlayerScore> scores = new NetworkList<PlayerScore>();
+
     public bool gameStarted, roundEnding;
 
     [SerializeField] TextMeshProUGUI roomNameText;
@@ -26,7 +29,6 @@ public class InGameManager : NetworkBehaviour
 
     List<PointsDisplayScript> pointsDisplays;
 
-
     bool canStartGame;
 
     private void Awake()
@@ -35,6 +37,26 @@ public class InGameManager : NetworkBehaviour
         {
             Instance = this;
         }
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        scores.OnListChanged += OnScoresChanged;
+
+        LogRankings();
+
+        if (IsHost)
+        {
+            playersAlive.Value = NetworkManager.Singleton.ConnectedClients.Count;
+
+            // Add all already-connected clients (including host) that joined before this object spawned
+            foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
+            {
+                scores.Add(new PlayerScore { clientId = client.ClientId, points = 0 });
+            }
+        }
+
+        NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
     }
 
     void Start()
@@ -52,16 +74,30 @@ public class InGameManager : NetworkBehaviour
 
             startGameButton.onClick.AddListener(StartGame);
 
-            SwitchAllPlayerMovementRPC(true, 0.25f);
+            SwitchAllPlayerMovementRPC(true, 0.1f);
         }
         else
         {
-            SwitchAllPlayerMovementRPC(false, 0.25f);
+            SwitchAllPlayerMovementRPC(false, 0.1f);
         }
 
         UpdatePlayerInfo();
+    }
 
-        NetworkManager.Singleton.OnClientConnectedCallback += (ulong clientId) => UpdatePlayerInfo();
+    public override void OnDestroy()
+    {
+        scores.OnListChanged -= OnScoresChanged;
+
+        if (NetworkManager.Singleton != null)
+            NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected;
+    }
+
+    void HandleClientConnected(ulong clientId)
+    {
+        if (IsHost) 
+            scores.Add(new PlayerScore { clientId = clientId, points = 0 });
+
+        UpdatePlayerInfo();
     }
 
     private void Update()
@@ -85,17 +121,28 @@ public class InGameManager : NetworkBehaviour
 
         #region testing
 
-        if (SceneManager.GetActiveScene().name == "RanGen")
-        {
-            //Debug.Log(playersAlive.Value + " / " + netPlayers.Count + " players alive");
-        }
-
         if (Keyboard.current.gKey.wasPressedThisFrame && IsHost)
         {
             StartNewRound();
         }
 
         #endregion
+    }
+
+    #region Round System
+
+    // Called by each client once their tilemap RPC has finished rendering
+    [Rpc(SendTo.Server)]
+    public void ClientReadyRPC(ulong clientId)
+    {
+        readyClients.Add(clientId);
+
+        if (readyClients.Count >= NetworkManager.Singleton.ConnectedClients.Count)
+        {
+            readyClients.Clear();
+            Debug.Log("All clients ready, starting round...");
+            StartCoroutine(RoundStartCountdown());
+        }
     }
 
     void StartGame()
@@ -112,21 +159,33 @@ public class InGameManager : NetworkBehaviour
 
     IEnumerator RoundEndDelay()
     {
-        Debug.Log("Round Finished! Starting next round...");
+        // One second check for if the last player alive also dies
+        // If no one is alive after the one second delay then it counts as a draw
+        yield return new WaitForSeconds(1);
 
-        for (int i = 0; i < netPlayers.Count; i++)
+        bool isDraw = playersAlive.Value <= 0;
+
+        if (!isDraw)
         {
-            PlayerMovement moveScript = netPlayers[i].PlayerObject.GetComponent<PlayerMovement>();
-            PlayerHealth healthScript = moveScript.GetComponent<PlayerHealth>();
-
-            if (healthScript.isAlive.Value)
+            for (int i = 0; i < netPlayers.Count; i++)
             {
-                // Last player alive awarded one point
-                moveScript.ModifyPointsRPC(1);
-            }
+                PlayerMovement moveScript = netPlayers[i].PlayerObject.GetComponent<PlayerMovement>();
+                PlayerHealth healthScript = moveScript.GetComponent<PlayerHealth>();
 
+                if (healthScript.isAlive.Value)
+                {
+                    // Last player alive awarded one point
+                    AwardPoint(healthScript.OwnerClientId);
+                }
+            }
         }
-        yield return new WaitForSeconds(3);
+
+        else
+        {
+            Debug.Log("Is a draw, no points awarded");
+        }
+
+        yield return new WaitForSeconds(2);
 
         StartNewRound();
         roundEnding = false;
@@ -134,29 +193,39 @@ public class InGameManager : NetworkBehaviour
 
     public void StartNewRound()
     {
-        playersAlive.Value = netPlayers.Count;
+        playersAlive.Value = NetworkManager.Singleton.ConnectedClientsList.Count;
 
         SwitchAllPlayerMovementRPC(false, 0.1f);
 
         TilemapGen.Instance.GenerateAutoSmooth();
-
-        Debug.Log("Generated map");
-
-        StartCoroutine(RoundStartCountdown());
     }
 
     IEnumerator RoundStartCountdown()
     {
+        yield return new WaitForSeconds(0.5f);
+
         // first countdown sprite
+        Debug.Log("READY");
+
         yield return new WaitForSeconds(1);
+
         // second countdown sprite
+        Debug.Log("SET");
+
         yield return new WaitForSeconds(1);
+
         // third countdown sprite
+        Debug.Log("ROLL!!");
+
         yield return new WaitForSeconds(1);
 
         // allow players to move
-        SwitchAllPlayerMovementRPC(true, 0.1f);
+        SwitchAllPlayerMovementRPC(true, 0);
     }
+
+    #endregion
+
+    #region Player
 
     [Rpc(SendTo.Server)]
     public void SwitchAllPlayerMovementRPC(bool state, float delay)
@@ -176,22 +245,12 @@ public class InGameManager : NetworkBehaviour
                 moveScript.ModifyCanMoveRPC(state);
             }
         }
-        else
-        {
-            Debug.Log("Not host, ");
-        }
-        
     }
 
     [Rpc(SendTo.Server)]
     public void ModifyPlayersAliveRPC(int addAmount)
     {
         playersAlive.Value += addAmount;
-    }
-    [Rpc(SendTo.Server)]
-    public void ModifyPlayersReadyRPC(int addAmount)
-    {
-        playersReady.Value += addAmount;
     }
 
     void UpdatePlayerLists()
@@ -201,7 +260,7 @@ public class InGameManager : NetworkBehaviour
             players = LobbyManager.Instance.currentLobby.Players;
         }
 
-        netPlayers = (List<NetworkClient>)NetworkManager.Singleton.ConnectedClientsList;
+        netPlayers = new List<NetworkClient>(NetworkManager.Singleton.ConnectedClientsList);
     }
 
     void UpdatePlayerInfo()
@@ -273,16 +332,67 @@ public class InGameManager : NetworkBehaviour
         }
     }
 
+    #endregion
+
     #region Points Display
 
-    void UpdateDisplay()
+    void AwardPoint(ulong clientId)
     {
-
+        for (int i = 0; i < scores.Count; i++)
+        {
+            if (scores[i].clientId == clientId)
+            {
+                PlayerScore score = scores[i];
+                score.points++;
+                scores[i] = score;
+                break;
+            }
+        }
     }
 
-    void ModifyPointDisplay()
+    public List<PlayerScore> GetRankedPlayers()
     {
+        List<PlayerScore> ranked = new List<PlayerScore>();
 
+        foreach (PlayerScore score in scores)
+        {
+            ranked.Add(score);
+        }
+
+        ranked.Sort((a, b) => b.points.CompareTo(a.points)); // descending
+        return ranked;
+    }
+
+    void OnScoresChanged(NetworkListEvent<PlayerScore> changeEvent)
+    {
+        // Type tells you what happened
+        switch (changeEvent.Type)
+        {
+            case NetworkListEvent<PlayerScore>.EventType.Add:
+                Debug.Log($"Player {changeEvent.Value.clientId} joined the scoreboard");
+                break;
+
+            case NetworkListEvent<PlayerScore>.EventType.Value:
+                Debug.Log($"Player {changeEvent.Value.clientId} now has {changeEvent.Value.points} points");
+                break;
+
+            case NetworkListEvent<PlayerScore>.EventType.Remove:
+                Debug.Log($"Player {changeEvent.Value.clientId} removed from scoreboard");
+                break;
+        }
+
+        // Log full rankings after any change
+        LogRankings();
+    }
+
+    void LogRankings()
+    {
+        List<PlayerScore> ranked = GetRankedPlayers();
+
+        for (int i = 0; i < ranked.Count; i++)
+        {
+            Debug.Log($"#{i + 1} - Client {ranked[i].clientId}: {ranked[i].points} pts");
+        }
     }
 
     #endregion
@@ -317,5 +427,15 @@ public class InGameManager : NetworkBehaviour
     //        }
     //    }
     //}
+}
+
+[System.Serializable]
+public struct PlayerScore : INetworkSerializeByMemcpy, System.IEquatable<PlayerScore>
+{
+    public ulong clientId;
+    public int points;
+    public FixedString64Bytes displayName;
+
+    public bool Equals(PlayerScore other) => clientId == other.clientId && points == other.points;
 }
 

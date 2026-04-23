@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
 public class TilemapGen : NetworkBehaviour
@@ -71,6 +70,8 @@ public class TilemapGen : NetworkBehaviour
         }
 
         RenderTileMap();
+        // Host signals theyre ready to themself
+        InGameManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
         GetViableSpawnPoints();
     }
 
@@ -147,6 +148,9 @@ public class TilemapGen : NetworkBehaviour
             for (int y = 0; y < height; y++)
                 if (clientGrid[x, y] == 1)
                     mainTileMap.SetTile(new Vector3Int(x, y), wallTile);
+
+        // Signal to server that this client is ready
+        InGameManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
     }
 
     [Rpc(SendTo.SpecifiedInParams)]
@@ -164,6 +168,9 @@ public class TilemapGen : NetworkBehaviour
             for (int y = 0; y < height; y++)
                 if (clientGrid[x, y] == 1)
                     mainTileMap.SetTile(new Vector3Int(x, y), wallTile);
+
+        // Signal to server that this client is ready
+        InGameManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
     }
 
     public void SendMapToClient(ulong clientId)

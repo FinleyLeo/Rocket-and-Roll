@@ -29,11 +29,6 @@ public class PlayerLookAt : NetworkBehaviour
         healthScript = GetComponent<PlayerHealth>();
         shootScript = GetComponentInChildren<PlayerShooting>();
 
-        if (moveScript == null)
-        {
-            Debug.Log("Player script not found");
-        }
-
         lookAction = InputSystem.actions.FindAction("Look");
 
         eyePivot = transform.GetChild(1);

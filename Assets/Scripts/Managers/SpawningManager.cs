@@ -215,8 +215,6 @@ public class SpawningManager : NetworkBehaviour
 
             if (obj.IsOwner)
             {
-                Debug.Log("Killed on spawn");
-
                 clientHealth.ModifyAliveStateRPC(false);
                 break;
             }
