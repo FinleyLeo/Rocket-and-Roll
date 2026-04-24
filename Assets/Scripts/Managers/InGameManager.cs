@@ -54,6 +54,7 @@ public class InGameManager : NetworkBehaviour
         }
 
         NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
+        NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnected;
     }
 
     void Start()
@@ -85,7 +86,10 @@ public class InGameManager : NetworkBehaviour
         scores.OnListChanged -= OnScoresChanged;
 
         if (NetworkManager.Singleton != null)
+        {
             NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnected;
+        }
     }
 
     void HandleClientConnected(ulong clientId)
@@ -94,6 +98,20 @@ public class InGameManager : NetworkBehaviour
             scores.Add(new PlayerScore { clientId = clientId, points = 0 });
 
         netPlayers = new List<NetworkClient>(NetworkManager.Singleton.ConnectedClientsList);
+    }
+
+    void HandleClientDisconnected(ulong clientId)
+    {
+        if (IsHost)
+        {
+            foreach (PlayerScore score in scores)
+            {
+                if (score.clientId == clientId)
+                {
+                    scores.Remove(score);
+                }
+            }
+        }
     }
 
     private void Update()
@@ -281,7 +299,7 @@ public class InGameManager : NetworkBehaviour
             else
             {
                 // Set based on player join ranking
-                clientOrder = ((int)clientObj.GetComponent<PlayerMovement>().NetworkObjectId - 1);
+                clientOrder = i - 1;
             }
 
             Renderer[] children = clientObj.GetComponentsInChildren<Renderer>();

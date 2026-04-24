@@ -13,13 +13,11 @@ public class PlayerShooting : NetworkBehaviour
     public float cooldownTimer;
 
     PlayerMovement playerScript;
-    PlayerHealth playerHealth;
     Rigidbody2D playerRB;
 
     private void Start()
     {
         playerScript = GetComponentInParent<PlayerMovement>();
-        playerHealth = GetComponentInParent<PlayerHealth>();
         playerRB = GetComponentInParent<Rigidbody2D>();
 
         attackAction = InputSystem.actions.FindAction("Shoot");
@@ -63,6 +61,7 @@ public class PlayerShooting : NetworkBehaviour
 
             MissileScript missileScript = missile.GetComponent<MissileScript>();
 
+            missileScript.moveDirection = transform.right;
             missileScript.startVelocity = playerRB.linearVelocity * 0.002f;
 
             missile.GetComponent<NetworkObject>().Spawn(true);
@@ -82,6 +81,7 @@ public class PlayerShooting : NetworkBehaviour
 
         MissileScript missileScript = missile.GetComponent<MissileScript>();
 
+        missileScript.moveDirection = transform.right;
         missileScript.startVelocity = velocity * 0.001f;
 
         missile.GetComponent<NetworkObject>().Spawn(true);

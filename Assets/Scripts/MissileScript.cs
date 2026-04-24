@@ -15,6 +15,7 @@ public class MissileScript : NetworkBehaviour
     float constantVelocity;
     [SerializeField] float explosionForce = 5f;
     [HideInInspector] public Vector2 startVelocity;
+    public Vector2 moveDirection;
     float lifeTime = 5;
 
     //public string playerId;
@@ -81,7 +82,7 @@ public class MissileScript : NetworkBehaviour
         constantVelocity += velocityMulti;
         constantVelocity = Mathf.Clamp(constantVelocity, 0, 3);
 
-        transform.position += (constantVelocity * transform.right);
+        transform.position += (constantVelocity * (Vector3)moveDirection);
 
         if (startVelocity.magnitude > 0.001f)
         {
@@ -95,17 +96,21 @@ public class MissileScript : NetworkBehaviour
         // If host then explode and despawn
         if (IsServer)
         {
-            // explosion visuals
-            SendExplosionRPC();
-
-            // Tilemap explosion interactions
-            if (SceneManager.GetActiveScene().name == "RanGen")
+            if (!InGameManager.Instance.roundEnding)
             {
-                TilemapGen.Instance.DestroyInCircle(transform.position);
-            }
+                // explosion visuals
+                SendExplosionRPC();
 
-            // Player explosion interactions
-            SendExplosionKnockbackRPC();
+                // Tilemap explosion interactions
+                if (SceneManager.GetActiveScene().name == "RanGen")
+                {
+                    TilemapGen.Instance.DestroyInCircle(transform.position);
+                }
+
+                // Player explosion interactions
+                SendExplosionKnockbackRPC();
+            }
+            
             Destroy(gameObject);
         }
     }

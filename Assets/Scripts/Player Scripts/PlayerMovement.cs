@@ -136,6 +136,11 @@ public class PlayerMovement : NetworkBehaviour
         {
             moveDir = moveAction.ReadValue<Vector2>().x;
 
+            if (rb.gravityScale != 4)
+            {
+                rb.gravityScale = 4;
+            }
+
             if (PauseMenuScript.instance != null)
             {
                 if (!PauseMenuScript.instance.isPaused)
@@ -157,6 +162,12 @@ public class PlayerMovement : NetworkBehaviour
             anim.SetBool("IsFalling", false);
             anim.SetBool("IsRolling", false);
             anim.SetBool("IsGrounded", true);
+
+            if (rb.gravityScale != 0)
+            {
+                rb.gravityScale = 0;
+                rb.linearVelocity = Vector2.zero;
+            }
         }
 
         position.Value = transform.position;
@@ -185,11 +196,6 @@ public class PlayerMovement : NetworkBehaviour
                 VelocityDecay();
                 ClampVelocity();
             }   
-        }
-
-        else
-        {
-            rb.linearVelocity = Vector2.zero;
         }
     }
 

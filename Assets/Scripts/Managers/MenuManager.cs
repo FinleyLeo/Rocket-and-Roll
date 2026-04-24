@@ -74,7 +74,7 @@ public class MenuManager : MonoBehaviour
         {
             if (string.IsNullOrEmpty(playerNameInput.text))
             {
-                PlayerPrefs.SetString("Username", LobbyManager.Instance.playerId);
+                PlayerPrefs.SetString("Username", "Player");
                 return;
             }
 

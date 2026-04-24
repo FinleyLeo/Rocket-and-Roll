@@ -1335,6 +1335,11 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+  canMove:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
   playerId: null
   rollState: 0
   inFullRoll: 0
@@ -1342,7 +1347,6 @@ MonoBehaviour:
   moveSpeed: 10
   axisMaxClamps: {x: 15, y: 20}
   moveDir: 0
-  canMove: 1
   collideLayer:
     serializedVersion: 2
     m_Bits: 8
