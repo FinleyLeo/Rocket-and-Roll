@@ -150,6 +150,8 @@ public class PlayerMovement : NetworkBehaviour
         else
         {
             moveDir = 0;
+            inFullRoll = false;
+            rollState = RollState.Normal;
 
             anim.SetBool("IsRunning", false);
             anim.SetBool("IsFalling", false);

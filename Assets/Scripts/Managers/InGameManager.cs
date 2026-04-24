@@ -13,7 +13,6 @@ public class InGameManager : NetworkBehaviour
 {
     public static InGameManager Instance;
 
-    List<Player> players;
     List<NetworkClient> netPlayers;
     public NetworkVariable<int> playersAlive = new NetworkVariable<int>();
     private HashSet<ulong> readyClients = new HashSet<ulong>();
@@ -26,8 +25,6 @@ public class InGameManager : NetworkBehaviour
 
     [SerializeField] Button startGameButton;
     [SerializeField] GameObject pointsInfoPrefab, pointsDisplay;
-
-    List<PointsDisplayScript> pointsDisplays;
 
     bool canStartGame;
 
@@ -61,10 +58,9 @@ public class InGameManager : NetworkBehaviour
 
     void Start()
     {
-        players = new List<Player>();
         netPlayers = new List<NetworkClient>();
 
-        UpdatePlayerLists();
+        netPlayers = new List<NetworkClient>(NetworkManager.Singleton.ConnectedClientsList);
 
         if (SceneManager.GetActiveScene().name == "Lobby")
         {
@@ -97,7 +93,7 @@ public class InGameManager : NetworkBehaviour
         if (IsHost) 
             scores.Add(new PlayerScore { clientId = clientId, points = 0 });
 
-        UpdatePlayerInfo();
+        netPlayers = new List<NetworkClient>(NetworkManager.Singleton.ConnectedClientsList);
     }
 
     private void Update()
@@ -194,8 +190,14 @@ public class InGameManager : NetworkBehaviour
     public void StartNewRound()
     {
         playersAlive.Value = NetworkManager.Singleton.ConnectedClientsList.Count;
+        GameObject[] missiles = GameObject.FindGameObjectsWithTag("Missile");
 
         SwitchAllPlayerMovementRPC(false, 0.1f);
+
+        foreach (GameObject missile in missiles)
+        {
+            DestroyImmediate(missile);
+        }
 
         TilemapGen.Instance.GenerateAutoSmooth();
     }
@@ -253,20 +255,15 @@ public class InGameManager : NetworkBehaviour
         playersAlive.Value += addAmount;
     }
 
-    void UpdatePlayerLists()
-    {
-        if (LobbyManager.Instance.currentLobby != null)
-        {
-            players = LobbyManager.Instance.currentLobby.Players;
-        }
-
-        netPlayers = new List<NetworkClient>(NetworkManager.Singleton.ConnectedClientsList);
-    }
-
     void UpdatePlayerInfo()
     {
         // Loads values of every player to get new joiner up to date and old joiners to track new player
-        UpdatePlayerLists();
+        netPlayers = new List<NetworkClient>(NetworkManager.Singleton.ConnectedClientsList);
+
+        List<Player> players = new List<Player>();
+
+        if (LobbyManager.Instance.currentLobby != null)
+            players = LobbyManager.Instance.currentLobby.Players;
 
         for (int i = 0; i < netPlayers.Count; i++)
         {

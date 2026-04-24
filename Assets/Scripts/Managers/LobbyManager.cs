@@ -240,7 +240,7 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
-    float activityTimer = 15f;
+    float activityTimer = 5f;
     async void HandleLobbyActivityCheck()
     {
         if (currentLobby != null && IsLobbyHost())
@@ -249,7 +249,7 @@ public class LobbyManager : MonoBehaviour
 
             if (activityTimer <= 0)
             {
-                activityTimer = 15f;
+                activityTimer = 5f;
                 await LobbyService.Instance.SendHeartbeatPingAsync(currentLobby.Id);
             }
         }

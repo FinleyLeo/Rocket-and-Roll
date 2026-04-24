@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -106,6 +107,43 @@ public class TilemapGen : NetworkBehaviour
 
         // Updates main grid once all calculations are complete
         cellGrid = tempGrid;
+    }
+
+    public void DestroyInCircle(Vector2 pos)
+    {
+        Vector2Int _pos = new Vector2Int((int)pos.x, (int)pos.y);
+
+        int radius = 2;
+
+        for (int x = _pos.x - radius; x <= _pos.x + radius; x++)
+            for (int y = _pos.y - radius; y <= _pos.y + radius; y++)
+            {
+                // Keeps within bounds
+                if (x >= 0 && x < width && y >= 0 && y < height)
+                {
+                    // doesnt effect corners to create a plus shape, creates a more circular shape overall
+                    if (x == _pos.x + radius && y == _pos.y + radius)
+                    {
+                        continue;
+                    }
+                    else if (x == _pos.x - radius && y == _pos.y - radius)
+                    {
+                        continue;
+                    }
+                    else if (x == _pos.x - radius && y == _pos.y + radius)
+                    {
+                        continue;
+                    }
+                    else if (x == _pos.x + radius && y == _pos.y - radius)
+                    {
+                        continue;
+                    }
+
+                    cellGrid[x, y] = 0;
+                }
+            }
+
+        RenderTileMap();
     }
 
     #endregion

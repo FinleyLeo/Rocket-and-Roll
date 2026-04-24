@@ -3,10 +3,10 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Tilemaps;
 
 public class MissileScript : NetworkBehaviour
 {
-    //NetworkVariable<Vector2> position = new NetworkVariable<Vector2>();
     NetworkVariable<bool> trailActive = new NetworkVariable<bool>(false);
     NetworkVariable<bool> srActive = new NetworkVariable<bool>(false);
     NetworkVariable<bool> colActive = new NetworkVariable<bool>(false);
@@ -95,7 +95,16 @@ public class MissileScript : NetworkBehaviour
         // If host then explode and despawn
         if (IsServer)
         {
+            // explosion visuals
             SendExplosionRPC();
+
+            // Tilemap explosion interactions
+            if (SceneManager.GetActiveScene().name == "RanGen")
+            {
+                TilemapGen.Instance.DestroyInCircle(transform.position);
+            }
+
+            // Player explosion interactions
             SendExplosionKnockbackRPC();
             Destroy(gameObject);
         }
@@ -139,7 +148,7 @@ public class MissileScript : NetworkBehaviour
                     playerRB.linearVelocity = (knockDir * reversedDistance);
 
                     // only take damage if force is higher than a certain threshold aka within a range
-                    if (reversedDistance > 3f)
+                    if (reversedDistance > 6f)
                     {
                         if (playerId.Value != playerScript.playerId && SceneManager.GetActiveScene().name != "Lobby")
                         {
