@@ -18,7 +18,7 @@ public class InGameManager : NetworkBehaviour
     private HashSet<ulong> readyClients = new HashSet<ulong>();
     public NetworkList<PlayerScore> scores = new NetworkList<PlayerScore>();
 
-    public bool gameStarted, roundEnding;
+    public bool roundEnding, clientsReady;
 
     [SerializeField] TextMeshProUGUI roomNameText;
     [SerializeField] TextMeshProUGUI roomCodeText;
@@ -71,14 +71,18 @@ public class InGameManager : NetworkBehaviour
 
             startGameButton.onClick.AddListener(StartGame);
 
-            SwitchAllPlayerMovementRPC(true, 0.1f);
+            if (IsHost)
+            {
+                SwitchAllPlayerMovementRPC(true, 0.1f);
+                clientsReady = true;
+            }
         }
         else
         {
             SwitchAllPlayerMovementRPC(false, 0.1f);
         }
 
-        UpdatePlayerInfo();
+        UpdateLayerOrder();
     }
 
     public override void OnDestroy()
@@ -94,10 +98,18 @@ public class InGameManager : NetworkBehaviour
 
     void HandleClientConnected(ulong clientId)
     {
+        netPlayers = new List<NetworkClient>(NetworkManager.Singleton.ConnectedClientsList);
+
         if (IsHost) 
             scores.Add(new PlayerScore { clientId = clientId, points = 0 });
 
-        netPlayers = new List<NetworkClient>(NetworkManager.Singleton.ConnectedClientsList);
+        // if in the lobby, set the players movement to true, unlocking control
+        if (SceneManager.GetActiveScene().name == "Lobby")
+        {
+            SwitchAllPlayerMovementRPC(true, 0.1f);
+        }
+
+        UpdateLayerOrder();
     }
 
     void HandleClientDisconnected(ulong clientId)
@@ -125,12 +137,14 @@ public class InGameManager : NetworkBehaviour
                 startGameButton.interactable = true;
             }
         }
-
-        // Win condition for rounds
-        if (playersAlive.Value <= 1 && IsHost && gameStarted && !roundEnding)
+        else
         {
-            roundEnding = true;
-            StartCoroutine(RoundEndDelay());
+            // Win condition for rounds
+            if (playersAlive.Value <= 1 && IsHost && !roundEnding)
+            {
+                roundEnding = true;
+                StartCoroutine(RoundEndDelay());
+            }
         }
 
         #region testing
@@ -155,6 +169,7 @@ public class InGameManager : NetworkBehaviour
         {
             readyClients.Clear();
             Debug.Log("All clients ready, starting round...");
+            clientsReady = true;
             StartCoroutine(RoundStartCountdown());
         }
     }
@@ -201,6 +216,7 @@ public class InGameManager : NetworkBehaviour
 
         yield return new WaitForSeconds(2);
 
+        clientsReady = false;
         StartNewRound();
         roundEnding = false;
     }
@@ -273,11 +289,8 @@ public class InGameManager : NetworkBehaviour
         playersAlive.Value += addAmount;
     }
 
-    void UpdatePlayerInfo()
+    void UpdateLayerOrder()
     {
-        // Loads values of every player to get new joiner up to date and old joiners to track new player
-        netPlayers = new List<NetworkClient>(NetworkManager.Singleton.ConnectedClientsList);
-
         List<Player> players = new List<Player>();
 
         if (LobbyManager.Instance.currentLobby != null)
@@ -294,23 +307,25 @@ public class InGameManager : NetworkBehaviour
 
             if (clientObj.GetComponent<PlayerMovement>().IsOwner)
             {
-                clientOrder = 12;
+                clientOrder = (netPlayers.Count + 5) * 5;
             }
             else
             {
                 // Set based on player join ranking
-                clientOrder = i - 1;
+                clientOrder = (i * 5);
             }
 
             Renderer[] children = clientObj.GetComponentsInChildren<Renderer>();
 
             foreach (Renderer childRend in children)
             {
-                if (childRend.sortingOrder < 5)
+                if (!clientObj.GetComponent<PlayerMovement>().layerUpdated)
                 {
                     childRend.sortingOrder += clientOrder;
                 }
             }
+
+            clientObj.GetComponent<PlayerMovement>().layerUpdated = true;
         }
     }
 

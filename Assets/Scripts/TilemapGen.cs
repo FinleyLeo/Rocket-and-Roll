@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -15,8 +14,8 @@ public class TilemapGen : NetworkBehaviour
     int lastWidth, lastHeight;
 
     [Header("Map Options")]
-    [SerializeField] int width;
-    [SerializeField] int height;
+    public int width;
+    public int height;
 
     [Range(0, 1)]
     [SerializeField] float fillPercentage;
@@ -45,7 +44,7 @@ public class TilemapGen : NetworkBehaviour
     {
         cam = Camera.main;
 
-        if (IsHost && !InGameManager.Instance.gameStarted)
+        if (IsHost)
         {
             StartCoroutine(DelayRoundStart());
         }
@@ -56,7 +55,6 @@ public class TilemapGen : NetworkBehaviour
         yield return new WaitForSeconds(0.1f);
 
         InGameManager.Instance.StartNewRound();
-        InGameManager.Instance.gameStarted = true;
     }
 
     #region Generation

@@ -3,7 +3,6 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Tilemaps;
 
 public class MissileScript : NetworkBehaviour
 {
@@ -96,7 +95,7 @@ public class MissileScript : NetworkBehaviour
         // If host then explode and despawn
         if (IsServer)
         {
-            if (!InGameManager.Instance.roundEnding)
+            if (InGameManager.Instance.clientsReady)
             {
                 // explosion visuals
                 SendExplosionRPC();

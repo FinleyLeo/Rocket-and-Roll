@@ -1,15 +1,17 @@
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerHealth : NetworkBehaviour
 {
-    public int maxHealth = 1;
+    public int maxHealth = 2;
     public int health;
-    //public bool isAlive;
+
+    [SerializeField] float iFramelength = 1f;
+    NetworkVariable<bool> invincible = new NetworkVariable<bool>();
+    NetworkVariable<bool> flashOn = new NetworkVariable<bool>();
 
     public NetworkVariable<bool> isAlive = new NetworkVariable<bool>();
-    public NetworkVariable<int> points = new NetworkVariable<int>();
 
     Rigidbody2D rb;
     SpriteRenderer sr;
@@ -23,6 +25,15 @@ public class PlayerHealth : NetworkBehaviour
 
     float alphaAmount;
 
+    public override void OnNetworkSpawn()
+    {
+        flashOn.OnValueChanged += (bool prev, bool current) =>
+        {
+            Debug.Log("flash set to - " + flashOn.Value);
+            SetAlpha(current ? 0f : 1f);
+        };
+    }
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -31,12 +42,8 @@ public class PlayerHealth : NetworkBehaviour
         moveScript = GetComponent<PlayerMovement>();
 
         ghostTrail.enabled = false;
-    }
 
-    private void Start()
-    {
         health = maxHealth;
-
         alphaAmount = 1f;
     }
 
@@ -46,7 +53,7 @@ public class PlayerHealth : NetworkBehaviour
         {
             GhostVisual();
         }
-        else
+        else if (!invincible.Value)
         {
             // Reset all ghost visuals
             if (sr.color.a != 1f)
@@ -54,28 +61,23 @@ public class PlayerHealth : NetworkBehaviour
                 SetAlpha(1);
             }
         }
-
-        if (Keyboard.current.rKey.wasPressedThisFrame && IsOwner)
-        {
-            if (!isAlive.Value)
-            {
-                SendRespawnRPC();
-            }
-            else
-            {
-                SendDieRPC();
-            }
-        }
     }
 
     [Rpc(SendTo.Server)]
     public void TakeDamageRPC(int damage)
     {
-        health -= damage;
-
-        if (health <= 0)
+        if (!invincible.Value)
         {
-            SendDieRPC();
+            health -= damage;
+
+            if (health <= 0)
+            {
+                SendDieRPC();
+            }
+            else
+            {
+                StartCoroutine(InvincibilityEffect());
+            }
         }
     }
 
@@ -159,9 +161,28 @@ public class PlayerHealth : NetworkBehaviour
         SetAlpha(alphaAmount);
     }
 
+    IEnumerator InvincibilityEffect()
+    {
+        invincible.Value = true;
+
+        float elapsedTime = 0f;
+        float flashInterval = 0.1f;
+
+        while (elapsedTime < iFramelength)
+        {
+            flashOn.Value = !flashOn.Value;
+
+            yield return new WaitForSeconds(flashInterval);
+            elapsedTime += flashInterval;
+        }
+
+        flashOn.Value = false;
+        invincible.Value = false;
+    }
+
     public void SetAlpha(float alpha)
     {
-        SpriteRenderer[] children = GetComponentsInChildren<SpriteRenderer>();
+        SpriteRenderer[] children = GetComponentsInChildren<SpriteRenderer>(true);
 
         foreach (SpriteRenderer child in children)
         {

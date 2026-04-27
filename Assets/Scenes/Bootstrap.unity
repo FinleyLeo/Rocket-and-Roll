@@ -821,6 +821,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1882253468}
   - component: {fileID: 1882253469}
+  - component: {fileID: 1882253470}
   m_Layer: 0
   m_Name: Audio Manager
   m_TagString: Untagged
@@ -865,6 +866,14 @@ MonoBehaviour:
   music: []
   musicMuted: 0
   SFXMuted: 0
+--- !u!81 &1882253470
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1882253467}
+  m_Enabled: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

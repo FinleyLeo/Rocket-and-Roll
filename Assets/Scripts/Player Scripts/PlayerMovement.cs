@@ -56,6 +56,7 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] float bufferTime;
     [SerializeField] bool airVelocityDecay;
     public float airDecayTimer;
+    public bool layerUpdated;
 
     Vector2 storedBallVelocity;
     bool canBallHop;

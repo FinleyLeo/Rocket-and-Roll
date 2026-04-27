@@ -1046,6 +1046,7 @@ GameObject:
   - component: {fileID: 8428599949539066022}
   - component: {fileID: 8499360465936672072}
   - component: {fileID: 9058613642219626617}
+  - component: {fileID: 1608191342458943904}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -1360,6 +1361,7 @@ MonoBehaviour:
   bufferTime: 0.2
   airVelocityDecay: 1
   airDecayTimer: 0
+  layerUpdated: 0
   smokeTrail: {fileID: 2347120553096682415}
 --- !u!114 &8428599949539066022
 MonoBehaviour:
@@ -1402,8 +1404,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   ShowTopMostFoldoutHeaderGroup: 1
-  maxHealth: 1
+  maxHealth: 2
   health: 1
+  iFramelength: 1
   isAlive:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -1419,6 +1422,20 @@ MonoBehaviour:
   rpgObj: {fileID: 2553373157500969636}
   eyesObj: {fileID: 189155355169331635}
   emptyHandsObj: {fileID: 8584484875828309913}
+--- !u!114 &1608191342458943904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8882995978763723287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13e498eed68629a41a69375cb9bca0c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BorderDetection
+  ShowTopMostFoldoutHeaderGroup: 1
+  borderDeathEffect: {fileID: 4367462710127534640, guid: 45eff8c52c6acf644b881fb01c23f960, type: 3}
 --- !u!1001 &2453994643041242444
 PrefabInstance:
   m_ObjectHideFlags: 0
