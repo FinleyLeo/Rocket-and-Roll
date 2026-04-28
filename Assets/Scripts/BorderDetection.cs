@@ -86,7 +86,7 @@ public class BorderDetection : NetworkBehaviour
         healthScript.TakeDamageRPC(1);
 
         // if still alive after taking damage
-        if (healthScript.health > 0)
+        if (healthScript.health.Value > 0)
         {
             // Add knockback away from border
             SendRBForceRPC(knockDir * 50);

@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/RanGen.unity
     guid: 4a50dd9f533263e4ea094ec87a81b4ad
+  - enabled: 1
+    path: Assets/Scenes/WinScreen.unity
+    guid: 9c7d075c127770045bb685ff9b9be344
   - enabled: 0
     path: Assets/Scenes/Testing/Relay Testing.unity
     guid: 07552bc63cbdc164c81a37bc4bc5c445

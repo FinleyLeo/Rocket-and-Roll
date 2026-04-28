@@ -77,9 +77,20 @@ public class InGameManager : NetworkBehaviour
                 clientsReady = true;
             }
         }
-        else
+        else if (SceneManager.GetActiveScene().name == "RanGen")
         {
             SwitchAllPlayerMovementRPC(false, 0.1f);
+        }
+        else // win screen
+        {
+            if (IsHost)
+            {
+                // turn movement back on after a short time
+                SwitchAllPlayerMovementRPC(false, 0.1f);
+                SwitchAllPlayerMovementRPC(true, 1f);
+
+                StartCoroutine(ReturnToLobby());
+            }
         }
 
         UpdateLayerOrder();
@@ -216,9 +227,24 @@ public class InGameManager : NetworkBehaviour
 
         yield return new WaitForSeconds(2);
 
-        clientsReady = false;
-        StartNewRound();
-        roundEnding = false;
+        bool matchOver = false;
+
+        foreach (PlayerScore score in GetRankedPlayers())
+        {
+            if (score.points >= 3)
+            {
+                matchOver = true;
+                EndMatch();
+                break;
+            }
+        }
+
+        if (!matchOver)
+        {
+            clientsReady = false;
+            StartNewRound();
+            roundEnding = false;
+        }
     }
 
     public void StartNewRound()
@@ -257,6 +283,26 @@ public class InGameManager : NetworkBehaviour
 
         // allow players to move
         SwitchAllPlayerMovementRPC(true, 0);
+    }
+
+    public void EndMatch()
+    {
+        // resets all scores
+        for (int i = 0; i < scores.Count; i++)
+        {
+            PlayerScore score = scores[i];
+            score.points = 0;
+            scores[i] = score;
+        }
+
+        TransitionManager.Instance.LoadScene("WinScreen");
+    }
+
+    IEnumerator ReturnToLobby()
+    {
+        yield return new WaitForSeconds(5);
+
+        TransitionManager.Instance.LoadScene("Lobby");
     }
 
     #endregion

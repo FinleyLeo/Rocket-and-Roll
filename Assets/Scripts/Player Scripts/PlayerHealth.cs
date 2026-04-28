@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -5,7 +6,7 @@ using UnityEngine;
 public class PlayerHealth : NetworkBehaviour
 {
     public int maxHealth = 2;
-    public int health;
+    public NetworkVariable<int> health = new NetworkVariable<int>();
 
     [SerializeField] float iFramelength = 1f;
     NetworkVariable<bool> invincible = new NetworkVariable<bool>();
@@ -29,7 +30,6 @@ public class PlayerHealth : NetworkBehaviour
     {
         flashOn.OnValueChanged += (bool prev, bool current) =>
         {
-            Debug.Log("flash set to - " + flashOn.Value);
             SetAlpha(current ? 0f : 1f);
         };
     }
@@ -43,8 +43,12 @@ public class PlayerHealth : NetworkBehaviour
 
         ghostTrail.enabled = false;
 
-        health = maxHealth;
         alphaAmount = 1f;
+    }
+
+    private void Start()
+    {
+        health.Value = maxHealth;
     }
 
     private void Update()
@@ -68,9 +72,9 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (!invincible.Value)
         {
-            health -= damage;
+            health.Value -= damage;
 
-            if (health <= 0)
+            if (health.Value <= 0)
             {
                 SendDieRPC();
             }
@@ -123,8 +127,6 @@ public class PlayerHealth : NetworkBehaviour
             ModifyAliveStateRPC(true);
         }
 
-        health = maxHealth;
-
         // Enable components
         rb.simulated = true;
         GetComponent<Collider2D>().enabled = true;
@@ -143,6 +145,12 @@ public class PlayerHealth : NetworkBehaviour
     public void ModifyAliveStateRPC(bool state)
     {
         isAlive.Value = state;
+    }
+
+    [Rpc(SendTo.Server)]
+    public void SetHealthRPC(int value)
+    {
+        health.Value = value;
     }
 
     void GhostVisual()

@@ -198,6 +198,7 @@ public class SpawningManager : NetworkBehaviour
                     clientHealth.SendRespawnRPC();
                 }
 
+                clientHealth.SetHealthRPC(clientHealth.maxHealth);
                 obj.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
                 obj.transform.position = position;
                 break;
