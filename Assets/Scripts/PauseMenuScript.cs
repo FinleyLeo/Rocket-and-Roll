@@ -111,6 +111,7 @@ public class PauseMenuScript : NetworkBehaviour
     {
         LobbyManager.Instance.LeaveLobby();
 
+        // Used to keep pause menu active until scene loaded
         StartCoroutine(DelayLeave());
     }
 

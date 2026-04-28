@@ -111,6 +111,8 @@ public class MenuManager : MonoBehaviour
         {
             LobbyManager.Instance.LeaveLobby();
         }
+
+        TransitionManager.Instance.EndTransition();
     }
 
     void Update()

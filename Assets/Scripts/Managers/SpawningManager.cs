@@ -14,6 +14,8 @@ public class SpawningManager : NetworkBehaviour
     public NetworkVariable<bool> allPointsUsed = new NetworkVariable<bool>(false);
     public NetworkVariable<bool> pointsReady = new NetworkVariable<bool>();
 
+    [SerializeField] Vector2[] podiumSpawns;
+
     #region Events
 
     private void Awake()
@@ -28,7 +30,14 @@ public class SpawningManager : NetworkBehaviour
     {
         if (IsHost)
         {
-            StartCoroutine(FindSpawnPoints());
+            if (SceneManager.GetActiveScene().name != "WinScreen")
+            {
+                StartCoroutine(FindSpawnPoints());
+            }
+            else
+            {
+                // use spawns based on how well they performed
+            }
 
             NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnection;
         }

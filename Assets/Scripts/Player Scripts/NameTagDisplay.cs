@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 public class NameTagDisplay : NetworkBehaviour
 {
     NetworkVariable<FixedString64Bytes> nameTag = new NetworkVariable<FixedString64Bytes>("Unknown", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    TextMeshProUGUI usernameText;
+    [HideInInspector] public TextMeshProUGUI usernameText;
 
     Camera cam;
 

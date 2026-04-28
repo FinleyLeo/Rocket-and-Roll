@@ -154,7 +154,7 @@ public class MissileScript : NetworkBehaviour
                     // only take damage if force is higher than a certain threshold aka within a range
                     if (reversedDistance > 6f)
                     {
-                        if (playerId.Value != playerScript.playerId && SceneManager.GetActiveScene().name != "Lobby")
+                        if (playerId.Value != playerScript.playerId.ToString() && SceneManager.GetActiveScene().name != "Lobby")
                         {
                             playerHealth.TakeDamageRPC(1);
                         }
@@ -172,7 +172,7 @@ public class MissileScript : NetworkBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             // Only collides if hitting someone other than the shooter and if the player id is set
-            if (playerId.Value != collision.gameObject.GetComponent<PlayerMovement>().playerId && !string.IsNullOrEmpty(playerId.ToString()))
+            if (playerId.Value != collision.gameObject.GetComponent<PlayerMovement>().playerId.ToString() && !string.IsNullOrEmpty(playerId.ToString()))
             {
                 Explode();
             }

@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.Collections;
 using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -22,9 +21,9 @@ public class InGameManager : NetworkBehaviour
 
     [SerializeField] TextMeshProUGUI roomNameText;
     [SerializeField] TextMeshProUGUI roomCodeText;
+    [SerializeField] TextMeshProUGUI winScreenText;
 
     [SerializeField] Button startGameButton;
-    [SerializeField] GameObject pointsInfoPrefab, pointsDisplay;
 
     bool canStartGame;
 
@@ -91,7 +90,30 @@ public class InGameManager : NetworkBehaviour
 
                 StartCoroutine(ReturnToLobby());
             }
+
+            //winScreenText = GameObject.Find("USER WINS").GetComponent<TextMeshProUGUI>();
+
+            bool winnerFound = false;
+
+            for (int i = 0; i < netPlayers.Count; i++)
+            {
+                PlayerMovement playerScript = netPlayers[i].PlayerObject.GetComponent<PlayerMovement>();
+
+                if (playerScript.isWinner.Value)
+                {
+                    winScreenText.text = playerScript.GetComponent<NameTagDisplay>().usernameText.text + " WINS!";
+                    winnerFound = true;
+                    break;
+                }
+            }
+
+            if (!winnerFound)
+            {
+                winScreenText.text = "NULL WINS!";
+            }
         }
+
+        TransitionManager.Instance.EndTransition();
 
         UpdateLayerOrder();
     }
@@ -192,9 +214,16 @@ public class InGameManager : NetworkBehaviour
             PlayerHealth healthScript = netPlayers[i].PlayerObject.GetComponent<PlayerHealth>();
 
             healthScript.ModifyAliveStateRPC(false);
+
+            if (!healthScript.IsHost)
+            {
+                TransitionManager.Instance.StartTransitionManually();
+            }
         }
 
-        NetworkManager.Singleton.SceneManager.LoadScene("RanGen", LoadSceneMode.Single);
+        TransitionManager.Instance.LoadScene("RanGen");
+
+        //NetworkManager.Singleton.SceneManager.LoadScene("RanGen", LoadSceneMode.Single);
     }
 
     IEnumerator RoundEndDelay()
@@ -234,7 +263,8 @@ public class InGameManager : NetworkBehaviour
             if (score.points >= 3)
             {
                 matchOver = true;
-                EndMatch();
+
+                EndMatch(score.clientId);
                 break;
             }
         }
@@ -285,7 +315,7 @@ public class InGameManager : NetworkBehaviour
         SwitchAllPlayerMovementRPC(true, 0);
     }
 
-    public void EndMatch()
+    public void EndMatch(ulong winningID)
     {
         // resets all scores
         for (int i = 0; i < scores.Count; i++)
@@ -295,12 +325,32 @@ public class InGameManager : NetworkBehaviour
             scores[i] = score;
         }
 
+        for (int i = 0; i < netPlayers.Count; i++)
+        {
+            PlayerMovement player = netPlayers[i].PlayerObject.GetComponent<PlayerMovement>();
+
+            Debug.Log("Player id: " + player.playerId.ToString());
+            Debug.Log("winning id: " + winningID.ToString());
+
+            if (player.playerId == winningID)
+            {
+                player.isWinner.Value = true;
+            }
+        }
+
         TransitionManager.Instance.LoadScene("WinScreen");
     }
 
     IEnumerator ReturnToLobby()
     {
         yield return new WaitForSeconds(5);
+
+        for (int i = 0;i < netPlayers.Count; i++)
+        {
+            PlayerMovement player = netPlayers[i].PlayerObject.GetComponent<PlayerMovement>();
+
+            player.isWinner.Value = false;
+        }
 
         TransitionManager.Instance.LoadScene("Lobby");
     }
@@ -344,10 +394,10 @@ public class InGameManager : NetworkBehaviour
 
         for (int i = 0; i < netPlayers.Count; i++)
         {
-            GameObject clientObj = netPlayers[i].PlayerObject.gameObject;
+            NetworkObject clientObj = netPlayers[i].PlayerObject;
 
             // Assign player id
-            clientObj.GetComponent<PlayerMovement>().playerId = players[i].Id;
+            clientObj.GetComponent<PlayerMovement>().playerId = clientObj.OwnerClientId;
 
             int clientOrder;
 
@@ -446,7 +496,6 @@ public struct PlayerScore : INetworkSerializeByMemcpy, System.IEquatable<PlayerS
 {
     public ulong clientId;
     public int points;
-    public FixedString64Bytes displayName;
 
     public bool Equals(PlayerScore other) => clientId == other.clientId && points == other.points;
 }

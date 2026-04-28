@@ -571,7 +571,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 194575308}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Spawn point
   m_TagString: Spawn
   m_Icon: {fileID: 0}
@@ -690,7 +690,7 @@ GameObject:
   - component: {fileID: 216863698}
   - component: {fileID: 216863699}
   - component: {fileID: 216863700}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: 3RD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -846,7 +846,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 219113077}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Spawn point
   m_TagString: Spawn
   m_Icon: {fileID: 0}
@@ -1216,7 +1216,7 @@ GameObject:
   - component: {fileID: 648486791}
   - component: {fileID: 648486790}
   m_Layer: 5
-  m_Name: ____ WINS
+  m_Name: USER WINS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1534,7 +1534,7 @@ GameObject:
   - component: {fileID: 1083876047}
   - component: {fileID: 1083876048}
   - component: {fileID: 1083876049}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: 1ST
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13856,7 +13856,7 @@ GameObject:
   - component: {fileID: 1477540904}
   - component: {fileID: 1477540905}
   - component: {fileID: 1477540906}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: 2ND
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14215,7 +14215,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1656101287}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Spawn point
   m_TagString: Spawn
   m_Icon: {fileID: 0}
@@ -14296,9 +14296,8 @@ MonoBehaviour:
   clientsReady: 0
   roomNameText: {fileID: 0}
   roomCodeText: {fileID: 0}
+  winScreenText: {fileID: 648486790}
   startGameButton: {fileID: 0}
-  pointsInfoPrefab: {fileID: 0}
-  pointsDisplay: {fileID: 0}
 --- !u!114 &1793440851
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -51,18 +51,18 @@ public class LobbyManager : MonoBehaviour
         HandleRoomUpdate();
     }
 
-    public Player GetPlayer()
-    {
-        Player player = new Player
-        {
-            Data = new Dictionary<string, PlayerDataObject>
-            {
-                {"Username", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, PlayerPrefs.GetString("Username", "Unknown")) }
-            }
-        };
+    //public Player GetPlayer()
+    //{
+    //    Player player = new Player
+    //    {
+    //        Data = new Dictionary<string, PlayerDataObject>
+    //        {
+    //            {"Username", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, PlayerPrefs.GetString("Username", "Unknown")) }
+    //        }
+    //    };
 
-        return player;
-    }
+    //    return player;
+    //}
 
     public async Task CreateLobby(bool isPrivate, int maxPlayers, string lobbyName)
     {
@@ -84,7 +84,7 @@ public class LobbyManager : MonoBehaviour
             CreateLobbyOptions options = new CreateLobbyOptions
             {
                 IsPrivate = isPrivate,
-                Player = GetPlayer(),
+                //Player = GetPlayer(),
                 Data = new Dictionary<string, DataObject>
                 {
                     {"IsGameStarted", new DataObject(DataObject.VisibilityOptions.Public, "false") },
@@ -151,7 +151,7 @@ public class LobbyManager : MonoBehaviour
 
             JoinLobbyByIdOptions options = new JoinLobbyByIdOptions
             {
-                Player = GetPlayer()
+                //Player = GetPlayer()
             };
 
             currentLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId, options);
@@ -186,7 +186,7 @@ public class LobbyManager : MonoBehaviour
 
             JoinLobbyByCodeOptions options = new JoinLobbyByCodeOptions
             {
-                Player = GetPlayer()
+                //Player = GetPlayer()
             };
 
             currentLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode, options);

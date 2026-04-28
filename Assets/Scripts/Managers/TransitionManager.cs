@@ -34,7 +34,7 @@ public class TransitionManager : MonoBehaviour
         loadingScene = true;
         fillAmount = 1;
 
-        SceneManager.activeSceneChanged += EndTransition;
+        //SceneManager.activeSceneChanged += EndTransition;
     }
 
     private void Update()
@@ -47,7 +47,7 @@ public class TransitionManager : MonoBehaviour
         transitionMat.SetFloat("_FillAmount", fillAmount);
     }
 
-    void EndTransition(Scene scene, Scene _scene)
+    public void EndTransition()
     {
         if (fillAmount < 1)
         {
@@ -74,29 +74,19 @@ public class TransitionManager : MonoBehaviour
         loadingScene = true;
     }
 
-    public void LoadScene(int sceneIndex)
-    {
-        StartCoroutine(LoadSceneDelay(sceneIndex));
-    }
     public void LoadScene(string sceneIndex)
     {
         StartCoroutine(LoadSceneDelay(sceneIndex));
     }
 
-    IEnumerator LoadSceneDelay(int sceneIndex)
-    {
-        loadingScene = true;
-
-        yield return new WaitForSeconds(transitionSpeed / 2);
-
-        NetworkManager.Singleton.SceneManager.LoadScene(SceneManager.GetSceneByBuildIndex(sceneIndex).name, LoadSceneMode.Single);
-    }
-
     IEnumerator LoadSceneDelay(string sceneIndex)
     {
-        loadingScene = true;
+        StartTransitionManually();
 
-        yield return new WaitForSeconds(transitionSpeed / 2);
+        while (fillAmount < 1)
+        {
+            yield return null;
+        }
 
         NetworkManager.Singleton.SceneManager.LoadScene(sceneIndex, LoadSceneMode.Single);
     }

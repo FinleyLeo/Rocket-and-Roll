@@ -48,7 +48,10 @@ public class PlayerHealth : NetworkBehaviour
 
     private void Start()
     {
-        health.Value = maxHealth;
+        if (IsHost)
+        {
+            health.Value = maxHealth;
+        }
     }
 
     private void Update()

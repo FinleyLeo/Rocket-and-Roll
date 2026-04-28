@@ -65,11 +65,11 @@ public class PlayerShooting : NetworkBehaviour
             missileScript.startVelocity = playerRB.linearVelocity * 0.002f;
 
             missile.GetComponent<NetworkObject>().Spawn(true);
-            missileScript.playerId.Value = playerScript.playerId;
+            missileScript.playerId.Value = playerScript.playerId.ToString();
         }
         else
         {
-            SpawnMissileRPC(playerRB.linearVelocity, playerScript.playerId);
+            SpawnMissileRPC(playerRB.linearVelocity, playerScript.playerId.ToString());
         }
     }
 
