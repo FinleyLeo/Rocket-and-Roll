@@ -31,12 +31,12 @@ public class BorderDetection : NetworkBehaviour
     {
         if (IsHost)
         {
-            if (TilemapGen.Instance != null && InGameManager.Instance != null)
+            if (TilemapGen.Instance != null)
             {
                 if (SceneManager.GetActiveScene().name == "RanGen")
                 {
                     // checks if the round is properly started and the player is alive
-                    if (healthScript.isAlive.Value && InGameManager.Instance.clientsReady && moveScript.canMove.Value)
+                    if (healthScript.isAlive.Value && moveScript.canMove.Value) // possibly add a players ready check if need be, removed for now as seemingly unneeded
                     {
                         if (transform.position.y < -borderOffset)
                             BorderHit(Direction.Down);

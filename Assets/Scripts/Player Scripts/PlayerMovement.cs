@@ -2,6 +2,7 @@ using System;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public enum RollState
 {
@@ -13,11 +14,10 @@ public class PlayerMovement : NetworkBehaviour
 {
     #region variables
 
-    NetworkVariable<Vector2> position = new NetworkVariable<Vector2>(new Vector2(0, 5), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    [HideInInspector] public NetworkVariable<bool> isFlipped = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    [HideInInspector] public NetworkVariable<bool> knockBacked = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    public NetworkVariable<bool> canMove = new NetworkVariable<bool>();
-    public NetworkVariable<bool> isWinner = new NetworkVariable<bool>();
+    // Network variables
+    [HideInInspector]public NetworkVariable<Vector2> position = new(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    [HideInInspector] public NetworkVariable<bool> knockBacked = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<bool> canMove = new(true);
 
     public ulong playerId;
 
@@ -25,21 +25,26 @@ public class PlayerMovement : NetworkBehaviour
     InputAction jumpAction;
     InputAction rollAction;
 
-    bool rbNotFound;
+    //bool rbNotFound;
     Rigidbody2D rb;
     Animator anim;
-    SpriteRenderer sr;
-    PlayerLookAt playerVisualScript;
+    PlayerVisuals visualScript;
     PlayerHealth playerHealth;
 
-    [HideInInspector] public RollState rollState;
-    public bool inFullRoll;
-
+    [Space(10)]
     [Header("Movement")]
     [SerializeField] float jumpForce = 16f;
     [SerializeField] float moveSpeed = 8f;
     [SerializeField] Vector2 axisMaxClamps;
-    [HideInInspector] public float moveDir;
+    public float moveDir;
+    public float airDecayTimer;
+
+    [Space(10)]
+    [Header("Jumping")]
+    [SerializeField] float bufferTime;
+    float bufferTimer;
+    [SerializeField] bool airVelocityDecay;
+    public bool canStopEarly;
 
     [Space(10)]
     [Header("Raycasts")]
@@ -51,41 +56,49 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] float[] groundCastWidth;
 
     [Space(10)]
-    [Header("Misc Values")]
-    public bool canStopEarly;
-    [SerializeField] float bufferTime;
-    [SerializeField] bool airVelocityDecay;
-    public float airDecayTimer;
-    public bool layerUpdated;
-
+    [Header("Rolling")]
+    public RollState rollState;
+    public bool inFullRoll;
     Vector2 storedBallVelocity;
     bool canBallHop;
-    float bufferTimer;
-
-    [Space(10)]
-    [Header("External References")]
-
-    [SerializeField] ParticleSystem smokeTrail;
 
     #endregion variables
 
     public override void OnNetworkSpawn()
     {
+        rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+
+        visualScript = GetComponent<PlayerVisuals>();
+        playerHealth = GetComponent<PlayerHealth>();
+
+        playerId = OwnerClientId;
+
         if (!IsOwner)
         {
-            if (rb != null)
-            {
-                // stops rb from fighting with movement updates while keeping collisions
-                rb.gravityScale = 0f;
-            }
-
-            else
-            {
-                rbNotFound = true;
-            }
+            rb.gravityScale = 0; // stops fighting between device and listening clients
         }
 
-        knockBacked.OnValueChanged += (bool prev, bool next) => UpdateSmokeTrail();
+        SceneManager.activeSceneChanged += (Scene prev, Scene current) =>
+        {
+            if (IsOwner)
+            {
+                Debug.Log("Running spawn event");
+
+                switch (current.name)
+                {
+                    case ("Lobby"):
+                        ModifyCanMoveRPC(true);
+                        break;
+                    case ("RanGen"):
+                        ModifyCanMoveRPC(false);
+                        break;
+                    case ("WinScreen"):
+                        ModifyCanMoveRPC(false);
+                        break;
+                }
+            }
+        };
     }
 
     void Start()
@@ -94,44 +107,17 @@ public class PlayerMovement : NetworkBehaviour
         jumpAction = InputSystem.actions.FindAction("Jump");
         rollAction = InputSystem.actions.FindAction("Roll");
 
-        rb = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>();
-        sr = GetComponent<SpriteRenderer>();
-
-        playerVisualScript = GetComponent<PlayerLookAt>();
-        playerHealth = GetComponent<PlayerHealth>();
-
-        if (rbNotFound)
-        {
-            // stops rb from fighting with movement updates while keeping collisions
-            rb.gravityScale = 0f;
-            rbNotFound = false;
-        }
-    }
-
-    void UpdateNetworkValues()
-    {
-        if (Vector2.Distance(transform.position, position.Value) > 0.001f)
-        {
-            transform.position = Vector3.Lerp(transform.position, position.Value, Time.deltaTime * 40); // Keeps player movement smooth on other clients
-        }
-
-        sr.flipX = isFlipped.Value;
+        //if (rbNotFound)
+        //{
+        //    // stops rb from fighting with movement updates while keeping collisions
+        //    rb.gravityScale = 0f;
+        //    rbNotFound = false;
+        //}
     }
 
     void Update()
     {
-        if (!IsOwner)
-        {
-            UpdateNetworkValues();
-            return;
-        }
-
-        // if not alive then set canMove to false once
-        if (canMove.Value && !playerHealth.isAlive.Value)
-        {
-            ModifyCanMoveRPC(false);
-        }
+        if (!IsOwner) return;
 
         if (canMove.Value)
         {
@@ -151,18 +137,12 @@ public class PlayerMovement : NetworkBehaviour
             }
 
             RollCheck();
-            AnimationChecks();
         }
         else
         {
             moveDir = 0;
             inFullRoll = false;
             rollState = RollState.Normal;
-
-            anim.SetBool("IsRunning", false);
-            anim.SetBool("IsFalling", false);
-            anim.SetBool("IsRolling", false);
-            anim.SetBool("IsGrounded", true);
 
             if (rb.gravityScale != 0)
             {
@@ -445,14 +425,6 @@ public class PlayerMovement : NetworkBehaviour
         inFullRoll = false;
     }
 
-    bool IsFalling()
-    {
-        if (rb.linearVelocity.y < 0)
-        {
-            return true;
-        }
-        return false;
-    }
     bool IsFalling(float offset)
     {
         if (rb.linearVelocity.y < offset)
@@ -462,36 +434,10 @@ public class PlayerMovement : NetworkBehaviour
         return false;
     }
 
-    void AnimationChecks()
-    {
-        if (Mathf.Abs(moveDir) > 0.1f) // only update when moving
-        {
-            sr.flipX = moveDir < 0.1f;
-            isFlipped.Value = sr.flipX;
-        }
-
-        playerVisualScript.rotationSpeed = -(rb.linearVelocityX * (Mathf.PI * 10) * Time.deltaTime);
-
-        anim.SetBool("IsRunning", canMove.Value && Mathf.Abs(moveDir) > 0);
-        anim.SetBool("IsFalling", canMove.Value && IsFalling(-3));
-        anim.SetBool("IsGrounded", canMove.Value && isGrounded);
-    }
-
-    void UpdateSmokeTrail()
-    {
-        if (knockBacked.Value)
-        {
-            smokeTrail.Play();
-        }
-        else
-        {
-            smokeTrail.Stop();
-        }
-    }
-
     [Rpc(SendTo.Server)]
     public void ModifyCanMoveRPC(bool state)
     {
+        Debug.Log("CanMove set to: " + state);
         canMove.Value = state;
     }
 

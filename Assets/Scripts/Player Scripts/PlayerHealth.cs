@@ -6,14 +6,15 @@ using UnityEngine;
 public class PlayerHealth : NetworkBehaviour
 {
     public int maxHealth = 2;
-    public NetworkVariable<int> health = new NetworkVariable<int>();
+    public NetworkVariable<int> health = new();
+    public NetworkVariable<bool> isAlive = new(true);
 
     [SerializeField] float iFramelength = 1f;
-    NetworkVariable<bool> invincible = new NetworkVariable<bool>();
-    NetworkVariable<bool> flashOn = new NetworkVariable<bool>();
+    NetworkVariable<bool> invincible = new();
+    NetworkVariable<bool> flashOn = new();
 
-    public NetworkVariable<bool> isAlive = new NetworkVariable<bool>();
-
+    [Space(10)]
+    [Header("References")]
     Rigidbody2D rb;
     SpriteRenderer sr;
     Animator anim;
@@ -94,6 +95,7 @@ public class PlayerHealth : NetworkBehaviour
         if (IsHost)
         {
             ModifyAliveStateRPC(false);
+            moveScript.ModifyCanMoveRPC(false);
         }
 
         rb.linearVelocity = Vector3.zero;
@@ -113,9 +115,9 @@ public class PlayerHealth : NetworkBehaviour
         {
             moveScript.knockBacked.Value = false;
 
-            if (InGameManager.Instance.playersAlive.Value > 0)
+            if (MatchManager.Instance.playersAlive.Value > 0)
             {
-                InGameManager.Instance.ModifyPlayersAliveRPC(-1);
+                MatchManager.Instance.NotifyPlayerDeathRPC();
             }
         }
 

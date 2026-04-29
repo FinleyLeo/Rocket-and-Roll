@@ -95,7 +95,9 @@ public class MissileScript : NetworkBehaviour
         // If host then explode and despawn
         if (IsServer)
         {
-            if (InGameManager.Instance.clientsReady)
+            MatchState match = MatchManager.Instance.matchState.Value;
+
+            if (match == MatchState.RoundStarting || match == MatchState.RoundEnding || match == MatchState.Lobby || match == MatchState.RoundActive)
             {
                 // explosion visuals
                 SendExplosionRPC();

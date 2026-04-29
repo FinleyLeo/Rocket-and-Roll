@@ -51,19 +51,6 @@ public class LobbyManager : MonoBehaviour
         HandleRoomUpdate();
     }
 
-    //public Player GetPlayer()
-    //{
-    //    Player player = new Player
-    //    {
-    //        Data = new Dictionary<string, PlayerDataObject>
-    //        {
-    //            {"Username", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, PlayerPrefs.GetString("Username", "Unknown")) }
-    //        }
-    //    };
-
-    //    return player;
-    //}
-
     public async Task CreateLobby(bool isPrivate, int maxPlayers, string lobbyName)
     {
         try
@@ -84,7 +71,6 @@ public class LobbyManager : MonoBehaviour
             CreateLobbyOptions options = new CreateLobbyOptions
             {
                 IsPrivate = isPrivate,
-                //Player = GetPlayer(),
                 Data = new Dictionary<string, DataObject>
                 {
                     {"IsGameStarted", new DataObject(DataObject.VisibilityOptions.Public, "false") },

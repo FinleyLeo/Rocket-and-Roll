@@ -8,13 +8,13 @@ public class SpawningManager : NetworkBehaviour
 {
     public static SpawningManager Instance;
 
-    private Queue<ulong> pendingClients = new Queue<ulong>();
-    public NetworkList<SpawnPoint> spawnPoints = new NetworkList<SpawnPoint>();
+    private Queue<ulong> pendingClients = new();
+    public NetworkList<SpawnPoint> spawnPoints = new();
 
-    public NetworkVariable<bool> allPointsUsed = new NetworkVariable<bool>(false);
-    public NetworkVariable<bool> pointsReady = new NetworkVariable<bool>();
+    public NetworkVariable<bool> allPointsUsed = new();
+    public NetworkVariable<bool> pointsReady = new();
 
-    [SerializeField] Vector2[] podiumSpawns;
+    [SerializeField] Transform[] podiumSpawns;
 
     #region Events
 

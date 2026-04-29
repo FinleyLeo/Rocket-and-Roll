@@ -1043,10 +1043,9 @@ GameObject:
   - component: {fileID: 6583592863880152288}
   - component: {fileID: 7269438256808642059}
   - component: {fileID: -8442060739272315709}
-  - component: {fileID: 8428599949539066022}
-  - component: {fileID: 8499360465936672072}
   - component: {fileID: 9058613642219626617}
   - component: {fileID: 1608191342458943904}
+  - component: {fileID: 1596643362366343693}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -1232,7 +1231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1134355502
+  GlobalObjectIdHash: 1776018959
   InScenePlacedSourceGlobalObjectIdHash: 1134355502
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1326,11 +1325,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   ShowTopMostFoldoutHeaderGroup: 1
-  isFlipped:
+  position:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
+    m_InternalValue: {x: 0, y: 5}
   knockBacked:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -1341,13 +1340,20 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
-  playerId: null
-  rollState: 0
-  inFullRoll: 0
+  isWinner:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  playerId: 0
   jumpForce: 20
   moveSpeed: 10
   axisMaxClamps: {x: 15, y: 20}
   moveDir: 0
+  airDecayTimer: 0
+  bufferTime: 0.2
+  airVelocityDecay: 1
+  canStopEarly: 0
   collideLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -1357,40 +1363,8 @@ MonoBehaviour:
   groundCastWidth:
   - 0.8
   - 1
-  canStopEarly: 0
-  bufferTime: 0.2
-  airVelocityDecay: 1
-  airDecayTimer: 0
-  layerUpdated: 0
-  smokeTrail: {fileID: 2347120553096682415}
---- !u!114 &8428599949539066022
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8882995978763723287}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe553a23973fc8e43830281c4272b7dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NameTagDisplay
-  ShowTopMostFoldoutHeaderGroup: 1
-  offset: {x: 0, y: 1, z: 0}
---- !u!114 &8499360465936672072
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8882995978763723287}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 060af5aa51ad3d6418062de529161f15, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerLookAt
-  ShowTopMostFoldoutHeaderGroup: 1
-  rotationSpeed: 0
+  rollState: 0
+  inFullRoll: 0
 --- !u!114 &9058613642219626617
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1410,12 +1384,12 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
-  iFramelength: 1
   isAlive:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+  iFramelength: 1
   ghostSprite: {fileID: 7193426204462787812, guid: 108672b11ee07f5488f9c86e6b1a5156, type: 3}
   ghostTrail: {fileID: 7335451232995978839}
   rpgObj: {fileID: 2553373157500969636}
@@ -1435,6 +1409,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BorderDetection
   ShowTopMostFoldoutHeaderGroup: 1
   borderDeathEffect: {fileID: 4367462710127534640, guid: 45eff8c52c6acf644b881fb01c23f960, type: 3}
+--- !u!114 &1596643362366343693
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8882995978763723287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fab9520bc305974d9d78047567ac2f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerVisuals
+  ShowTopMostFoldoutHeaderGroup: 1
+  layerUpdated: 0
+  isFlipped:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  usernameText: {fileID: 4874331361860019789}
+  offset: {x: 0, y: 1, z: 0}
+  eyePivot: {fileID: 1190699841494986593}
+  rpgPivot: {fileID: 264526465283841572}
+  rotationSpeed: 0
+  smokeTrail: {fileID: 2347120553096682415}
 --- !u!1001 &2453994643041242444
 PrefabInstance:
   m_ObjectHideFlags: 0

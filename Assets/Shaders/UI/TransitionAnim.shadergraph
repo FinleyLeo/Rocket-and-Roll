@@ -641,7 +641,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "_PixelationAmount",
     "m_StageCapability": 3,
-    "m_Value": 150.0,
+    "m_Value": 300.0,
     "m_DefaultValue": 0.0,
     "m_Labels": [],
     "m_LiteralMode": false

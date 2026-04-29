@@ -46,15 +46,8 @@ public class TilemapGen : NetworkBehaviour
 
         if (IsHost)
         {
-            StartCoroutine(DelayRoundStart());
+            RoundSceneManager.Instance.EndCurrentRound();
         }
-    }
-
-    IEnumerator DelayRoundStart()
-    {
-        yield return new WaitForSeconds(0.1f);
-
-        InGameManager.Instance.StartNewRound();
     }
 
     #region Generation
@@ -70,7 +63,7 @@ public class TilemapGen : NetworkBehaviour
 
         RenderTileMap();
         // Host signals theyre ready to themself
-        InGameManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
+        RoundSceneManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
         GetViableSpawnPoints();
     }
 
@@ -186,7 +179,8 @@ public class TilemapGen : NetworkBehaviour
                     mainTileMap.SetTile(new Vector3Int(x, y), wallTile);
 
         // Signal to server that this client is ready
-        InGameManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
+        Debug.Log(NetworkManager.Singleton.LocalClientId);
+        RoundSceneManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
     }
 
     [Rpc(SendTo.SpecifiedInParams)]
@@ -206,7 +200,8 @@ public class TilemapGen : NetworkBehaviour
                     mainTileMap.SetTile(new Vector3Int(x, y), wallTile);
 
         // Signal to server that this client is ready
-        InGameManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
+        Debug.Log(NetworkManager.Singleton.LocalClientId);
+        RoundSceneManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
     }
 
     public void SendMapToClient(ulong clientId)
