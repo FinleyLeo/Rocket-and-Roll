@@ -169,7 +169,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 75
+      scalar: 60
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -3649,9 +3649,9 @@ ParticleSystem:
         key6: {r: 0, g: 0, b: 0, a: 0}
         key7: {r: 0, g: 0, b: 0, a: 0}
         ctime0: 8481
-        ctime1: 22166
+        ctime1: 21588
         ctime2: 65535
-        ctime3: 48766
+        ctime3: 65535
         ctime4: 65535
         ctime5: 0
         ctime6: 0
@@ -3698,7 +3698,7 @@ ParticleSystem:
         m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
-    range: {x: 0, y: 75}
+    range: {x: 0, y: 60}
   CollisionModule:
     enabled: 0
     serializedVersion: 4

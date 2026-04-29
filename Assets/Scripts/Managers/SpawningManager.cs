@@ -14,8 +14,6 @@ public class SpawningManager : NetworkBehaviour
     public NetworkVariable<bool> allPointsUsed = new();
     public NetworkVariable<bool> pointsReady = new();
 
-    [SerializeField] Transform[] podiumSpawns;
-
     #region Events
 
     private void Awake()

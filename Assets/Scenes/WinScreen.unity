@@ -638,10 +638,6 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
-  podiumSpawns:
-  - {fileID: 219113077}
-  - {fileID: 1656101287}
-  - {fileID: 194575308}
 --- !u!114 &203822217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1255,6 +1251,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WinSceneManager
   ShowTopMostFoldoutHeaderGroup: 1
   winScreenText: {fileID: 648486790}
+  podiumSpawns:
+  - {fileID: 219113077}
+  - {fileID: 1656101287}
+  - {fileID: 194575308}
+  scores:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
 --- !u!114 &540554107
 MonoBehaviour:
   m_ObjectHideFlags: 0

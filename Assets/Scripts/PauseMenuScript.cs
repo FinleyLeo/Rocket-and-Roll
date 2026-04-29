@@ -85,7 +85,7 @@ public class PauseMenuScript : NetworkBehaviour
             fillAmount -= Time.deltaTime * 1f;
         }
 
-        fillAmount = Mathf.Clamp(fillAmount, -0.3f, 1.05f);
+        fillAmount = Mathf.Clamp(fillAmount, -0.35f, 1.05f);
         buttonBannerMat.SetFloat("_FillAmount", fillAmount);
         buttonHighlightMat.SetFloat("_FillAmount", fillAmount);
     }

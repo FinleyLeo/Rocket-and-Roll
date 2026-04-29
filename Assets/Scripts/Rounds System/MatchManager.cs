@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public enum MatchState 
 { 
@@ -138,14 +139,6 @@ public class MatchManager : NetworkBehaviour
 
     public void EndMatch()
     {
-        // resets all scores
-        for (int i = 0; i < scores.Count; i++)
-        {
-            PlayerScore score = scores[i];
-            score.points = 0;
-            scores[i] = score;
-        }
-
         TransitionManager.Instance.LoadScene("WinScreen");
     }
 

@@ -449,7 +449,6 @@ public class PlayerMovement : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void ModifyCanMoveRPC(bool state)
     {
-        Debug.Log("CanMove set to: " + state);
         canMove.Value = state;
     }
 
