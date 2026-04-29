@@ -57,6 +57,8 @@ public class PlayerVisuals : NetworkBehaviour
 
         moveScript.knockBacked.OnValueChanged += (bool prev, bool next) => UpdateSmokeTrail();
         nameTag.OnValueChanged += (FixedString64Bytes before, FixedString64Bytes after) => usernameText.text = nameTag.Value.ToString();
+        usernameText.text = nameTag.Value.ToString();
+
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
 
         if (IsOwner)
@@ -74,7 +76,10 @@ public class PlayerVisuals : NetworkBehaviour
 
     public override void OnDestroy()
     {
-        NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+        }
     }
 
     private void Update()

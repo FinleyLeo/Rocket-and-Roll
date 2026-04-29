@@ -72,8 +72,7 @@ public class SpawningManager : NetworkBehaviour
     public override void OnDestroy()
     {
         if (NetworkManager.Singleton == null || !IsHost) return;
-
-        NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnection;
+            NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnection;
     }
 
     #endregion
@@ -103,6 +102,8 @@ public class SpawningManager : NetworkBehaviour
 
         pointsReady.Value = false;
         allPointsUsed.Value = false;
+
+        yield return new WaitForSeconds(0.25f);
 
         // checks for spawn points until found (atleast one spawn point)
         while (spawnPoints.Count == 0)

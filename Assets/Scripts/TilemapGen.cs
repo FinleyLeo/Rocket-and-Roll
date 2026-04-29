@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -62,9 +63,38 @@ public class TilemapGen : NetworkBehaviour
         }
 
         RenderTileMap();
-        // Host signals theyre ready to themself
-        RoundSceneManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
+        // Host signals they're ready to themself (but only if RoundSceneManager is safe to call)
+        if (RoundSceneManager.Instance != null && RoundSceneManager.Instance.NetworkObject != null && RoundSceneManager.Instance.NetworkObject.IsSpawned)
+        {
+            RoundSceneManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
+        }
+        else
+        {
+            StartCoroutine(WaitAndCallClientReady(NetworkManager.Singleton.LocalClientId));
+        }
+
         GetViableSpawnPoints();
+    }
+
+    IEnumerator WaitAndCallClientReady(ulong clientId)
+    {
+        float timeout = 5f;
+        float timer = 0f;
+
+        while ((RoundSceneManager.Instance == null || RoundSceneManager.Instance.NetworkObject == null || !RoundSceneManager.Instance.NetworkObject.IsSpawned) && timer < timeout)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        if (RoundSceneManager.Instance != null && RoundSceneManager.Instance.NetworkObject != null && RoundSceneManager.Instance.NetworkObject.IsSpawned)
+        {
+            RoundSceneManager.Instance.ClientReadyRPC(clientId);
+        }
+        else
+        {
+            Debug.LogWarning($"WaitAndCallClientReady: RoundSceneManager not ready after {timeout}s, skipping ClientReadyRPC for client {clientId}.");
+        }
     }
 
     void GenerateMap()
@@ -179,8 +209,16 @@ public class TilemapGen : NetworkBehaviour
                     mainTileMap.SetTile(new Vector3Int(x, y), wallTile);
 
         // Signal to server that this client is ready
-        Debug.Log(NetworkManager.Singleton.LocalClientId);
-        RoundSceneManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
+        // Calling a SendTo.Server RPC requires the target NetworkBehaviour to be spawned.
+        if (RoundSceneManager.Instance != null && RoundSceneManager.Instance.NetworkObject != null && RoundSceneManager.Instance.NetworkObject.IsSpawned)
+        {
+            RoundSceneManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
+        }
+        else
+        {
+            // Wait until RoundSceneManager is available/fully spawned before calling RPC to avoid NRE in Netcode internals.
+            StartCoroutine(WaitAndCallClientReady(NetworkManager.Singleton.LocalClientId));
+        }
     }
 
     [Rpc(SendTo.SpecifiedInParams)]
@@ -201,7 +239,15 @@ public class TilemapGen : NetworkBehaviour
 
         // Signal to server that this client is ready
         Debug.Log(NetworkManager.Singleton.LocalClientId);
-        RoundSceneManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
+
+        if (RoundSceneManager.Instance != null && RoundSceneManager.Instance.NetworkObject != null && RoundSceneManager.Instance.NetworkObject.IsSpawned)
+        {
+            RoundSceneManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);
+        }
+        else
+        {
+            StartCoroutine(WaitAndCallClientReady(NetworkManager.Singleton.LocalClientId));
+        }
     }
 
     public void SendMapToClient(ulong clientId)

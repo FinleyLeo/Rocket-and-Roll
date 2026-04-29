@@ -103,7 +103,6 @@ public class MatchManager : NetworkBehaviour
         }
     }
 
-
     void OnStateChanged(MatchState prev, MatchState current)
     {
         if (!IsHost) return; // only server drives logic
@@ -125,7 +124,7 @@ public class MatchManager : NetworkBehaviour
                 break;
 
             case MatchState.RoundEnding:
-                SetAllPlayerMovement(false);
+                SetAllPlayerMovement(true);
                 break;
 
             case MatchState.MatchEnded:

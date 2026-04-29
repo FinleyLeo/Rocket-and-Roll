@@ -99,6 +99,25 @@ public class PlayerMovement : NetworkBehaviour
                 }
             }
         };
+
+        // If this object spawns into an already-active scene (join-in-progress or first spawn),
+        // ensure owner gets the correct canMove state immediately.
+        if (IsOwner)
+        {
+            string currentScene = SceneManager.GetActiveScene().name;
+            switch (currentScene)
+            {
+                case ("Lobby"):
+                    ModifyCanMoveRPC(true);
+                    break;
+                case ("RanGen"):
+                    ModifyCanMoveRPC(false);
+                    break;
+                case ("WinScreen"):
+                    ModifyCanMoveRPC(false);
+                    break;
+            }
+        }
     }
 
     void Start()
@@ -106,13 +125,6 @@ public class PlayerMovement : NetworkBehaviour
         moveAction = InputSystem.actions.FindAction("Move");
         jumpAction = InputSystem.actions.FindAction("Jump");
         rollAction = InputSystem.actions.FindAction("Roll");
-
-        //if (rbNotFound)
-        //{
-        //    // stops rb from fighting with movement updates while keeping collisions
-        //    rb.gravityScale = 0f;
-        //    rbNotFound = false;
-        //}
     }
 
     void Update()

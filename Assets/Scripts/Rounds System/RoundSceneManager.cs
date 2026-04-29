@@ -25,6 +25,14 @@ public class RoundSceneManager : NetworkBehaviour
         TransitionManager.Instance.EndTransition();
     }
 
+    public override void OnDestroy()
+    {
+        if (MatchManager.Instance != null)
+        {
+            MatchManager.Instance.OnMatchStateChanged -= RoundStateLogic;
+        }
+    }
+
     private void Start()
     {
         TransitionManager.Instance.EndTransition();
@@ -43,7 +51,10 @@ public class RoundSceneManager : NetworkBehaviour
         switch (state)
         {
             case MatchState.RoundEnding:
-                StartCoroutine(RoundEndCountdown());
+                if (IsHost)
+                {
+                    StartCoroutine(RoundEndCountdown());
+                }
                 break;
             case MatchState.RoundActive:
                 // temp, may be needed later
@@ -54,12 +65,40 @@ public class RoundSceneManager : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void ClientReadyRPC(ulong clientId)
     {
-        Debug.Log("client " + clientId + "ready notification");
+        // This RPC is executed on the server. Be defensive: guard against missing singletons.
+        Debug.Log($"ClientReadyRPC received for client {clientId} on server.");
+
+        if (!IsServer)
+        {
+            Debug.LogWarning("ClientReadyRPC was invoked but this instance is not the server. Ignoring.");
+            return;
+        }
+
+        if (readyClients == null)
+            readyClients = new HashSet<ulong>();
+
+        // Add client to ready set
         readyClients.Add(clientId);
 
-        if (readyClients.Count >= NetworkManager.Singleton.ConnectedClients.Count)
+        // Defensive check for NetworkManager
+        if (NetworkManager.Singleton == null)
+        {
+            Debug.LogWarning("NetworkManager.Singleton is null in ClientReadyRPC.");
+            return;
+        }
+
+        int connectedCount = NetworkManager.Singleton.ConnectedClientsList?.Count ?? NetworkManager.Singleton.ConnectedClients.Count;
+
+        // If every connected client has connected, proceed to start round countdown.
+        if (readyClients.Count >= connectedCount)
         {
             readyClients.Clear();
+
+            if (MatchManager.Instance == null)
+            {
+                Debug.LogWarning("MatchManager.Instance is null in ClientReadyRPC; cannot check match state.");
+                return;
+            }
 
             if (MatchManager.Instance.matchState.Value == MatchState.RoundStarting)
             {
