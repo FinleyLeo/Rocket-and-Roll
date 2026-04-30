@@ -24,7 +24,7 @@ public class LobbySceneManager : NetworkBehaviour
 
     private void Update()
     {
-        if (SceneManager.GetActiveScene().name == "Lobby")
+        if (SceneManager.GetActiveScene().name == "Lobby" && NetworkManager.Singleton != null)
         {
             if (IsHost && !canStartGame && NetworkManager.Singleton.ConnectedClientsList.Count > 1)
             {

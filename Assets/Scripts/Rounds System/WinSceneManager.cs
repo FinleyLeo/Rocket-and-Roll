@@ -54,6 +54,7 @@ public class WinSceneManager : NetworkBehaviour
     {
         yield return new WaitForSeconds(5);
 
+        MatchManager.Instance.ResetScores();
         TransitionManager.Instance.LoadScene("Lobby");
     }
 

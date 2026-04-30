@@ -188,6 +188,8 @@ public class TilemapGen : NetworkBehaviour
         lastWidth = width;
         lastHeight = height;
 
+        mainTileMap.GetComponent<ShadowScript>().UpdateShadowTilemap();
+
         RenderOnAllClientsRPC(lastWidth, lastHeight, lastFlattenedGrid);
     }
 
@@ -207,6 +209,8 @@ public class TilemapGen : NetworkBehaviour
             for (int y = 0; y < height; y++)
                 if (clientGrid[x, y] == 1)
                     mainTileMap.SetTile(new Vector3Int(x, y), wallTile);
+
+        mainTileMap.GetComponent<ShadowScript>().UpdateShadowTilemap();
 
         // Signal to server that this client is ready
         // Calling a SendTo.Server RPC requires the target NetworkBehaviour to be spawned.
@@ -237,9 +241,9 @@ public class TilemapGen : NetworkBehaviour
                 if (clientGrid[x, y] == 1)
                     mainTileMap.SetTile(new Vector3Int(x, y), wallTile);
 
-        // Signal to server that this client is ready
-        Debug.Log(NetworkManager.Singleton.LocalClientId);
+        mainTileMap.GetComponent<ShadowScript>().UpdateShadowTilemap();
 
+        // Signal to server that this client is ready
         if (RoundSceneManager.Instance != null && RoundSceneManager.Instance.NetworkObject != null && RoundSceneManager.Instance.NetworkObject.IsSpawned)
         {
             RoundSceneManager.Instance.ClientReadyRPC(NetworkManager.Singleton.LocalClientId);

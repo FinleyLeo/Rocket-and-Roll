@@ -271,6 +271,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2504061587926897748}
   - component: {fileID: 1531466917340074816}
+  - component: {fileID: 936869059902168864}
   m_Layer: 6
   m_Name: Player hand
   m_TagString: Untagged
@@ -352,6 +353,19 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &936869059902168864
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 462461046478744037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e70d1a181741aa54e9f36f602703f163, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShadowScript
+  wallTile: {fileID: 0}
 --- !u!1 &1021966278408997526
 GameObject:
   m_ObjectHideFlags: 0
@@ -486,6 +500,7 @@ GameObject:
   - component: {fileID: 9108001809276087787}
   - component: {fileID: 9190109609599747944}
   - component: {fileID: 700114437868632214}
+  - component: {fileID: 6319231451112116748}
   m_Layer: 6
   m_Name: player RPG
   m_TagString: Untagged
@@ -616,6 +631,19 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &6319231451112116748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2553373157500969636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e70d1a181741aa54e9f36f602703f163, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShadowScript
+  wallTile: {fileID: 0}
 --- !u!1 &4562543330884219674
 GameObject:
   m_ObjectHideFlags: 0
@@ -776,6 +804,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3322706760950409898}
   - component: {fileID: 837100320175453162}
+  - component: {fileID: 7578569445699899273}
   m_Layer: 6
   m_Name: Player hand 2
   m_TagString: Untagged
@@ -857,6 +886,19 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &7578569445699899273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5432031025787624300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e70d1a181741aa54e9f36f602703f163, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShadowScript
+  wallTile: {fileID: 0}
 --- !u!1 &7402403528338015127
 GameObject:
   m_ObjectHideFlags: 0
@@ -1046,6 +1088,7 @@ GameObject:
   - component: {fileID: 9058613642219626617}
   - component: {fileID: 1608191342458943904}
   - component: {fileID: 1596643362366343693}
+  - component: {fileID: 6563941752178803034}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -1340,11 +1383,6 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
-  isWinner:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
   playerId: 0
   jumpForce: 20
   moveSpeed: 10
@@ -1434,6 +1472,19 @@ MonoBehaviour:
   rpgPivot: {fileID: 264526465283841572}
   rotationSpeed: 0
   smokeTrail: {fileID: 2347120553096682415}
+--- !u!114 &6563941752178803034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8882995978763723287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e70d1a181741aa54e9f36f602703f163, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShadowScript
+  wallTile: {fileID: 0}
 --- !u!1001 &2453994643041242444
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1624,7 +1675,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6256790499918600906, guid: 4a61ddebe1ab5604eb42f8f8f9ee7a03, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4295410166110538775}
   m_SourcePrefab: {fileID: 100100000, guid: 4a61ddebe1ab5604eb42f8f8f9ee7a03, type: 3}
 --- !u!4 &6244784745665746020 stripped
 Transform:
@@ -1636,3 +1690,21 @@ TrailRenderer:
   m_CorrespondingSourceObject: {fileID: 4836784597017910997, guid: 4a61ddebe1ab5604eb42f8f8f9ee7a03, type: 3}
   m_PrefabInstance: {fileID: 2797711730119569538}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8072669560053410376 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6256790499918600906, guid: 4a61ddebe1ab5604eb42f8f8f9ee7a03, type: 3}
+  m_PrefabInstance: {fileID: 2797711730119569538}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4295410166110538775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8072669560053410376}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e70d1a181741aa54e9f36f602703f163, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShadowScript
+  wallTile: {fileID: 0}

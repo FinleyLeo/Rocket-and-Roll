@@ -288,7 +288,12 @@ public class PlayerVisuals : NetworkBehaviour
             Renderer[] children = visualScript.GetComponentsInChildren<Renderer>();
 
             foreach (Renderer childRend in children)
-                childRend.sortingOrder += clientOrder;
+            {
+                if (childRend.gameObject.name != "Shadow")
+                {
+                    childRend.sortingOrder += clientOrder;
+                }
+            }
 
             visualScript.layerUpdated = true;
         }

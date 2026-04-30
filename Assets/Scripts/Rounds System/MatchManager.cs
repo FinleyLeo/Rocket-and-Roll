@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 public enum MatchState 
 { 
@@ -41,7 +40,6 @@ public class MatchManager : NetworkBehaviour
     {
         // Temp points display for debugging
         scores.OnListChanged += OnScoresChanged;
-
         LogRankings();
 
         matchState.OnValueChanged += (prev, current) =>
@@ -180,6 +178,16 @@ public class MatchManager : NetworkBehaviour
                 }
                 break;
             }
+        }
+    }
+
+    public void ResetScores()
+    {
+        for (int i = 0; i < scores.Count; i++)
+        {
+            PlayerScore _score = scores[i];
+            _score.points = 0;
+            scores[i] = _score;
         }
     }
 
