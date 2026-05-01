@@ -99,6 +99,12 @@ public class MatchManager : NetworkBehaviour
             // Update alive count if round is still starting
             if (matchState.Value == MatchState.RoundStarting)
                 playersAlive.Value = NetworkManager.Singleton.ConnectedClients.Count;
+
+            // If a player leaves during an active round, check if we need to end it
+            if (matchState.Value != MatchState.None && matchState.Value != MatchState.Lobby && matchState.Value != MatchState.MatchEnded && NetworkManager.Singleton.ConnectedClients.Count <= 1)
+            {
+                matchState.Value = MatchState.MatchEnded;
+            }
         }
     }
 
@@ -137,6 +143,7 @@ public class MatchManager : NetworkBehaviour
 
     public void EndMatch()
     {
+        ClientTransitionRPC();
         TransitionManager.Instance.LoadScene("WinScreen");
     }
 
@@ -158,6 +165,8 @@ public class MatchManager : NetworkBehaviour
             matchState.Value = MatchState.RoundEnding;
         }
     }
+
+    #region Point System
 
     public void AwardPoint(ulong clientId)
     {
@@ -256,6 +265,14 @@ public class MatchManager : NetworkBehaviour
     }
 
     #endregion
+
+    #endregion
+
+    [Rpc(SendTo.NotServer)]
+    public void ClientTransitionRPC()
+    {
+        TransitionManager.Instance.StartTransitionManually();
+    }
 }
 
 [System.Serializable]

@@ -37,6 +37,13 @@ public class LobbySceneManager : NetworkBehaviour
 
     void StartGame()
     {
+        ClientTransitionRPC();
         TransitionManager.Instance.LoadScene("RanGen");
+    }
+
+    [Rpc(SendTo.NotServer)]
+    public void ClientTransitionRPC()
+    {
+        TransitionManager.Instance.StartTransitionManually();
     }
 }

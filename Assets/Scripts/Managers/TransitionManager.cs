@@ -90,4 +90,10 @@ public class TransitionManager : MonoBehaviour
 
         NetworkManager.Singleton.SceneManager.LoadScene(sceneIndex, LoadSceneMode.Single);
     }
+
+    [Rpc(SendTo.NotServer)]
+    public void ClientTransitionRPC()
+    {
+        StartTransitionManually();
+    }
 }

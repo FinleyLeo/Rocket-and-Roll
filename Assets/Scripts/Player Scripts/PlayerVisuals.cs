@@ -41,6 +41,9 @@ public class PlayerVisuals : NetworkBehaviour
     SpriteRenderer sr;
     Rigidbody2D rb;
 
+    MaterialPropertyBlock mpb;
+    [SerializeField] Material material;
+
     public override void OnNetworkSpawn()
     {
         moveScript = GetComponent<PlayerMovement>();
@@ -55,6 +58,8 @@ public class PlayerVisuals : NetworkBehaviour
         eyeTransform = eyePivot.GetChild(0);
         rpg = rpgPivot.GetChild(0);
 
+        mpb = new MaterialPropertyBlock();
+
         moveScript.knockBacked.OnValueChanged += (bool prev, bool next) => UpdateSmokeTrail();
         nameTag.OnValueChanged += (FixedString64Bytes before, FixedString64Bytes after) => usernameText.text = nameTag.Value.ToString();
         usernameText.text = nameTag.Value.ToString();
@@ -67,6 +72,7 @@ public class PlayerVisuals : NetworkBehaviour
         }
 
         UpdateLayerOrder();
+        SetColour();
     }
 
     void OnClientConnected(ulong clientId)
@@ -297,5 +303,10 @@ public class PlayerVisuals : NetworkBehaviour
 
             visualScript.layerUpdated = true;
         }
+    }
+
+    void SetColour()
+    {
+        material.SetColor("_Outline", ColourChangeManager.Instance.selectedPlayerColour);
     }
 }

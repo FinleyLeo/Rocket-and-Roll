@@ -1472,6 +1472,7 @@ MonoBehaviour:
   rpgPivot: {fileID: 264526465283841572}
   rotationSpeed: 0
   smokeTrail: {fileID: 2347120553096682415}
+  material: {fileID: 2100000, guid: 82ac16c198837504288bfd0db72cedc8, type: 2}
 --- !u!114 &6563941752178803034
 MonoBehaviour:
   m_ObjectHideFlags: 0
