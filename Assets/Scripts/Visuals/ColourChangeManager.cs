@@ -20,11 +20,13 @@ public class ColourChangeManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+
     }
 
     private void Start()
     {
-        selectedPlayerColour =  playerColours[PlayerPrefs.GetInt("SelectedPlayerColour", 0)];
+        selectedPlayerColour =  playerColours[PlayerPrefs.GetInt("SelectedPlayerColour", Random.Range(0, playerColours.Length + 1))];
         selectedPalette = palettes[PlayerPrefs.GetInt("SelectedPalette", 0)];
     }
 }

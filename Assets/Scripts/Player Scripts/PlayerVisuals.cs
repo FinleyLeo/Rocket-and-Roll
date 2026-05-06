@@ -44,6 +44,8 @@ public class PlayerVisuals : NetworkBehaviour
     MaterialPropertyBlock mpb;
     [SerializeField] Material material;
 
+    public NetworkVariable<Color> playerColor = new();
+
     public override void OnNetworkSpawn()
     {
         moveScript = GetComponent<PlayerMovement>();
@@ -61,6 +63,7 @@ public class PlayerVisuals : NetworkBehaviour
         mpb = new MaterialPropertyBlock();
 
         moveScript.knockBacked.OnValueChanged += (bool prev, bool next) => UpdateSmokeTrail();
+        playerColor.OnValueChanged += (Color prev, Color next) => SetMaterialColour();
         nameTag.OnValueChanged += (FixedString64Bytes before, FixedString64Bytes after) => usernameText.text = nameTag.Value.ToString();
         usernameText.text = nameTag.Value.ToString();
 
@@ -72,7 +75,7 @@ public class PlayerVisuals : NetworkBehaviour
         }
 
         UpdateLayerOrder();
-        SetColour();
+        SetCurrentColourRPC();
     }
 
     void OnClientConnected(ulong clientId)
@@ -305,8 +308,17 @@ public class PlayerVisuals : NetworkBehaviour
         }
     }
 
-    void SetColour()
+    [Rpc(SendTo.ClientsAndHost)]
+    public void SetCurrentColourRPC()
     {
-        material.SetColor("_Outline", ColourChangeManager.Instance.selectedPlayerColour);
+        if (IsOwner)
+        {
+            playerColor.Value = ColourChangeManager.Instance.selectedPlayerColour;
+        }
+    }
+
+    void SetMaterialColour()
+    {
+        sr.material.SetColor("_Outline", playerColor.Value);
     }
 }

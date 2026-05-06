@@ -401,7 +401,10 @@ MonoBehaviour:
   selectedPalette: {fileID: 11400000, guid: e07ee558ab8db9246a394da1c7a9a9a8, type: 2}
   selectedPlayerColour: {r: 0, g: 0, b: 0, a: 0}
   playerColours:
-  - {r: 0.8392157, g: 0.19215687, b: 0.7173356, a: 0}
+  - {r: 0.5346502, g: 0.32133323, b: 0.7830189, a: 0}
+  - {r: 0.8773585, g: 0.8049417, b: 0.2027857, a: 0}
+  - {r: 0.8392157, g: 0.23644279, b: 0.19215687, a: 0}
+  - {r: 0.19215687, g: 0.64485264, b: 0.8392157, a: 0}
 --- !u!4 &686334057
 Transform:
   m_ObjectHideFlags: 0
