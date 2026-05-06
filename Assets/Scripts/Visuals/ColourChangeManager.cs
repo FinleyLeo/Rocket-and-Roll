@@ -6,7 +6,7 @@ public class ColourChangeManager : MonoBehaviour
 
     [SerializeField] PaletteSO[] palettes;
     public PaletteSO selectedPalette;
-    public Color selectedPlayerColour;
+    public Color selectedPlayerColour, selectedRPGColour;
     public Color[] playerColours;
 
     private void Awake()
@@ -20,13 +20,12 @@ public class ColourChangeManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-
-
     }
 
     private void Start()
     {
-        selectedPlayerColour =  playerColours[PlayerPrefs.GetInt("SelectedPlayerColour", Random.Range(0, playerColours.Length + 1))];
+        selectedPlayerColour =  playerColours[PlayerPrefs.GetInt("SelectedPlayerColour", Random.Range(0, playerColours.Length))];
+        selectedRPGColour =  playerColours[PlayerPrefs.GetInt("SelectedPlayerColour", Random.Range(0, playerColours.Length))];
         selectedPalette = palettes[PlayerPrefs.GetInt("SelectedPalette", 0)];
     }
 }

@@ -41,10 +41,13 @@ public class PlayerVisuals : NetworkBehaviour
     SpriteRenderer sr;
     Rigidbody2D rb;
 
+    SpriteRenderer rpgSR;
+
     MaterialPropertyBlock mpb;
     [SerializeField] Material material;
 
-    public NetworkVariable<Color> playerColor = new();
+    public NetworkVariable<Color> rpgColor = new(new Vector4(0, 0, 0, 0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<Color> playerColor = new(new Vector4(0, 0, 0, 0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     public override void OnNetworkSpawn()
     {
@@ -59,6 +62,7 @@ public class PlayerVisuals : NetworkBehaviour
 
         eyeTransform = eyePivot.GetChild(0);
         rpg = rpgPivot.GetChild(0);
+        rpgSR = rpg.GetComponent<SpriteRenderer>();
 
         mpb = new MaterialPropertyBlock();
 
@@ -80,6 +84,7 @@ public class PlayerVisuals : NetworkBehaviour
 
     void OnClientConnected(ulong clientId)
     {
+        UpdatePlayerColours();
         UpdateLayerOrder();
     }
 
@@ -308,17 +313,40 @@ public class PlayerVisuals : NetworkBehaviour
         }
     }
 
+    void UpdatePlayerColours()
+    {
+        foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            PlayerVisuals clientVisuals = client.PlayerObject.GetComponent<PlayerVisuals>();
+
+            clientVisuals.SetMaterialColour();
+        }
+    }
+
+
     [Rpc(SendTo.ClientsAndHost)]
     public void SetCurrentColourRPC()
     {
         if (IsOwner)
         {
             playerColor.Value = ColourChangeManager.Instance.selectedPlayerColour;
+            rpgColor.Value = ColourChangeManager.Instance.selectedRPGColour;
         }
     }
 
     void SetMaterialColour()
     {
         sr.material.SetColor("_Outline", playerColor.Value);
+        rpgSR.material.SetColor("_Outline", rpgColor.Value);
+
+        SpriteRenderer[] children = sr.GetComponentsInChildren<SpriteRenderer>();
+
+        foreach (SpriteRenderer childRend in children)
+        {
+            if (childRend.gameObject.name != "Shadow" && childRend.gameObject.name != "RPG")
+            {
+                childRend.material = sr.material;
+            }
+        }
     }
 }

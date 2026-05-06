@@ -502,7 +502,7 @@ GameObject:
   - component: {fileID: 700114437868632214}
   - component: {fileID: 6319231451112116748}
   m_Layer: 6
-  m_Name: player RPG
+  m_Name: RPG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1274,7 +1274,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1776018959
+  GlobalObjectIdHash: 1134355502
   InScenePlacedSourceGlobalObjectIdHash: 1134355502
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1473,6 +1473,11 @@ MonoBehaviour:
   rotationSpeed: 0
   smokeTrail: {fileID: 2347120553096682415}
   material: {fileID: 2100000, guid: 82ac16c198837504288bfd0db72cedc8, type: 2}
+  playerColor:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &6563941752178803034
 MonoBehaviour:
   m_ObjectHideFlags: 0

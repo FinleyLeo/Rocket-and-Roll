@@ -19,6 +19,7 @@ public class MissileScript : NetworkBehaviour
 
     //public string playerId;
     public NetworkVariable<FixedString64Bytes> playerId = new();
+    public NetworkVariable<Color> missileColor = new();
 
     [SerializeField] ParticleSystem explosion;
     [SerializeField] GameObject rocketTrail;
@@ -32,6 +33,7 @@ public class MissileScript : NetworkBehaviour
         trailActive.OnValueChanged += (bool prev, bool next) => rocketTrail.SetActive(trailActive.Value);
         srActive.OnValueChanged += (bool prev, bool next) => sr.enabled = srActive.Value;
         colActive.OnValueChanged += (bool prev, bool next) => col.enabled = colActive.Value;
+        missileColor.OnValueChanged += (Color prev, Color next) => sr.material.SetColor("_Base", missileColor.Value);
     }
 
     void Start()
@@ -50,6 +52,7 @@ public class MissileScript : NetworkBehaviour
 
         srActive.Value = true;
         colActive.Value = true;
+        sr.material.SetColor("_Base", missileColor.Value);
 
         yield return new WaitForSeconds(0.07f);
 

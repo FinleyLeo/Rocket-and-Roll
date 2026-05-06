@@ -15,6 +15,7 @@ public class BorderDetection : NetworkBehaviour
     PlayerHealth healthScript;
     PlayerMovement moveScript;
     Rigidbody2D rb;
+    SpriteRenderer sr;
 
     [SerializeField] ParticleSystem borderDeathEffect;
 
@@ -25,6 +26,7 @@ public class BorderDetection : NetworkBehaviour
         healthScript = GetComponent<PlayerHealth>();
         moveScript = GetComponent<PlayerMovement>();
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -94,18 +96,27 @@ public class BorderDetection : NetworkBehaviour
         else
         {
             // play death effect away from border
-            SendBorderParticleRPC(angle, particlePosition);
+            SendBorderParticleRPC(angle, particlePosition, sr.material.GetColor("_Outline"));
         }
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    void SendBorderParticleRPC(float angle, Vector3 pos)
+    void SendBorderParticleRPC(float angle, Vector3 pos, Color color)
     {
         ParticleSystem particle = Instantiate(borderDeathEffect, pos, Quaternion.identity);
 
         particle.transform.eulerAngles = new Vector3(0, 0, angle);
 
+        var main = particle.main;
+        Gradient grad = main.startColor.gradient;
+        
+
+        // color key and color key count is null and a nullrefexception is thrown
+
+        main.startColor = new ParticleSystem.MinMaxGradient(grad);
         particle.Play();
+
+        Destroy(particle.gameObject, particle.main.startLifetime.constant * 5);
     }
 
     [Rpc(SendTo.ClientsAndHost)]

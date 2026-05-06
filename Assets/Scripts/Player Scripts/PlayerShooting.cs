@@ -1,4 +1,3 @@
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -55,26 +54,13 @@ public class PlayerShooting : NetworkBehaviour
     {
         cooldownTimer = cooldown;
 
-        if (IsHost)
-        {
-            var missile = Instantiate(missilePrefab, transform.position, Quaternion.Euler(RotationAlignment(transform.rotation.eulerAngles)));
+        SpriteRenderer rpgSR = GetComponentInParent<SpriteRenderer>();
 
-            MissileScript missileScript = missile.GetComponent<MissileScript>();
-
-            missileScript.moveDirection = transform.right;
-            missileScript.startVelocity = playerRB.linearVelocity * 0.002f;
-
-            missile.GetComponent<NetworkObject>().Spawn(true);
-            missileScript.playerId.Value = playerScript.playerId.ToString();
-        }
-        else
-        {
-            SpawnMissileRPC(playerRB.linearVelocity, playerScript.playerId.ToString());
-        }
+        SpawnMissileRPC(playerRB.linearVelocity, playerScript.playerId.ToString(), rpgSR.material.GetColor("_Outline"));
     }
 
     [Rpc(SendTo.Server)]
-    void SpawnMissileRPC(Vector2 velocity, string playerId)
+    void SpawnMissileRPC(Vector2 velocity, string playerId, Color color)
     {
         //var missile = Instantiate(missilePrefab, transform.position, transform.rotation);
         var missile = Instantiate(missilePrefab, transform.position, Quaternion.Euler(RotationAlignment(transform.rotation.eulerAngles)));
@@ -82,9 +68,10 @@ public class PlayerShooting : NetworkBehaviour
         MissileScript missileScript = missile.GetComponent<MissileScript>();
 
         missileScript.moveDirection = transform.right;
-        missileScript.startVelocity = velocity * 0.001f;
+        missileScript.startVelocity = velocity * 0.002f;
 
         missile.GetComponent<NetworkObject>().Spawn(true);
+        missileScript.missileColor.Value = color;
         missileScript.playerId.Value = playerId;
     }
 

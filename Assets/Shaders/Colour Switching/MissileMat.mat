@@ -57,11 +57,11 @@ Material:
     - _UseOutline: 0
     m_Colors:
     - White: {r: 1, g: 1, b: 1, a: 1}
-    - _Base: {r: 0.7843138, g: 0.18823531, b: 0.83921576, a: 1}
+    - _Base: {r: 0, g: 0, b: 0, a: 1}
     - _BaseColour: {r: 0.8470589, g: 0.3647059, b: 0.36078432, a: 1}
     - _BaseIN: {r: 1, g: 1, b: 1, a: 1}
     - _BaseIn: {r: 1, g: 1, b: 1, a: 1}
-    - _Outline: {r: 0.8396226, g: 0.19406366, b: 0.19406366, a: 1}
+    - _Outline: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColour: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineIN: {r: 0.7137255, g: 0.7137255, b: 0.7137255, a: 1}
     - _OutlineIn: {r: 0.6320754, g: 0.6320754, b: 0.6320754, a: 1}
