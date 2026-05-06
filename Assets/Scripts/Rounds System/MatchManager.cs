@@ -149,9 +149,21 @@ public class MatchManager : NetworkBehaviour
 
     void SetAllPlayerMovement(bool canMove)
     {
-        foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
+        if (NetworkManager.Singleton != null)
         {
-            client.PlayerObject.GetComponent<PlayerMovement>().canMove.Value = canMove;
+            foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
+            {
+                PlayerMovement moveScript = client?.PlayerObject.GetComponent<PlayerMovement>();
+
+                if (moveScript != null)
+                {
+                    moveScript.canMove.Value = canMove;
+                }
+            }
+        }
+        else
+        {
+            Debug.Log("No singleton found, skipping move state changes");
         }
     }
 

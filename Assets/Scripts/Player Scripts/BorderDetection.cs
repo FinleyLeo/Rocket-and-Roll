@@ -16,8 +16,10 @@ public class BorderDetection : NetworkBehaviour
     PlayerMovement moveScript;
     Rigidbody2D rb;
     SpriteRenderer sr;
+    PlayerVisuals visuals;
 
     [SerializeField] ParticleSystem borderDeathEffect;
+    [SerializeField] Gradient gradientTemplate;
 
     float borderOffset = 0.5f;
 
@@ -27,6 +29,7 @@ public class BorderDetection : NetworkBehaviour
         moveScript = GetComponent<PlayerMovement>();
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
+        visuals = GetComponent<PlayerVisuals>();
     }
 
     void Update()
@@ -88,16 +91,10 @@ public class BorderDetection : NetworkBehaviour
         healthScript.TakeDamageRPC(1);
 
         // if still alive after taking damage
-        if (healthScript.health.Value > 0)
-        {
-            // Add knockback away from border
+        if (healthScript.health.Value > 0) // Add knockback away from border
             SendRBForceRPC(knockDir * 50);
-        }
-        else
-        {
-            // play death effect away from border
+        else // play death effect away from border
             SendBorderParticleRPC(angle, particlePosition, sr.material.GetColor("_Outline"));
-        }
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -107,13 +104,21 @@ public class BorderDetection : NetworkBehaviour
 
         particle.transform.eulerAngles = new Vector3(0, 0, angle);
 
-        var main = particle.main;
-        Gradient grad = main.startColor.gradient;
-        
+        Gradient gradient = new Gradient();
+        gradient.mode = GradientMode.Fixed;
+        gradient.colorKeys = new GradientColorKey[]
+        {
+            // Default template smoke colours
+            new GradientColorKey(gradientTemplate.colorKeys[0].color, 0.15f),
+            new GradientColorKey(gradientTemplate.colorKeys[1].color, 0.3f),
 
-        // color key and color key count is null and a nullrefexception is thrown
+            // Custom colour depending on player outline
+            new GradientColorKey(visuals.playerColor.Value, 1)
+        };
 
-        main.startColor = new ParticleSystem.MinMaxGradient(grad);
+        var bySpeed = particle.colorBySpeed;
+        bySpeed.color = gradient;
+
         particle.Play();
 
         Destroy(particle.gameObject, particle.main.startLifetime.constant * 5);
