@@ -15,7 +15,7 @@ public class WinSceneManager : NetworkBehaviour
     {
         SortScoreList();
 
-        if (IsHost)
+        if (IsServer)
         {
             StartCoroutine(ReturnToLobby());
 
@@ -89,7 +89,7 @@ public class WinSceneManager : NetworkBehaviour
     // Server-side helper to revive everyone
     void ReviveAllPlayers()
     {
-        if (!IsHost) return;
+        if (!IsServer) return;
 
         foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
         {

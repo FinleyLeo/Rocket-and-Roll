@@ -16,7 +16,7 @@ public class LobbySceneManager : NetworkBehaviour
         startGameButton.onClick.AddListener(StartGame);
         TransitionManager.Instance.EndTransition();
 
-        if (IsHost)
+        if (IsServer)
         {
             MatchManager.Instance.matchState.Value = MatchState.Lobby;
         }
@@ -26,7 +26,7 @@ public class LobbySceneManager : NetworkBehaviour
     {
         if (SceneManager.GetActiveScene().name == "Lobby" && NetworkManager.Singleton != null)
         {
-            if (IsHost && !canStartGame && NetworkManager.Singleton.ConnectedClientsList.Count > 1)
+            if (IsServer && !canStartGame && NetworkManager.Singleton.ConnectedClientsList.Count > 1)
             {
                 canStartGame = true;
 

@@ -34,7 +34,7 @@ public class BorderDetection : NetworkBehaviour
 
     void Update()
     {
-        if (IsHost)
+        if (IsServer)
         {
             if (TilemapGen.Instance != null)
             {

@@ -40,7 +40,7 @@ public class RoundSceneManager : NetworkBehaviour
 
     private void Update()
     {
-        if (Keyboard.current.gKey.wasPressedThisFrame && IsHost)
+        if (Keyboard.current.gKey.wasPressedThisFrame && IsServer)
         {
             EndCurrentRound();
         }
@@ -51,7 +51,7 @@ public class RoundSceneManager : NetworkBehaviour
         switch (state)
         {
             case MatchState.RoundEnding:
-                if (IsHost)
+                if (IsServer)
                 {
                     StartCoroutine(RoundEndCountdown());
                 }
@@ -118,7 +118,7 @@ public class RoundSceneManager : NetworkBehaviour
         yield return new WaitForSeconds(1f);
         // Show "GO"
 
-        if (IsHost)
+        if (IsServer)
             MatchManager.Instance.matchState.Value = MatchState.RoundActive;
     }
 

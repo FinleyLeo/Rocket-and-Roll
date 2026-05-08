@@ -45,7 +45,7 @@ public class TilemapGen : NetworkBehaviour
     {
         cam = Camera.main;
 
-        if (IsHost)
+        if (IsServer)
         {
             RoundSceneManager.Instance.EndCurrentRound();
         }

@@ -49,7 +49,7 @@ public class PlayerHealth : NetworkBehaviour
 
     private void Start()
     {
-        if (IsHost)
+        if (IsServer)
         {
             health.Value = maxHealth;
         }
@@ -92,7 +92,7 @@ public class PlayerHealth : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     void SendDieRPC()
     {
-        if (IsHost)
+        if (IsServer)
         {
             ModifyAliveStateRPC(false);
             moveScript.ModifyCanMoveRPC(false);
@@ -127,7 +127,7 @@ public class PlayerHealth : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     public void SendRespawnRPC()
     {
-        if (IsHost)
+        if (IsServer)
         {
             ModifyAliveStateRPC(true);
         }

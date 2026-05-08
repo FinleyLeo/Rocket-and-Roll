@@ -20,11 +20,6 @@ public class PlayerShooting : NetworkBehaviour
         playerRB = GetComponentInParent<Rigidbody2D>();
 
         attackAction = InputSystem.actions.FindAction("Shoot");
-
-        if (!IsHost)
-        {
-            cooldown = 0.95f; // slightly reduces cooldown for clients as host has slight shooting advantage
-        }
     }
 
     private void Update()

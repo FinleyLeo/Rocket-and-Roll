@@ -48,7 +48,7 @@ public class MatchManager : NetworkBehaviour
             OnStateChanged(prev, current);
         };
 
-        if (IsHost)
+        if (IsServer)
         {
             NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnected;
@@ -62,7 +62,7 @@ public class MatchManager : NetworkBehaviour
         // temp point display
         scores.OnListChanged -= OnScoresChanged;
 
-        if (NetworkManager.Singleton != null && IsHost)
+        if (NetworkManager.Singleton != null && IsServer)
         {
             NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnected;
@@ -72,7 +72,7 @@ public class MatchManager : NetworkBehaviour
     void HandleClientConnected(ulong clientId)
     {
         // Add to scoreboard
-        if (IsHost)
+        if (IsServer)
         {
             scores.Add(new PlayerScore { clientId = clientId, points = 0 });
 
@@ -84,7 +84,7 @@ public class MatchManager : NetworkBehaviour
 
     void HandleClientDisconnected(ulong clientId)
     {
-        if (IsHost)
+        if (IsServer)
         {
             // Remove from scoreboard
             for (int i = scores.Count - 1; i >= 0; i--)
@@ -110,7 +110,7 @@ public class MatchManager : NetworkBehaviour
 
     void OnStateChanged(MatchState prev, MatchState current)
     {
-        if (!IsHost) return; // only server drives logic
+        if (!IsServer) return; // only server drives logic
 
         switch (current)
         {
@@ -182,7 +182,7 @@ public class MatchManager : NetworkBehaviour
 
     public void AwardPoint(ulong clientId)
     {
-        if (!IsHost) return;
+        if (!IsServer) return;
 
         for (int i = 0; i < scores.Count; i++)
         {

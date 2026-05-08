@@ -26,7 +26,7 @@ public class SpawningManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (IsHost)
+        if (IsServer)
         {
             if (SceneManager.GetActiveScene().name != "WinScreen")
             {
@@ -69,7 +69,7 @@ public class SpawningManager : NetworkBehaviour
 
     public override void OnDestroy()
     {
-        if (NetworkManager.Singleton == null || !IsHost) return;
+        if (NetworkManager.Singleton == null || !IsServer) return;
             NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnection;
     }
 
@@ -77,7 +77,7 @@ public class SpawningManager : NetworkBehaviour
 
     private void Update()
     {
-        if (!IsHost) return;
+        if (!IsServer) return;
 
         bool anyFree = false;
 
