@@ -79,7 +79,7 @@ public class MatchManager : NetworkBehaviour
             // Update alive count if round is still starting
             if (matchState.Value == MatchState.RoundStarting)
                 playersAlive.Value = NetworkManager.Singleton.ConnectedClients.Count;
-        }  
+        }
     }
 
     void HandleClientDisconnected(ulong clientId)
@@ -121,6 +121,7 @@ public class MatchManager : NetworkBehaviour
 
             case MatchState.RoundStarting:
                 playersAlive.Value = NetworkManager.Singleton.ConnectedClients.Count;
+                ColourChangeManager.Instance.selectedPaletteIndex.Value = UnityEngine.Random.Range(0, ColourChangeManager.Instance.palettes.Length);
                 SetAllPlayerMovement(false);
                 break;
 

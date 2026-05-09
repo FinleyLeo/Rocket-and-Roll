@@ -9,6 +9,12 @@ public class PlayerVisuals : NetworkBehaviour
     public bool layerUpdated;
     public NetworkVariable<bool> isFlipped = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+    SpriteRenderer rpgSR;
+    [SerializeField] SpriteRenderer shadowSR;
+
+    public NetworkVariable<Color> rpgColor = new(new Vector4(0, 0, 0, 0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<Color> playerColor = new(new Vector4(0, 0, 0, 0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
     [Space(10)]
     [Header("Nametag Variables")]
     public TextMeshProUGUI usernameText;
@@ -41,14 +47,6 @@ public class PlayerVisuals : NetworkBehaviour
     SpriteRenderer sr;
     Rigidbody2D rb;
 
-    SpriteRenderer rpgSR;
-
-    MaterialPropertyBlock mpb;
-    [SerializeField] Material material;
-
-    public NetworkVariable<Color> rpgColor = new(new Vector4(0, 0, 0, 0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-    public NetworkVariable<Color> playerColor = new(new Vector4(0, 0, 0, 0), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-
     public override void OnNetworkSpawn()
     {
         moveScript = GetComponent<PlayerMovement>();
@@ -64,7 +62,6 @@ public class PlayerVisuals : NetworkBehaviour
         rpg = rpgPivot.GetChild(0);
         rpgSR = rpg.GetComponent<SpriteRenderer>();
 
-        mpb = new MaterialPropertyBlock();
 
         moveScript.knockBacked.OnValueChanged += (bool prev, bool next) => UpdateSmokeTrail();
         playerColor.OnValueChanged += (Color prev, Color next) => SetMaterialColour();
@@ -130,6 +127,26 @@ public class PlayerVisuals : NetworkBehaviour
         }
 
         sr.flipX = isFlipped.Value;
+
+        if (shadowSR != null)
+        {
+            shadowSR.flipX = isFlipped.Value;
+            return;
+        }
+        else
+        {
+            Debug.Log("Finding shadow renderer...");
+            SpriteRenderer[] childSrs = GetComponentsInChildren<SpriteRenderer>();
+
+            foreach (SpriteRenderer child in childSrs)
+            {
+                if (child.name == "Shadow")
+                {
+                    Debug.Log("shadow rend found");
+                    shadowSR = child;
+                }
+            }
+        }
     }
 
     #region Nametag Visuals
@@ -262,6 +279,23 @@ public class PlayerVisuals : NetworkBehaviour
         {
             sr.flipX = moveScript.moveDir < 0.1f;
             isFlipped.Value = sr.flipX;
+
+            if (shadowSR != null)
+            {
+                shadowSR.flipX = isFlipped.Value;
+            }
+            else
+            {
+                SpriteRenderer[] childSrs = GetComponentsInChildren<SpriteRenderer>();
+
+                foreach (SpriteRenderer child in childSrs)
+                {
+                    if (child.name == "Shadow")
+                    {
+                        shadowSR = child;
+                    }
+                }
+            }
         }
 
         rotationSpeed = -(rb.linearVelocityX * (Mathf.PI * 10) * Time.deltaTime);

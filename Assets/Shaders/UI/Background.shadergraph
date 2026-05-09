@@ -830,8 +830,8 @@
     "m_ObjectId": "0cb817a3d5614388ac852c0b8220285a",
     "m_Title": "Spiral",
     "m_Position": {
-        "x": -1629.000244140625,
-        "y": 1120.0
+        "x": -1628.9998779296875,
+        "y": 1119.9998779296875
     }
 }
 
@@ -1098,8 +1098,8 @@
     "m_ObjectId": "1d20d805abbf43bcb9c3c4cf0d1e2be5",
     "m_Title": "Lines",
     "m_Position": {
-        "x": -2009.000244140625,
-        "y": 313.0000305175781
+        "x": -2008.9998779296875,
+        "y": 313.0
     }
 }
 
@@ -2293,7 +2293,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "Range",
     "m_StageCapability": 3,
-    "m_Value": 0.10000000149011612,
+    "m_Value": 0.0010000000474974514,
     "m_DefaultValue": 0.0,
     "m_Labels": [],
     "m_LiteralMode": false
@@ -2534,7 +2534,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "Range",
     "m_StageCapability": 3,
-    "m_Value": 0.10000000149011612,
+    "m_Value": 0.0010000000474974514,
     "m_DefaultValue": 0.0,
     "m_Labels": [],
     "m_LiteralMode": false
@@ -2593,10 +2593,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -838.9998779296875,
-            "y": 1308.0,
+            "x": -791.9999389648438,
+            "y": 1307.9998779296875,
             "width": 105.0,
-            "height": 34.0001220703125
+            "height": 34.0
         }
     },
     "m_Slots": [

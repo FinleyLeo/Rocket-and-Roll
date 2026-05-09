@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -79,26 +80,7 @@ public class PlayerMovement : NetworkBehaviour
             rb.gravityScale = 0; // stops fighting between device and listening clients
         }
 
-        SceneManager.activeSceneChanged += (Scene prev, Scene current) =>
-        {
-            if (IsOwner)
-            {
-                Debug.Log("Running spawn event");
-
-                switch (current.name)
-                {
-                    case ("Lobby"):
-                        ModifyCanMoveRPC(true);
-                        break;
-                    case ("RanGen"):
-                        ModifyCanMoveRPC(false);
-                        break;
-                    case ("WinScreen"):
-                        ModifyCanMoveRPC(false);
-                        break;
-                }
-            }
-        };
+        SceneManager.activeSceneChanged += SceneChangedHandler;
 
         // If this object spawns into an already-active scene (join-in-progress or first spawn),
         // ensure owner gets the correct canMove state immediately.
@@ -108,16 +90,21 @@ public class PlayerMovement : NetworkBehaviour
             switch (currentScene)
             {
                 case ("Lobby"):
-                    ModifyCanMoveRPC(true);
+                    RequestModifyCanMove(true);
                     break;
                 case ("RanGen"):
-                    ModifyCanMoveRPC(false);
+                    RequestModifyCanMove(false);
                     break;
                 case ("WinScreen"):
-                    ModifyCanMoveRPC(false);
+                    RequestModifyCanMove(false);
                     break;
             }
         }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        SceneManager.activeSceneChanged -= SceneChangedHandler;
     }
 
     void Start()
@@ -159,8 +146,9 @@ public class PlayerMovement : NetworkBehaviour
             if (rb.gravityScale != 0)
             {
                 rb.gravityScale = 0;
-                rb.linearVelocity = Vector2.zero;
             }
+
+            rb.linearVelocity = Vector2.zero;
         }
 
         position.Value = transform.position;
@@ -312,6 +300,8 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
+    #region Jumping
+
     void JumpCheck()
     {
         DoGroundRay();
@@ -331,6 +321,7 @@ public class PlayerMovement : NetworkBehaviour
             rb.AddForce(Vector2.up * (jumpForce * 0.3f), ForceMode2D.Impulse); // Added to remove "headhitting" effect
         }
     }
+
     void Jump()
     {
         float jumpForceMulti = rollState == RollState.Balled ? 0.8f : 1f;
@@ -393,6 +384,19 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
+    bool IsFalling(float offset)
+    {
+        if (rb.linearVelocity.y < offset)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    #endregion
+
+    #region Rolling
+
     void RollCheck()
     {
         if (rollAction.IsPressed()) // enter roll state
@@ -437,25 +441,81 @@ public class PlayerMovement : NetworkBehaviour
         inFullRoll = false;
     }
 
-    bool IsFalling(float offset)
+    #endregion
+
+    #region CanMove Methods
+
+    public void RequestModifyCanMove(bool state)
     {
-        if (rb.linearVelocity.y < offset)
+        // Quick safety: if this object has been destroyed, bail out immediately.
+        if (this == null) return;
+
+        if (IsServer)
         {
-            return true;
+            canMove.Value = state;
+            return;
         }
-        return false;
+
+        // If client and object is spawned, call the ServerRpc immediately
+        if (NetworkObject != null && NetworkObject.IsSpawned)
+        {
+            ModifyCanMoveRpc(state);
+        }
+        else
+        {
+            // Defer until the NetworkObject is spawned
+            // Double-check safety inside the coroutine too.
+            StartCoroutine(DeferredModifyCanMove(state));
+        }
     }
 
     [Rpc(SendTo.Server)]
-    public void ModifyCanMoveRPC(bool state)
+    void ModifyCanMoveRpc(bool state)
     {
         canMove.Value = state;
     }
 
+    IEnumerator DeferredModifyCanMove(bool state)
+    {
+        // Wait until the network object exists and is spawned before trying to send the ServerRpc.
+        while (NetworkObject == null || !NetworkObject.IsSpawned)
+        {
+            // If the object was destroyed while waiting, stop waiting.
+            if (this == null) yield break;
+            yield return null;
+        }
+
+        if (this == null) yield break;
+
+        // On spawn, call the ServerRpc once.
+        ModifyCanMoveRpc(state);
+    }
+
+    void SceneChangedHandler(Scene prev, Scene current)
+    {
+        if (IsOwner)
+        {
+            Debug.Log("Running spawn event");
+
+            switch (current.name)
+            {
+                case ("Lobby"):
+                    RequestModifyCanMove(true);
+                    break;
+                case ("RanGen"):
+                    RequestModifyCanMove(false);
+                    break;
+                case ("WinScreen"):
+                    RequestModifyCanMove(false);
+                    break;
+            }
+        }
+    }
+
+    #endregion
+
     private void OnDrawGizmos()
     {
-        CapsuleCollider2D playerCol = GetComponent<CapsuleCollider2D>();
-
         Gizmos.DrawCube(transform.position + (!inFullRoll ? groundCastOffset : ballGroundCastOffset), new Vector3(!inFullRoll ? groundCastWidth[0] : groundCastWidth[1], 0.2f));
     }
 }

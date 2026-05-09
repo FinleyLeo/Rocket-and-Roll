@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: caa7e20c8b273d14291d154049148ece, type: 3}
-  m_Name: Ice Cream
+  m_Name: Mint
   m_EditorClassIdentifier: Assembly-CSharp::PaletteSO
-  backgroundPrimary: {r: 1, g: 0.96470594, b: 0.82745105, a: 0}
-  backgroundSecondary: {r: 0.97647065, g: 0.65882355, b: 0.45882356, a: 0}
-  foregroundPrimary: {r: 0.9215687, g: 0.41960788, b: 0.43529415, a: 0}
-  foregroundSecondary: {r: 0.48627454, g: 0.24705884, b: 0.34509805, a: 0}
+  backgroundPrimary: {r: 0.9843138, g: 1, b: 0.87843144, a: 0}
+  backgroundSecondary: {r: 0.58431375, g: 0.7803922, b: 0.59607846, a: 0}
+  foregroundPrimary: {r: 0.52156866, g: 0.427451, b: 0.32156864, a: 0}
+  foregroundSecondary: {r: 0.2509804, g: 0.20000002, b: 0.18431373, a: 0}

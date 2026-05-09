@@ -1,5 +1,6 @@
 using JetBrains.Annotations;
 using System.Collections;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -22,6 +23,7 @@ public class PlayerHealth : NetworkBehaviour
 
     [SerializeField] Sprite ghostSprite;
     [SerializeField] TrailRenderer ghostTrail;
+    [SerializeField] TextMeshProUGUI usernameText;
 
     [SerializeField] GameObject rpgObj, eyesObj, emptyHandsObj;
 
@@ -95,7 +97,7 @@ public class PlayerHealth : NetworkBehaviour
         if (IsServer)
         {
             ModifyAliveStateRPC(false);
-            moveScript.ModifyCanMoveRPC(false);
+            moveScript.RequestModifyCanMove(false);
         }
 
         rb.linearVelocity = Vector3.zero;
@@ -204,5 +206,6 @@ public class PlayerHealth : NetworkBehaviour
 
         // Set alpha values of ghost trail
         ghostTrail.startColor = new Color(1, 1, 1, alpha);
+        usernameText.color = new Color(1, 1, 1, alpha);
     }
 }

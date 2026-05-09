@@ -147,7 +147,7 @@ public class MissileScript : NetworkBehaviour
                 reversedDistance = Mathf.Clamp(reversedDistance, 0, explosionForce);
 
                 // only adds knockback effects if the knockback strength is above the threshold
-                if (reversedDistance > 1.5f)
+                if (reversedDistance > 1.5f && playerScript.canMove.Value)
                 {
                     playerRB.linearVelocity = Vector2.zero;
 
@@ -155,14 +155,14 @@ public class MissileScript : NetworkBehaviour
                     playerScript.canStopEarly = false;
 
                     playerRB.linearVelocity = (knockDir * reversedDistance);
+                }
 
-                    // only take damage if force is higher than a certain threshold aka within a range
-                    if (reversedDistance > 6f)
+                // only take damage if force is higher than a certain threshold
+                if (reversedDistance > 6f)
+                {
+                    if (playerId.Value != playerScript.playerId.ToString() && SceneManager.GetActiveScene().name != "Lobby")
                     {
-                        if (playerId.Value != playerScript.playerId.ToString() && SceneManager.GetActiveScene().name != "Lobby")
-                        {
-                            playerHealth.TakeDamageRPC(1);
-                        }
+                        playerHealth.TakeDamageRPC(1);
                     }
                 }
             }

@@ -20,6 +20,9 @@ public class LobbySceneManager : NetworkBehaviour
         {
             MatchManager.Instance.matchState.Value = MatchState.Lobby;
         }
+
+        ColourChangeManager instanceTemp = ColourChangeManager.Instance;
+        instanceTemp.selectedPalette = instanceTemp.palettes[PlayerPrefs.GetInt("SelectedPalette", instanceTemp.selectedPaletteIndex.Value)];
     }
 
     private void Update()
