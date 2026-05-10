@@ -159,7 +159,7 @@ public class PlayerVisuals : NetworkBehaviour
 
     void NameTagDisplayLogic()
     {
-        bool canDisplay = Keyboard.current.tabKey.isPressed;
+        bool canDisplay = Keyboard.current.tabKey.isPressed || MatchManager.Instance.matchState.Value == MatchState.RoundStarting;
 
         if (NetworkManager.Singleton != null)
         {

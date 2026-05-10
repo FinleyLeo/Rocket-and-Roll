@@ -36,6 +36,10 @@ public class RoundSceneManager : NetworkBehaviour
     private void Start()
     {
         TransitionManager.Instance.EndTransition();
+
+        ColourChangeManager instanceTemp = ColourChangeManager.Instance;
+        instanceTemp.selectedPalette = instanceTemp.palettes[instanceTemp.selectedPaletteIndex.Value];
+        instanceTemp.SetBackgroundPattern(instanceTemp.selectedPatternIndex.Value);
     }
 
     private void Update()

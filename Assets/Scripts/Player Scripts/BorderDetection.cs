@@ -122,6 +122,16 @@ public class BorderDetection : NetworkBehaviour
         particle.Play();
 
         Destroy(particle.gameObject, particle.main.startLifetime.constant * 5);
+
+        // Add camera shake upon border explosion
+        if (Camera.main.TryGetComponent<ShakerScript>(out ShakerScript shake))
+        {
+            shake.Shake(0.25f, 0.25f);
+        }
+        else
+        {
+            Debug.Log("No shaker script found on this camera");
+        }
     }
 
     [Rpc(SendTo.ClientsAndHost)]

@@ -262,7 +262,7 @@ GameObject:
   - component: {fileID: 434763132}
   - component: {fileID: 434763131}
   m_Layer: 5
-  m_Name: Transition Canvas
+  m_Name: Transition Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -410,6 +410,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fbb61e8c37dfe66408855df543434345, type: 2}
   - {fileID: 11400000, guid: 7eb6995c528039948a26f968e1b3709f, type: 2}
   - {fileID: 11400000, guid: 815226e8cbbcba248b710bf37d9308bc, type: 2}
+  - {fileID: 11400000, guid: 51526013511d2824e9f9d406ecd4b71d, type: 2}
   selectedPalette: {fileID: 0}
   selectedPlayerColour: {r: 0, g: 0, b: 0, a: 0}
   selectedRPGColour: {r: 0, g: 0, b: 0, a: 0}
@@ -423,6 +424,11 @@ MonoBehaviour:
   tmMat: {fileID: 2100000, guid: f574c921947295f448a2650f45af1699, type: 2}
   backgroundMat: {fileID: 2100000, guid: a0c2fcffc0f63f6409c35192da282156, type: 2}
   selectedPaletteIndex:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  selectedPatternIndex:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
@@ -731,7 +737,7 @@ GameObject:
   - component: {fileID: 1589734648}
   - component: {fileID: 1589734647}
   m_Layer: 5
-  m_Name: Transition Image
+  m_Name: Transition effect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1145,9 +1151,9 @@ SceneRoots:
   - {fileID: 1761987914}
   - {fileID: 1003807094}
   - {fileID: 1679874069}
+  - {fileID: 1590488289}
   - {fileID: 1882253468}
   - {fileID: 434763135}
-  - {fileID: 1590488289}
+  - {fileID: 686334057}
   - {fileID: 1837174321}
   - {fileID: 919366934}
-  - {fileID: 686334057}

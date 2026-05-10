@@ -22,7 +22,8 @@ public class LobbySceneManager : NetworkBehaviour
         }
 
         ColourChangeManager instanceTemp = ColourChangeManager.Instance;
-        instanceTemp.selectedPalette = instanceTemp.palettes[PlayerPrefs.GetInt("SelectedPalette", instanceTemp.selectedPaletteIndex.Value)];
+        instanceTemp.selectedPalette = instanceTemp.palettes[instanceTemp.selectedPaletteIndex.Value];
+        instanceTemp.SetBackgroundPattern(instanceTemp.selectedPatternIndex.Value);
     }
 
     private void Update()

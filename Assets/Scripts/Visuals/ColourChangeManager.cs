@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -16,6 +17,7 @@ public class ColourChangeManager : NetworkBehaviour
     [SerializeField] Material backgroundMat;
 
     public NetworkVariable<int> selectedPaletteIndex = new();
+    public NetworkVariable<int> selectedPatternIndex = new();
 
     private void Awake()
     {
@@ -28,21 +30,28 @@ public class ColourChangeManager : NetworkBehaviour
         {
             Destroy(gameObject);
         }
-
-        selectedPaletteIndex.OnValueChanged += (int prev, int current) =>
-        {
-            selectedPalette = palettes[current];
-        };
     }
 
     private void Start()
     {
-        selectedPaletteIndex.Value = Random.Range(0, palettes.Length);
+        selectedPaletteIndex.OnValueChanged += (int prev, int current) =>
+        {
+            selectedPalette = palettes[current];
+        };
 
-        selectedPlayerColour =  playerColours[PlayerPrefs.GetInt("SelectedPlayerColour", Random.Range(0, playerColours.Length))];
-        selectedRPGColour =  playerColours[PlayerPrefs.GetInt("SelectedPlayerColour", Random.Range(0, playerColours.Length))];
+        selectedPatternIndex.OnValueChanged += (int prev, int current) =>
+        {
+            backgroundMat.SetFloat("_Type", current);
+        };
 
-        selectedPalette = palettes[PlayerPrefs.GetInt("SelectedPalette", selectedPaletteIndex.Value)];
+        StartCoroutine(RandomisePalette());
+        StartCoroutine(RandomisePattern());
+
+        selectedPlayerColour = playerColours[Random.Range(0, playerColours.Length)];
+        selectedRPGColour = playerColours[Random.Range(0, playerColours.Length)];
+
+        selectedPalette = palettes[selectedPaletteIndex.Value];
+        SetBackgroundPattern(selectedPatternIndex.Value);
     }
 
     private void Update()
@@ -56,6 +65,30 @@ public class ColourChangeManager : NetworkBehaviour
         }
     }
 
+    // Both randomisation coroutines make sure the same pattern and palette arent chose twice
+    public IEnumerator RandomisePattern()
+    {
+        int patternBuffer = selectedPatternIndex.Value;
+
+        while (patternBuffer == selectedPatternIndex.Value)
+        {
+            selectedPatternIndex.Value = Random.Range(0, 2);
+
+            yield return null;
+        }
+    }
+    public IEnumerator RandomisePalette()
+    {
+        int paletteBuffer = selectedPaletteIndex.Value;
+
+        while (paletteBuffer == selectedPaletteIndex.Value)
+        {
+            selectedPaletteIndex.Value = Random.Range(0, palettes.Length);
+
+            yield return null;
+        }
+    }
+
     public void SetMapColours(PaletteSO palette)
     {
         tmMat.SetColor("_Base", palette.foregroundPrimary);
@@ -63,5 +96,9 @@ public class ColourChangeManager : NetworkBehaviour
 
         backgroundMat.SetColor("_Color", palette.backgroundPrimary);
         backgroundMat.SetColor("_Background_Color", palette.backgroundSecondary);
+    }
+    public void SetBackgroundPattern(int index)
+    {
+        backgroundMat.SetFloat("_Type", index);
     }
 }

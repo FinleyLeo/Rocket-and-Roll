@@ -48,6 +48,10 @@ public class WinSceneManager : NetworkBehaviour
         TransitionManager.Instance.EndTransition();
 
         SetWinText();
+
+        ColourChangeManager instanceTemp = ColourChangeManager.Instance;
+        instanceTemp.selectedPalette = instanceTemp.palettes[instanceTemp.selectedPaletteIndex.Value];
+        instanceTemp.SetBackgroundPattern(instanceTemp.selectedPatternIndex.Value);
     }
 
     IEnumerator ReturnToLobby()

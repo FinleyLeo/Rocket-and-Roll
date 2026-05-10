@@ -121,8 +121,10 @@ public class MatchManager : NetworkBehaviour
 
             case MatchState.RoundStarting:
                 playersAlive.Value = NetworkManager.Singleton.ConnectedClients.Count;
-                ColourChangeManager.Instance.selectedPaletteIndex.Value = UnityEngine.Random.Range(0, ColourChangeManager.Instance.palettes.Length);
                 SetAllPlayerMovement(false);
+
+                StartCoroutine(ColourChangeManager.Instance.RandomisePalette());
+                StartCoroutine(ColourChangeManager.Instance.RandomisePattern());
                 break;
 
             case MatchState.RoundActive:

@@ -124,6 +124,16 @@ public class MissileScript : NetworkBehaviour
     {
         GameObject particleObj = Instantiate(explosion, transform.position, Quaternion.Euler(-90, 0, 0)).gameObject;
         Destroy(particleObj, explosion.main.startLifetime.constant * 2);
+
+        // Add camera shake upon explosion
+        if (Camera.main.TryGetComponent<ShakerScript>(out ShakerScript shake))
+        {
+            shake.Shake(0.25f, 0.25f);
+        }
+        else
+        {
+            Debug.Log("No shaker script found on this camera");
+        }
     }
 
     [Rpc(SendTo.ClientsAndHost)]
