@@ -46,11 +46,11 @@ Material:
     - _Radius: 0.668
     - _Rotation: 135
     - _TYPE: 0
-    - _Type: 0
+    - _Type: 1
     m_Colors:
     - White: {r: 1, g: 1, b: 1, a: 1}
-    - _Background_Color: {r: 0.5294118, g: 0.10980393, b: 0.24313727, a: 0}
-    - _Color: {r: 0.82745105, g: 0.15686275, b: 0.21176472, a: 0}
+    - _Background_Color: {r: 0.9568628, g: 0.5803922, b: 0.6117647, a: 0}
+    - _Color: {r: 1, g: 0.81568635, b: 0.6431373, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &7262520765866479880

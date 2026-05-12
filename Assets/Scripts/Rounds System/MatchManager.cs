@@ -34,7 +34,12 @@ public class MatchManager : NetworkBehaviour
         {
             Destroy(gameObject);
         }
-    } 
+    }
+
+    void Start()
+    {
+        Cursor.lockState = CursorLockMode.Confined;
+    }
 
     public override void OnNetworkSpawn()
     {

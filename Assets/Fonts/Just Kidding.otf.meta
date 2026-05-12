@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 8ed8c8651c9f9a246b6d60355d19db58
+guid: a0ab54302aeee5f4b8cfd54c46ae025f
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Born2bSporty FS
+  - Just Kidding
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 2

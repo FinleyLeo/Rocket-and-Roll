@@ -44,13 +44,13 @@ Material:
     - _UseOutline: 1
     m_Colors:
     - White: {r: 1, g: 1, b: 1, a: 1}
-    - _Base: {r: 0.965, g: 0.965, b: 0.96097916, a: 1}
+    - _Base: {r: 0.95, g: 0.95, b: 0.95, a: 1}
     - _BaseColour: {r: 1, g: 1, b: 1, a: 1}
     - _BaseIN: {r: 1, g: 1, b: 1, a: 1}
     - _BaseIn: {r: 1, g: 1, b: 1, a: 1}
-    - _Outline: {r: 0.7686275, g: 0.7686275, b: 0.76470596, a: 1}
+    - _Outline: {r: 0.8, g: 0.8, b: 0.8, a: 1}
     - _OutlineColour: {r: 0.8301887, g: 0.36702642, b: 0.33285868, a: 1}
-    - _OutlineIN: {r: 0.7686275, g: 0.7686275, b: 0.76470596, a: 1}
+    - _OutlineIN: {r: 0.77, g: 0.77, b: 0.77, a: 1}
     - _OutlineIn: {r: 0.7960785, g: 0.7960785, b: 0.7960785, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
