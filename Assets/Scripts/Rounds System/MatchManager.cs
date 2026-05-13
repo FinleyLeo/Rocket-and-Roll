@@ -36,11 +36,6 @@ public class MatchManager : NetworkBehaviour
         }
     }
 
-    void Start()
-    {
-        Cursor.lockState = CursorLockMode.Confined;
-    }
-
     public override void OnNetworkSpawn()
     {
         // Temp points display for debugging

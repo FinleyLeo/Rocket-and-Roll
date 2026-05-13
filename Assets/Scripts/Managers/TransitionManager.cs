@@ -33,8 +33,6 @@ public class TransitionManager : MonoBehaviour
         SceneManager.LoadScene("Main Menu");
         loadingScene = true;
         fillAmount = 1;
-
-        //SceneManager.activeSceneChanged += EndTransition;
     }
 
     private void Update()
