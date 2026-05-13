@@ -1,15 +1,13 @@
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class MainMenuPlayer : MonoBehaviour
 {
+    public bool inMenu;
+
     [SerializeField] Material playerMat;
     [SerializeField] Material rpgMat;
 
-
-    [Space(10)]
-    [Header("Look-At Variables")]
     [SerializeField] Transform eyePivot;
     [SerializeField] Transform rpgPivot;
     Transform rpg;
@@ -31,7 +29,10 @@ public class MainMenuPlayer : MonoBehaviour
 
     private void Update()
     {
-        LookAtMouse();
+        if (!inMenu)
+        {
+            LookAtMouse();
+        }
     }
 
     Vector3 GetMousePosition()

@@ -10,13 +10,16 @@ public class MenuManager : MonoBehaviour
     [Header("Main Menu")]
     [SerializeField] GameObject mainMenuPanel;
     [SerializeField] Button playButton;
-    [SerializeField] Button optionsButton;
+    [SerializeField] Button settingsButton;
+    [SerializeField] Button customiseButton;
     [SerializeField] Button quitButton;
     [SerializeField] TMP_InputField playerNameInput;
 
     [Space(10)]
     [Header("Settings Menu")]
     [SerializeField] GameObject settingsPanel;
+    [SerializeField] GameObject accessibilityPanel, audioPanel, videoPanel, controlPanel;
+    [SerializeField] Button accessibilityTab, audioTab, videoTab, controlTab;
     [SerializeField] Button exitSettingsButton;
 
     [Space(10)]
@@ -51,6 +54,8 @@ public class MenuManager : MonoBehaviour
     [SerializeField] Button openRoomCodePanel;
     [SerializeField] Button joinLobbyWithCodeButton;
 
+    [SerializeField] MainMenuPlayer mainMenuPlayer;
+
     void Start()
     {
         playButton.onClick.AddListener(OpenPlayOption);
@@ -69,6 +74,15 @@ public class MenuManager : MonoBehaviour
         exitCreateLobbyButton.onClick.AddListener(CloseCreateLobbyMenu);
 
         quitButton.onClick.AddListener(QuitGame);
+
+        settingsButton.onClick.AddListener(OpenSettings);
+
+        accessibilityTab.onClick.AddListener(delegate { SwitchTab(0); });
+        audioTab.onClick.AddListener(delegate { SwitchTab(1); });
+        videoTab.onClick.AddListener(delegate { SwitchTab(2); });
+        controlTab.onClick.AddListener(delegate { SwitchTab(3); });
+
+        exitSettingsButton.onClick.AddListener(CloseSettings);
 
         playerNameInput.onEndEdit.AddListener(delegate
         {
@@ -133,24 +147,59 @@ public class MenuManager : MonoBehaviour
     {
         playQueryPanel.SetActive(true);
         mainMenuPanel.GetComponent<CanvasGroup>().interactable = false;
+        mainMenuPlayer.inMenu = true;
     }
 
     void ExitPlayOption()
     {
         playQueryPanel.SetActive(false);
         mainMenuPanel.GetComponent<CanvasGroup>().interactable = true;
+        mainMenuPlayer.inMenu = false;
     }
 
     void OpenSettings()
     {
         settingsPanel.SetActive(true);
         mainMenuPanel.GetComponent<CanvasGroup>().interactable = false;
+        mainMenuPlayer.inMenu = true;
+    }
+
+    void SwitchTab(int tabIndex)
+    {
+        switch (tabIndex)
+        {
+            case 0: // accessobility
+                accessibilityPanel.SetActive(true);
+                audioPanel.SetActive(false);
+                videoPanel.SetActive(false);
+                controlPanel.SetActive(false);
+                break;
+            case 1: // audio
+                audioPanel.SetActive(true);
+                accessibilityPanel.SetActive(false);
+                videoPanel.SetActive(false);
+                controlPanel.SetActive(false);
+                break;
+            case 2: // video
+                videoPanel.SetActive(true);
+                accessibilityPanel.SetActive(false);
+                audioPanel.SetActive(false);
+                controlPanel.SetActive(false);
+                break;
+            case 3: // control
+                controlPanel.SetActive(true);
+                accessibilityPanel.SetActive(false);
+                audioPanel.SetActive(false);
+                videoPanel.SetActive(false);
+                break;
+        }
     }
 
     void CloseSettings()
     {
         settingsPanel.SetActive(false);
         mainMenuPanel.GetComponent<CanvasGroup>().interactable = true;
+        mainMenuPlayer.inMenu = false;
     }
 
     void QuitGame()
@@ -165,6 +214,7 @@ public class MenuManager : MonoBehaviour
         lobbyListPanel.SetActive(true);
         playQueryPanel.SetActive(false);
         mainMenuPanel.GetComponent<CanvasGroup>().interactable = false;
+        mainMenuPlayer.inMenu = true;
 
         ListPublicLobbies();
     }
@@ -175,6 +225,7 @@ public class MenuManager : MonoBehaviour
 
         lobbyListPanel.SetActive(false);
         mainMenuPanel.GetComponent<CanvasGroup>().interactable = true;
+        mainMenuPlayer.inMenu = false;
     }
 
     void OpenCreateLobbyMenu()
@@ -184,12 +235,14 @@ public class MenuManager : MonoBehaviour
         playQueryPanel.SetActive(false);
         createRoomPanel.SetActive(true);
         roomNameInput.text = PlayerPrefs.GetString("Username") + "'s Lobby";
+        mainMenuPlayer.inMenu = true;
     }
 
     void CloseCreateLobbyMenu()
     {
         createRoomPanel.SetActive(false);
         mainMenuPanel.GetComponent<CanvasGroup>().interactable = true;
+        mainMenuPlayer.inMenu = false;
     }
 
     void OpenJoinWithCode()

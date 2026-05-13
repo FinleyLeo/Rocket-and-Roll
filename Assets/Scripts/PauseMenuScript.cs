@@ -31,43 +31,46 @@ public class PauseMenuScript : NetworkBehaviour
     [SerializeField] Material buttonBannerMat;
     [SerializeField] Material buttonHighlightMat;
 
-    Animator anim;
+    //Animator anim;
 
     float fillAmount;
 
     public bool isPaused;
-    bool animEnded;
+    //bool animEnded;
 
     private void Start()
     {
         instance = this;
 
-        anim = GetComponent<Animator>();
+        //anim = GetComponent<Animator>();
 
         closePausebutton.onClick.AddListener(ResumeGame);
+
+        openSettingsButton.onClick.AddListener(OpenSettings);
+        closeSettingsButton.onClick.AddListener(CloseSettings);
+
         quitToMenuButton.onClick.AddListener(QuitToMenu);
         quitGameButton.onClick.AddListener(QuitGame);
-        //openSettingsButton.onClick.AddListener(OpenSettings);
-        //closeSettingsButton.onClick.AddListener(CloseSettings);
 
-        buttonBannerMat.SetFloat("_FillAmount", 0);
-        buttonHighlightMat.SetFloat("_FillAmount", 0);
-        anim.SetBool("isOpen", isPaused);
+        //buttonBannerMat.SetFloat("_FillAmount", 0);
+        //buttonHighlightMat.SetFloat("_FillAmount", 0);
+        //anim.SetBool("isOpen", isPaused);
     }
 
     private void Update()
     {
-        if (animEnded)
+        if (!settingsMenuPanel.activeSelf)
         {
             if (Keyboard.current.escapeKey.wasPressedThisFrame)
             {
-                animEnded = false;
+                //animEnded = false;
                 isPaused = !isPaused;
 
-                anim.SetBool("isOpen", isPaused);
+                pauseMenuPanel.SetActive(isPaused);
+
+                //anim.SetBool("isOpen", isPaused);
             }
         }
-
         FadeInOutBanner();
         //HandlePlayerListUpdate();
     }
@@ -90,21 +93,24 @@ public class PauseMenuScript : NetworkBehaviour
         buttonHighlightMat.SetFloat("_FillAmount", fillAmount);
     }
 
-    // Tells script when animation has finished updating through event to respond accordingly
-    public void NotifyEnd()
-    {
-        animEnded = true;
-    }
+    //// Tells script when animation has finished updating through event to respond accordingly
+    //public void NotifyEnd()
+    //{
+    //    animEnded = true;
+    //}
 
     void ResumeGame()
     {
-        if (animEnded)
-        {
-            animEnded = false;
-            isPaused = false;
+        //if (animEnded)
+        //{
+        //    animEnded = false;
+        //    isPaused = false;
 
-            anim.SetBool("isOpen", isPaused);
-        }
+        //    //anim.SetBool("isOpen", isPaused);
+        //}
+
+        settingsMenuPanel.SetActive(false);
+        pauseMenuPanel.SetActive(false);
     }
 
     void QuitToMenu()
