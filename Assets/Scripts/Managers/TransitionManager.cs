@@ -30,7 +30,7 @@ public class TransitionManager : MonoBehaviour
 
     private void Start()
     {
-        SceneManager.LoadScene("Main Menu");
+        SceneManager.LoadScene("Logo");
         loadingScene = true;
         fillAmount = 1;
     }
@@ -86,7 +86,10 @@ public class TransitionManager : MonoBehaviour
             yield return null;
         }
 
-        NetworkManager.Singleton.SceneManager.LoadScene(sceneIndex, LoadSceneMode.Single);
+        if (NetworkManager.Singleton.SceneManager != null)
+            NetworkManager.Singleton.SceneManager.LoadScene(sceneIndex, LoadSceneMode.Single);
+        else
+            SceneManager.LoadScene(sceneIndex);
     }
 
     [Rpc(SendTo.NotServer)]

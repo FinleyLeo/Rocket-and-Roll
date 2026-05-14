@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,6 +18,8 @@ public class MainMenuPlayer : MonoBehaviour
 
     readonly float clampDistance = 0.35f;
 
+    [SerializeField] Sprite[] eyeSprites;
+
     private void Start()
     {
         eyeTransform = eyePivot.GetChild(0);
@@ -32,6 +35,17 @@ public class MainMenuPlayer : MonoBehaviour
         if (!inMenu)
         {
             LookAtMouse();
+
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                Vector3 mousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.value);
+                mousePos.z = 0;
+
+                if (Vector3.Distance(transform.position, mousePos) < 0.5f)
+                {
+                    SwitchEyes(eyeSprites[Random.Range(0, eyeSprites.Length)]);
+                }
+            }
         }
     }
 
@@ -82,5 +96,23 @@ public class MainMenuPlayer : MonoBehaviour
                 childRend.material = sr.material;
             }
         }
+    }
+
+    public void SwitchEyes(Sprite eyeSprite)
+    {
+        StopCoroutine(EyeSwitchDelay(eyeSprite));
+        StartCoroutine(EyeSwitchDelay(eyeSprite));
+    }
+
+    IEnumerator EyeSwitchDelay(Sprite eyeSprite)
+    {
+        Animator switchAnim = eyePivot.GetComponent<Animator>();
+
+        switchAnim.Play("Player-EyeIdle"); // makes sure eye switch effects dont overlap
+        switchAnim.SetTrigger("EyeSwitch");
+
+        yield return new WaitForSeconds(0.1f);
+
+        eyePivot.GetChild(0).GetComponent<SpriteRenderer>().sprite = eyeSprite;
     }
 }

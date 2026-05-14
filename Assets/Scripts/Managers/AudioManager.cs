@@ -5,7 +5,7 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance;
 
-    [SerializeField] AudioSource SFXSource, musicSource;
+    public AudioSource SFXSource, musicSource;
     [SerializeField] AudioMixer SFXMixer, musicMixer;
     [SerializeField] Clip[] SFX, music;
 
@@ -123,7 +123,6 @@ public class AudioManager : MonoBehaviour
     }
     public void PlayPitchedSFX(string clipName, float volume, float pitch)
     {
-
         AudioClip clip = null;
 
         for (int i = 0; i < SFX.Length; i++)

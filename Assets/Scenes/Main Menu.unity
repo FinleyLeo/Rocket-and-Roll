@@ -22564,6 +22564,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1190699840740222936}
+  - component: {fileID: 1190699840740222937}
   m_Layer: 6
   m_Name: Eye pivot
   m_TagString: Untagged
@@ -22693,6 +22694,28 @@ Transform:
   - {fileID: 4153869311874625002}
   m_Father: {fileID: 5484542927736142706}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &1190699840740222937
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 373574420727294734}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8fc9768d90b32f84a91be9f96bde4cad, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1326651188544763226
 GameObject:
   m_ObjectHideFlags: 0
@@ -23323,6 +23346,12 @@ MonoBehaviour:
   rpgMat: {fileID: 0}
   eyePivot: {fileID: 1190699840740222936}
   rpgPivot: {fileID: 264526464595891869}
+  eyeSprites:
+  - {fileID: 6552858712221328152, guid: 5b870790701eaca49a7bc1459e72738a, type: 3}
+  - {fileID: 34296543, guid: 5b870790701eaca49a7bc1459e72738a, type: 3}
+  - {fileID: -1129188780, guid: 5b870790701eaca49a7bc1459e72738a, type: 3}
+  - {fileID: 435316535, guid: 5b870790701eaca49a7bc1459e72738a, type: 3}
+  - {fileID: 1949545779, guid: 5b870790701eaca49a7bc1459e72738a, type: 3}
 --- !u!114 &8882995979048725168
 MonoBehaviour:
   m_ObjectHideFlags: 0

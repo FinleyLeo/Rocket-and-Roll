@@ -648,7 +648,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.25
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -1140,7 +1140,13 @@ MonoBehaviour:
   SFXMixer: {fileID: 24100000, guid: bacb927bf38484c4fb1c976756abef94, type: 2}
   musicMixer: {fileID: 24100000, guid: 854f2074b1e85ae4385ec64c28716e3d, type: 2}
   SFX: []
-  music: []
+  music:
+  - name: TitleStart
+    clip: {fileID: 8300000, guid: 3ec033fbb00ab8349adef179c3b5dd58, type: 3}
+  - name: TitleLoop
+    clip: {fileID: 8300000, guid: 39ecfd8d06ff1ca48993e1600822cc0e, type: 3}
+  - name: PauseMusic
+    clip: {fileID: 8300000, guid: 6ecbf0e40982666469b902ad896dda82, type: 3}
   musicMuted: 0
   SFXMuted: 0
 --- !u!81 &1882253470

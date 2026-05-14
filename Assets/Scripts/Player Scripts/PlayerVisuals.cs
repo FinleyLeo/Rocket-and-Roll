@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -383,5 +384,23 @@ public class PlayerVisuals : NetworkBehaviour
                 childRend.material = sr.material;
             }
         }
+    }
+
+    public void SwitchEyes(Sprite eyeSprite)
+    {
+        StopCoroutine(EyeSwitchDelay(eyeSprite));
+        StartCoroutine(EyeSwitchDelay(eyeSprite));
+    }
+
+    IEnumerator EyeSwitchDelay(Sprite eyeSprite)
+    {
+        Animator switchAnim = eyePivot.GetComponent<Animator>();
+
+        switchAnim.Play("Player-EyeIdle"); // makes sure eye switch effects dont overlap
+        switchAnim.SetTrigger("EyeSwitch");
+
+        yield return new WaitForSeconds(0.2f);
+
+        eyePivot.GetChild(0).GetComponent<SpriteRenderer>().sprite = eyeSprite;
     }
 }
