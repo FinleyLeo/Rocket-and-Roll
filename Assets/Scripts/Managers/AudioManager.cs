@@ -6,7 +6,7 @@ public class AudioManager : MonoBehaviour
     public static AudioManager instance;
 
     public AudioSource SFXSource, musicSource;
-    [SerializeField] AudioMixer SFXMixer, musicMixer;
+    public AudioMixer SFXMixer, musicMixer;
     [SerializeField] Clip[] SFX, music;
 
     public bool musicMuted, SFXMuted;
@@ -36,7 +36,6 @@ public class AudioManager : MonoBehaviour
     }
 
     #region sound-methods
-
     public void PlaySFX(string clipName, float volume)
     {
         AudioClip clip = null;
@@ -213,7 +212,6 @@ public class AudioManager : MonoBehaviour
 
         musicSource.Play();
     }
-
     public void SetMusicMuffle(float muffleStrength)
     {
         musicMixer.SetFloat("muffleAmount", muffleStrength);
@@ -221,19 +219,22 @@ public class AudioManager : MonoBehaviour
 
     #endregion
 
-    public void ToggleMusic()
-    {
-        musicMuted = !musicMuted;
-        musicSource.mute = musicMuted;
+    #region Volume
 
-        PlayerPrefs.SetInt("musicMuted", musicMuted ? 1 : 0);
+    public void SetMasterVolume(float value)
+    {
+        AudioListener.volume = value;
+    }
+    public void SetSFXVolume(float value)
+    {
+        SFXMixer.SetFloat("SFXVol", Mathf.Log10(value) * 20);
+        PlayerPrefs.SetFloat(SaveDataManager.instance.sfxVolKey, value);
+    }
+    public void SetMusicVolume(float value)
+    {
+        musicMixer.SetFloat("MusicVol", Mathf.Log10(value) * 20);
+        PlayerPrefs.SetFloat(SaveDataManager.instance.musicVolKey, value);
     }
 
-    public void ToggleSFX()
-    {
-        SFXMuted = !SFXMuted;
-        SFXSource.mute = SFXMuted;
-
-        PlayerPrefs.SetInt("sfxMuted", SFXMuted ? 1 : 0);
-    }
+    #endregion
 }

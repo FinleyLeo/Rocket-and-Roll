@@ -638,6 +638,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LogoVisuals
   logoCircle: {fileID: 1925609289}
+  logoTitle: {fileID: 751661150}
   startParticles: {fileID: 1814470138}
   startText: {fileID: 812359899}
   sampleDataLength: 1024
@@ -1138,7 +1139,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 3
       scalar: 120
-      minScalar: 50
+      minScalar: 60
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -4274,20 +4275,20 @@ ParticleSystem:
         - serializedVersion: 3
           time: 0
           value: 1
-          inSlope: -2
-          outSlope: -2
+          inSlope: -0.47112462
+          outSlope: -0.47112462
           tangentMode: 0
           weightedMode: 0
           inWeight: 0
-          outWeight: 0
+          outWeight: 0.18064514
         - serializedVersion: 3
           time: 1
           value: 0
-          inSlope: 0
-          outSlope: 0
+          inSlope: -0.016166033
+          outSlope: -0.016166033
           tangentMode: 0
           weightedMode: 0
-          inWeight: 0
+          inWeight: 0.31290382
           outWeight: 0
         m_PreInfinity: 2
         m_PostInfinity: 2

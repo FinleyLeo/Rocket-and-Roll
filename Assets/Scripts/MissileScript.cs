@@ -128,7 +128,7 @@ public class MissileScript : NetworkBehaviour
         // Add camera shake upon explosion
         if (Camera.main.TryGetComponent<ShakerScript>(out ShakerScript shake))
         {
-            shake.Shake(0.25f, 0.25f);
+            shake.Shake(0.25f * PlayerPrefs.GetFloat(SaveDataManager.instance.screenShakeKey), 0.25f);
         }
         else
         {

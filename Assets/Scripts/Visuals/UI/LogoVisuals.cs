@@ -7,9 +7,9 @@ using UnityEngine.UI;
 public class LogoVisuals : MonoBehaviour
 {
     bool canStartGame, gameStarting;
-    bool visualsStarted;
 
     [SerializeField] Transform logoCircle;
+    [SerializeField] Transform logoTitle;
     Image circleSr;
 
     Animator logoAnim;
@@ -17,6 +17,7 @@ public class LogoVisuals : MonoBehaviour
     [SerializeField] TextMeshProUGUI startText;
 
     Vector3 rootCircleScale;
+    Vector3 rootTitleScale;
 
     public int sampleDataLength = 1024;
     private float clipLoudness;
@@ -31,6 +32,7 @@ public class LogoVisuals : MonoBehaviour
     private void Start()
     {
         rootCircleScale = logoCircle.localScale;
+        rootTitleScale = logoTitle.localScale;
 
         StartCoroutine(StartDelay());
 
@@ -39,24 +41,55 @@ public class LogoVisuals : MonoBehaviour
 
     private void Update()
     {
-        if (canStartGame && !gameStarting)
+        if (canStartGame)
         {
-            if (Keyboard.current.anyKey.wasPressedThisFrame || Mouse.current.leftButton.wasPressedThisFrame)
+            if (!gameStarting)
             {
-                gameStarting = true;
+                if (Keyboard.current.anyKey.wasPressedThisFrame || Mouse.current.leftButton.wasPressedThisFrame)
+                {
+                    gameStarting = true;
 
-                TransitionManager.Instance.LoadScene("Main Menu");
+                    TransitionManager.Instance.LoadScene("Main Menu");
+                }
             }
+
+            TitleVisuals();
         }
 
-        CircleVisualiser();
+        CircleVisuals();
     }
 
-    void CircleVisualiser()
+    IEnumerator StartDelay()
+    {
+        AudioManager.instance.PlayMusic("TitleStart");
+
+        yield return new WaitForSeconds(0.1f);
+
+        circleSr = logoCircle.GetComponent<Image>();
+        Color palette = ColourChangeManager.Instance.selectedPalette.backgroundPrimary;
+        Color.RGBToHSV(palette, out float h, out float s, out float v);
+
+        Color newCircleColour = Color.HSVToRGB(h, s, v + 0.2f);
+
+        circleSr.color = newCircleColour;
+
+        startText.color = ColourChangeManager.Instance.selectedPalette.foregroundSecondary;
+
+        yield return new WaitForSeconds(3f);
+
+        startParticles.Play();
+
+        yield return new WaitForSeconds(1f);
+
+        logoAnim.Play("StartLogo");
+        canStartGame = true;
+    }
+
+    void CircleVisuals()
     {
         if (AudioManager.instance != null)
         {
-            AudioManager.instance.musicSource.clip.GetData(clipSampleData, AudioManager.instance.musicSource.timeSamples); //I read 1024 samples, which is about 80 ms on a 44khz stereo clip, beginning at the current sample position of the clip.
+            AudioManager.instance.musicSource.clip.GetData(clipSampleData, AudioManager.instance.musicSource.timeSamples);
 
             clipLoudness = 0f;
 
@@ -71,29 +104,14 @@ public class LogoVisuals : MonoBehaviour
         }
     }
 
-    IEnumerator StartDelay()
+    void TitleVisuals()
     {
-        AudioManager.instance.PlayMusic("TitleStart");
+        float offset = -0.4f;
+        float sinValue = Mathf.Sin(Time.time * 12.25f) + offset;
 
-        yield return new WaitForSeconds(0.1f);
-
-        circleSr = logoCircle.GetComponent<Image>();
-        Color palette = ColourChangeManager.Instance.selectedPalette.backgroundPrimary;
-        Color.RGBToHSV(palette, out float h, out float s, out _);
-
-        Color newCircleColour = Color.HSVToRGB(h, s, 1);
-
-        circleSr.color = newCircleColour;
-
-        startText.color = ColourChangeManager.Instance.selectedPalette.foregroundPrimary;
-
-        yield return new WaitForSeconds(2f);
-
-        startParticles.Play();
-
-        yield return new WaitForSeconds(0.8f);
-
-        logoAnim.Play("StartLogo");
-        canStartGame = true;
+        if (sinValue > rootTitleScale.x)
+        {
+            logoTitle.localScale = new Vector3(sinValue, sinValue);
+        }
     }
 }

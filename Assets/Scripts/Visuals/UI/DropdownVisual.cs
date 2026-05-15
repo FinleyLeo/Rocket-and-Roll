@@ -14,23 +14,23 @@ public class DropdownVisual : MonoBehaviour
     [SerializeField] DropdownType dropdownType;
 
     int defaultResIndex = 0;
-
-    readonly string resolutionKey = "Resolution";
-    readonly string screenModeKey = "ScreenMode";
+    bool isInitializing;
 
     private void Start()
     {
         dropdown = GetComponent<TMP_Dropdown>();
+
+        isInitializing = true;
 
         if (dropdownType == DropdownType.Resolution)
         {
             SetUpResolutions();
         }
 
-        SetValues();
-
+        GetPlayerPrefs();
         dropdown.onValueChanged.AddListener(OnChanged);
-        OnChanged(dropdown.value);
+
+        isInitializing = false;
     }
 
     void SetUpResolutions()
@@ -54,8 +54,37 @@ public class DropdownVisual : MonoBehaviour
 
     void OnChanged(int value)
     {
+        if (isInitializing) return;
+
         SetPlayerPrefs();
-        SetValues();
+
+        switch (dropdownType)
+        {
+            case DropdownType.Resolution:
+                int resIndex = value;
+                var res = Screen.resolutions[Mathf.Clamp(resIndex, 0, Screen.resolutions.Length - 1)];
+                bool fullscreen = PlayerPrefs.GetInt(SaveDataManager.instance.screenModeKey, 0) == 0;
+                Screen.SetResolution(res.width, res.height, fullscreen);
+                break;
+
+            case DropdownType.ScreenMode:
+                int mode = value;
+                switch (mode)
+                {
+                    case 0: // Fullscreen
+                        Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
+                        break;
+                    case 1: // Windowed
+                        Screen.fullScreenMode = FullScreenMode.Windowed;
+                        break;
+                    case 2: // Borderless
+                        Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
+                        break;
+                }
+                break;
+        }
+
+        GetPlayerPrefs();
     }
 
     void SetPlayerPrefs()
@@ -63,41 +92,25 @@ public class DropdownVisual : MonoBehaviour
         switch (dropdownType)
         {
             case DropdownType.Resolution:
-                PlayerPrefs.SetInt(resolutionKey, dropdown.value);
+                PlayerPrefs.SetInt(SaveDataManager.instance.resolutionKey, dropdown.value);
                 break;
 
             case DropdownType.ScreenMode:
-                PlayerPrefs.SetInt(screenModeKey, dropdown.value);
+                PlayerPrefs.SetInt(SaveDataManager.instance.screenModeKey, dropdown.value);
                 break;
         }
     }
 
-    void SetValues()
+    void GetPlayerPrefs()
     {
         switch (dropdownType)
         {
             case DropdownType.Resolution:
-                dropdown.value = PlayerPrefs.GetInt(resolutionKey, defaultResIndex);
-
-                Resolution r = Screen.resolutions[dropdown.value];
-                Screen.SetResolution(r.width, r.height, Screen.fullScreen);
+                dropdown.value = PlayerPrefs.GetInt(SaveDataManager.instance.resolutionKey, defaultResIndex);
                 break;
 
             case DropdownType.ScreenMode:
-                dropdown.value = PlayerPrefs.GetInt(screenModeKey, 0);
-
-                switch (dropdown.value)
-                {
-                    case 0:
-                        Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
-                        break;
-                    case 1:
-                        Screen.fullScreenMode = FullScreenMode.Windowed;
-                        break;
-                    case 2:
-                        Screen.fullScreenMode = FullScreenMode.MaximizedWindow;
-                        break;
-                }
+                dropdown.value = PlayerPrefs.GetInt(SaveDataManager.instance.screenModeKey, 0);
                 break;
         }
     }

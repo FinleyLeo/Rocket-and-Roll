@@ -126,7 +126,7 @@ public class BorderDetection : NetworkBehaviour
         // Add camera shake upon border explosion
         if (Camera.main.TryGetComponent<ShakerScript>(out ShakerScript shake))
         {
-            shake.Shake(0.25f, 0.25f);
+            shake.Shake(0.25f * PlayerPrefs.GetFloat(SaveDataManager.instance.screenShakeKey), 0.25f);
         }
         else
         {

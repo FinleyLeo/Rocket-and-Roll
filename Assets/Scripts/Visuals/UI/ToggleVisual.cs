@@ -14,32 +14,40 @@ public class ToggleVisual : MonoBehaviour
 
     [SerializeField] ToggleType toggleType;
 
-    readonly string vSyncKey = "Vsync";
+    bool isInitializing;
 
     private void Start()
     {
         toggle = GetComponent<Toggle>();
         toggleImage = GetComponent<Image>();
 
-        SetValues();
-
+        isInitializing = true;
+        GetPlayerPrefs();
         toggle.onValueChanged.AddListener(OnToggle);
-        OnToggle(toggle.isOn);
+        isInitializing = false;
+
+        UpdateSprite(toggle.isOn);
     }
 
     void OnToggle(bool isOn)
     {
-        if (isOn)
-        {
-            toggleImage.sprite = OnSprite;
-        }
-        else
-        {
-            toggleImage.sprite = OffSprite;
-        }
+        UpdateSprite(isOn);
+
+        if (isInitializing) return;
 
         SetPlayerPrefs();
-        SetValues();
+
+        switch (toggleType)
+        {
+            case ToggleType.Vsync:
+                QualitySettings.vSyncCount = isOn ? 1 : 0;
+                break;
+        }
+    }
+
+    void UpdateSprite(bool isOn)
+    {
+        toggleImage.sprite = isOn ? OnSprite : OffSprite;
     }
 
     void SetPlayerPrefs()
@@ -47,18 +55,17 @@ public class ToggleVisual : MonoBehaviour
         switch (toggleType)
         {
             case ToggleType.Vsync:
-                PlayerPrefs.SetInt(vSyncKey, toggle.isOn ? 1 : 0);
+                PlayerPrefs.SetInt(SaveDataManager.instance.vSyncKey, toggle.isOn ? 1 : 0);
                 break;
         }
     }
 
-    void SetValues()
+    void GetPlayerPrefs()
     {
         switch (toggleType)
         {
             case ToggleType.Vsync:
-                toggle.isOn = PlayerPrefs.GetInt(vSyncKey, toggle.isOn ? 1 : 0) == 1;
-                QualitySettings.vSyncCount = toggle.isOn ? 1 : 0;
+                toggle.isOn = PlayerPrefs.GetInt(SaveDataManager.instance.vSyncKey, 0) == 1;
                 break;
         }
     }
