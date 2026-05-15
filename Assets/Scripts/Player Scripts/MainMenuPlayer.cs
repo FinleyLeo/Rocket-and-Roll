@@ -41,7 +41,7 @@ public class MainMenuPlayer : MonoBehaviour
                 Vector3 mousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.value);
                 mousePos.z = 0;
 
-                if (Vector3.Distance(transform.position, mousePos) < 0.5f)
+                if (Vector3.Distance(transform.position - new Vector3(0, 0.5f), mousePos) < 2f)
                 {
                     SwitchEyes(eyeSprites[Random.Range(0, eyeSprites.Length)]);
                 }
