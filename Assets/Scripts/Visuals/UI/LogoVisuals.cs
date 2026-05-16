@@ -63,7 +63,7 @@ public class LogoVisuals : MonoBehaviour
     {
         AudioManager.instance.PlayMusic("TitleStart");
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.2f);
 
         circleSr = logoCircle.GetComponent<Image>();
         Color palette = ColourChangeManager.Instance.selectedPalette.backgroundPrimary;
