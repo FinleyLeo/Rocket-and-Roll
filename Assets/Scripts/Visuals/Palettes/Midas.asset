@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caa7e20c8b273d14291d154049148ece, type: 3}
   m_Name: Midas
   m_EditorClassIdentifier: Assembly-CSharp::PaletteSO
-  backgroundPrimary: {r: 0.8117648, g: 0.67058825, b: 0.31764707, a: 0}
-  backgroundSecondary: {r: 0.6156863, g: 0.39607847, b: 0.29803923, a: 0}
-  foregroundPrimary: {r: 0.3019608, g: 0.13333334, b: 0.17254902, a: 0}
-  foregroundSecondary: {r: 0.12941177, g: 0.043137256, b: 0.10588236, a: 0}
+  backgroundPrimary: {r: 0.8117648, g: 0.67058825, b: 0.31764707, a: 1}
+  backgroundSecondary: {r: 0.6156863, g: 0.39607847, b: 0.29803923, a: 1}
+  foregroundPrimary: {r: 0.3019608, g: 0.13333334, b: 0.17254902, a: 1}
+  foregroundSecondary: {r: 0.12941177, g: 0.043137256, b: 0.10588236, a: 1}

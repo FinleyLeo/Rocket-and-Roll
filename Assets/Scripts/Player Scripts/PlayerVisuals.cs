@@ -4,7 +4,6 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 
 public class PlayerVisuals : NetworkBehaviour
 {
@@ -365,8 +364,8 @@ public class PlayerVisuals : NetworkBehaviour
     {
         if (IsOwner)
         {
-            playerColor.Value = ColourChangeManager.Instance.selectedPlayerColour;
-            rpgColor.Value = ColourChangeManager.Instance.selectedRPGColour;
+            playerColor.Value = ColourChangeManager.instance.selectedPlayerColour;
+            rpgColor.Value = ColourChangeManager.instance.selectedRPGColour;
         }
     }
 

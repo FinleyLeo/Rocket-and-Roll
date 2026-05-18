@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class ShakerScript : MonoBehaviour
 {
@@ -13,6 +12,12 @@ public class ShakerScript : MonoBehaviour
     private void Start()
     {
         rootPos = transform.position;
+
+        if (TryGetComponent<Camera>(out Camera cam))
+        {
+            // Makes sure the root position is always -10 if its a camera
+            rootPos.z = -10;
+        }
     }
 
     public void Shake()
@@ -26,12 +31,15 @@ public class ShakerScript : MonoBehaviour
     }
     public void Shake(float strength, float duration)
     {
-        if (shake != null)
+        if (rootPos != null) // only run of the root position is set
         {
-            StopCoroutine(shake);
-        }
+            if (shake != null)
+            {
+                StopCoroutine(shake);
+            }
 
-        shake = StartCoroutine(ShakeEffect(strength, duration));
+            shake = StartCoroutine(ShakeEffect(strength, duration));
+        }   
     }
 
     public IEnumerator ShakeEffect(float strength, float duration)

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caa7e20c8b273d14291d154049148ece, type: 3}
   m_Name: Nostalgia
   m_EditorClassIdentifier: Assembly-CSharp::PaletteSO
-  backgroundPrimary: {r: 0.81568635, g: 0.81568635, b: 0.34509805, a: 0}
-  backgroundSecondary: {r: 0.627451, g: 0.65882355, b: 0.2509804, a: 0}
-  foregroundPrimary: {r: 0.43921572, g: 0.5019608, b: 0.15686275, a: 0}
-  foregroundSecondary: {r: 0.2509804, g: 0.3137255, b: 0.0627451, a: 0}
+  backgroundPrimary: {r: 0.81568635, g: 0.81568635, b: 0.34509805, a: 1}
+  backgroundSecondary: {r: 0.627451, g: 0.65882355, b: 0.2509804, a: 1}
+  foregroundPrimary: {r: 0.43921572, g: 0.5019608, b: 0.15686275, a: 1}
+  foregroundSecondary: {r: 0.2509804, g: 0.3137255, b: 0.0627451, a: 1}

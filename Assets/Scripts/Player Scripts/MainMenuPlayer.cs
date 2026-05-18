@@ -84,8 +84,8 @@ public class MainMenuPlayer : MonoBehaviour
 
     void SetMaterialColour()
     {
-        sr.material.SetColor("_Outline", ColourChangeManager.Instance.selectedPlayerColour);
-        rpgSR.material.SetColor("_Outline", ColourChangeManager.Instance.selectedRPGColour);
+        sr.material.SetColor("_Outline", ColourChangeManager.instance.selectedPlayerColour);
+        rpgSR.material.SetColor("_Outline", ColourChangeManager.instance.selectedRPGColour);
 
         SpriteRenderer[] children = sr.GetComponentsInChildren<SpriteRenderer>();
 

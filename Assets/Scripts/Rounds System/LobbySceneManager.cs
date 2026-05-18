@@ -21,7 +21,7 @@ public class LobbySceneManager : NetworkBehaviour
             MatchManager.Instance.matchState.Value = MatchState.Lobby;
         }
 
-        ColourChangeManager instanceTemp = ColourChangeManager.Instance;
+        ColourChangeManager instanceTemp = ColourChangeManager.instance;
         instanceTemp.selectedPalette = instanceTemp.palettes[instanceTemp.selectedPaletteIndex.Value];
         instanceTemp.SetBackgroundPattern(instanceTemp.selectedPatternIndex.Value);
     }

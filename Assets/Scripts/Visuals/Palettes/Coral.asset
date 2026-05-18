@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caa7e20c8b273d14291d154049148ece, type: 3}
   m_Name: Coral
   m_EditorClassIdentifier: Assembly-CSharp::PaletteSO
-  backgroundPrimary: {r: 1, g: 0.81568635, b: 0.6431373, a: 0}
-  backgroundSecondary: {r: 0.9568628, g: 0.5803922, b: 0.6117647, a: 0}
-  foregroundPrimary: {r: 0.48627454, g: 0.6039216, b: 0.6745098, a: 0}
-  foregroundSecondary: {r: 0.40784317, g: 0.31764707, b: 0.5411765, a: 0}
+  backgroundPrimary: {r: 1, g: 0.81568635, b: 0.6431373, a: 1}
+  backgroundSecondary: {r: 0.9568628, g: 0.5803922, b: 0.6117647, a: 1}
+  foregroundPrimary: {r: 0.48627454, g: 0.6039216, b: 0.6745098, a: 1}
+  foregroundSecondary: {r: 0.40784317, g: 0.31764707, b: 0.5411765, a: 1}

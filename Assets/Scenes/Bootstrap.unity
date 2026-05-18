@@ -412,8 +412,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 815226e8cbbcba248b710bf37d9308bc, type: 2}
   - {fileID: 11400000, guid: 51526013511d2824e9f9d406ecd4b71d, type: 2}
   selectedPalette: {fileID: 0}
-  selectedPlayerColour: {r: 0, g: 0, b: 0, a: 0}
-  selectedRPGColour: {r: 0, g: 0, b: 0, a: 0}
+  selectedPlayerColour: {r: 0, g: 0, b: 0, a: 1}
+  selectedRPGColour: {r: 0, g: 0, b: 0, a: 1}
   playerColours:
   - {r: 1, g: 0.45098042, b: 0.45098042, a: 0}
   - {r: 1, g: 0.6797386, b: 0.45098042, a: 0}

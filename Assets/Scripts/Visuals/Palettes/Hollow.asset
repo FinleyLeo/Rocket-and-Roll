@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caa7e20c8b273d14291d154049148ece, type: 3}
   m_Name: Hollow
   m_EditorClassIdentifier: Assembly-CSharp::PaletteSO
-  backgroundPrimary: {r: 0.058823533, g: 0.058823533, b: 0.10588236, a: 0}
-  backgroundSecondary: {r: 0.3372549, g: 0.3529412, b: 0.45882356, a: 0}
-  foregroundPrimary: {r: 0.7764706, g: 0.7176471, b: 0.74509805, a: 0}
-  foregroundSecondary: {r: 0.9647059, g: 0.96862745, b: 0.9490196, a: 0}
+  backgroundPrimary: {r: 0.058823533, g: 0.058823533, b: 0.10588236, a: 1}
+  backgroundSecondary: {r: 0.3372549, g: 0.3529412, b: 0.45882356, a: 1}
+  foregroundPrimary: {r: 0.7764706, g: 0.7176471, b: 0.74509805, a: 1}
+  foregroundSecondary: {r: 0.9647059, g: 0.96862745, b: 0.9490196, a: 1}

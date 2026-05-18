@@ -1,14 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class RoundSceneManager : NetworkBehaviour
 {
     public static RoundSceneManager Instance;
 
     HashSet<ulong> readyClients = new();
+
+    [SerializeField] Transform pointsParent;
+    [SerializeField] GameObject pointsPrefab;
+
+    //List<TextMeshProUGUI> pointDisplay = new();
+
+    [SerializeField] Animator crowdAnim;
 
     private void Awake()
     {
@@ -37,18 +45,14 @@ public class RoundSceneManager : NetworkBehaviour
     {
         TransitionManager.Instance.EndTransition();
 
-        ColourChangeManager instanceTemp = ColourChangeManager.Instance;
+        ColourChangeManager instanceTemp = ColourChangeManager.instance;
         instanceTemp.selectedPalette = instanceTemp.palettes[instanceTemp.selectedPaletteIndex.Value];
         instanceTemp.SetBackgroundPattern(instanceTemp.selectedPatternIndex.Value);
+
+        //InitialisePointDisplay();
     }
 
-    private void Update()
-    {
-        if (Keyboard.current.gKey.wasPressedThisFrame && IsServer)
-        {
-            EndCurrentRound();
-        }
-    }
+    #region Round System
 
     void RoundStateLogic(MatchState state)
     {
@@ -128,9 +132,20 @@ public class RoundSceneManager : NetworkBehaviour
 
     IEnumerator RoundEndCountdown()
     {
-        // run when round state changed to round ending
+        bool crowdOn = PlayerPrefs.GetInt(SaveDataManager.instance.crowdToggleKey, 0) == 1;
 
-        yield return new WaitForSeconds(2);
+        MatchManager.Instance.SendEndTimeSlowRPC(0.5f);
+
+        yield return new WaitForSecondsRealtime(1.5f);
+
+        if (crowdOn)
+        {
+            SetCrowdBoolRPC(true);
+        }
+
+        MatchManager.Instance.SendEndTimeSlowRPC(1f);
+
+        yield return new WaitForSecondsRealtime(0.5f);
 
         // check if any player still alive after 2 second(s) of round ending, if not then its a draw
         bool isDraw = true;
@@ -154,6 +169,11 @@ public class RoundSceneManager : NetworkBehaviour
 
         yield return new WaitForSeconds(2);
 
+        if (crowdOn)
+        {
+            SetCrowdBoolRPC(false);
+        }
+
         if (MatchManager.Instance.matchState.Value != MatchState.MatchEnded)
         {
             EndCurrentRound();
@@ -175,4 +195,31 @@ public class RoundSceneManager : NetworkBehaviour
         MatchManager.Instance.matchState.Value = MatchState.RoundStarting;
         TilemapGen.Instance.GenerateAutoSmooth();
     }
+
+    #endregion
+
+    [Rpc(SendTo.ClientsAndHost)]
+    void SetCrowdBoolRPC(bool value1)
+    {
+        crowdAnim.SetBool("Cheering", value1);
+    }
+
+    //void InitialisePointDisplay()
+    //{
+    //    foreach (PlayerScore score in MatchManager.Instance.scores)
+    //    {
+    //        TextMeshProUGUI pointShadowText = Instantiate(pointsPrefab, pointsParent).GetComponent<TextMeshProUGUI>();
+    //        TextMeshProUGUI pointText = pointShadowText.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+
+    //        pointText.text = score.points.ToString();
+    //        pointShadowText.text = score.points.ToString();
+
+    //        pointDisplay.Add(pointShadowText);
+    //    }
+    //}
+
+    // When players first load in, THEN add all currently joined players
+    // When a new player joins, add onto the list
+    // New players should get all currently joined players
+    // When a player leaves, remove their point prefab from the list
 }

@@ -1,6 +1,4 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class SaveDataManager : MonoBehaviour
 {
@@ -13,11 +11,12 @@ public class SaveDataManager : MonoBehaviour
     public readonly string screenShakeKey = "CameraShake";
 
     // Toggles
-    public readonly string vSyncKey = "VSync";
+    public readonly string vSyncToggleKey = "VSyncToggle";
+    public readonly string crowdToggleKey = "CrowdToggle";
 
     // Dropdowns
-    public readonly string resolutionKey = "Resolution";
-    public readonly string screenModeKey = "ScreenMode";
+    public readonly string resolutionDropKey = "ResolutionDrop";
+    public readonly string screenModeDropKey = "ScreenModeDrop";
 
     private void Awake()
     {
@@ -35,6 +34,9 @@ public class SaveDataManager : MonoBehaviour
     private void Start()
     {
         SetPlayerPrefValues();
+
+        // Left here for now, maybe move to its own dedicated script
+        Cursor.lockState = CursorLockMode.Confined;
     }
 
     void SetPlayerPrefValues()
@@ -42,7 +44,7 @@ public class SaveDataManager : MonoBehaviour
         AudioManager.instance.SetMasterVolume(PlayerPrefs.GetFloat(masterVolKey, 0.75f));
         AudioManager.instance.SetSFXVolume(PlayerPrefs.GetFloat(sfxVolKey, 0.75f));
         AudioManager.instance.SetMusicVolume(PlayerPrefs.GetFloat(musicVolKey, 0.75f));
-        QualitySettings.vSyncCount = PlayerPrefs.GetInt(vSyncKey, 0);
+        QualitySettings.vSyncCount = PlayerPrefs.GetInt(vSyncToggleKey, 0);
 
         // Apply screen mode first, then resolution using the saved mode.
         SetScreenMode();
@@ -53,7 +55,7 @@ public class SaveDataManager : MonoBehaviour
     {
         int defaultResIndex = 0;
 
-        if (!PlayerPrefs.HasKey(resolutionKey))
+        if (!PlayerPrefs.HasKey(resolutionDropKey))
         {
             int i = 0;
 
@@ -69,16 +71,16 @@ public class SaveDataManager : MonoBehaviour
             }
         }
 
-        int resIndex = Mathf.Clamp(PlayerPrefs.GetInt(resolutionKey, defaultResIndex), 0, Mathf.Max(0, Screen.resolutions.Length - 1));
+        int resIndex = Mathf.Clamp(PlayerPrefs.GetInt(resolutionDropKey, defaultResIndex), 0, Mathf.Max(0, Screen.resolutions.Length - 1));
         Resolution res = Screen.resolutions[resIndex];
 
-        bool fullscreen = PlayerPrefs.GetInt(screenModeKey) == 0 || PlayerPrefs.GetInt(screenModeKey) == 2;
+        bool fullscreen = PlayerPrefs.GetInt(screenModeDropKey) == 0 || PlayerPrefs.GetInt(screenModeDropKey) == 2;
         Screen.SetResolution(res.width, res.height, fullscreen);
     }
 
     void SetScreenMode()
     {
-        switch (PlayerPrefs.GetInt(screenModeKey, 0))
+        switch (PlayerPrefs.GetInt(screenModeDropKey, 0))
         {
             case 0: // Fullscreen
                 Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;

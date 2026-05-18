@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -115,6 +116,7 @@ public class MatchManager : NetworkBehaviour
         switch (current)
         {
             case MatchState.Lobby:
+                SendEndTimeSlowRPC(1f);
                 playersAlive.Value = 0;
                 SetAllPlayerMovement(true);
                 break;
@@ -123,11 +125,12 @@ public class MatchManager : NetworkBehaviour
                 playersAlive.Value = NetworkManager.Singleton.ConnectedClients.Count;
                 SetAllPlayerMovement(false);
 
-                StartCoroutine(ColourChangeManager.Instance.RandomisePalette());
-                StartCoroutine(ColourChangeManager.Instance.RandomisePattern());
+                StartCoroutine(ColourChangeManager.instance.RandomisePalette());
+                StartCoroutine(ColourChangeManager.instance.RandomisePattern());
                 break;
 
             case MatchState.RoundActive:
+                SendEndTimeSlowRPC(1f);
                 SetAllPlayerMovement(true);
                 break;
 
@@ -136,8 +139,13 @@ public class MatchManager : NetworkBehaviour
                 break;
 
             case MatchState.MatchEnded:
+                SendEndTimeSlowRPC(1f);
                 SetAllPlayerMovement(false);
                 EndMatch();
+                break;
+
+            case MatchState.None:
+                SendEndTimeSlowRPC(1f);
                 break;
         }
     }
@@ -146,8 +154,7 @@ public class MatchManager : NetworkBehaviour
 
     public void EndMatch()
     {
-        ClientTransitionRPC();
-        TransitionManager.Instance.LoadScene("WinScreen");
+        StartCoroutine(DelayWinTransition());
     }
 
     void SetAllPlayerMovement(bool canMove)
@@ -283,10 +290,24 @@ public class MatchManager : NetworkBehaviour
 
     #endregion
 
+    IEnumerator DelayWinTransition()
+    {
+        yield return new WaitForSecondsRealtime(1);
+
+        ClientTransitionRPC();
+        TransitionManager.Instance.LoadScene("WinScreen");
+    }
+
     [Rpc(SendTo.NotServer)]
     public void ClientTransitionRPC()
     {
         TransitionManager.Instance.StartTransitionManually();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void SendEndTimeSlowRPC(float value)
+    {
+        Time.timeScale = value;
     }
 }
 

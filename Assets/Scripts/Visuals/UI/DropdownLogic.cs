@@ -7,7 +7,7 @@ enum DropdownType
     ScreenMode
 }
 
-public class DropdownVisual : MonoBehaviour
+public class DropdownLogic : MonoBehaviour
 {
     TMP_Dropdown dropdown;
 
@@ -63,7 +63,7 @@ public class DropdownVisual : MonoBehaviour
             case DropdownType.Resolution:
                 int resIndex = value;
                 var res = Screen.resolutions[Mathf.Clamp(resIndex, 0, Screen.resolutions.Length - 1)];
-                bool fullscreen = PlayerPrefs.GetInt(SaveDataManager.instance.screenModeKey, 0) == 0;
+                bool fullscreen = PlayerPrefs.GetInt(SaveDataManager.instance.screenModeDropKey, 0) == 0;
                 Screen.SetResolution(res.width, res.height, fullscreen);
                 break;
 
@@ -92,11 +92,11 @@ public class DropdownVisual : MonoBehaviour
         switch (dropdownType)
         {
             case DropdownType.Resolution:
-                PlayerPrefs.SetInt(SaveDataManager.instance.resolutionKey, dropdown.value);
+                PlayerPrefs.SetInt(SaveDataManager.instance.resolutionDropKey, dropdown.value);
                 break;
 
             case DropdownType.ScreenMode:
-                PlayerPrefs.SetInt(SaveDataManager.instance.screenModeKey, dropdown.value);
+                PlayerPrefs.SetInt(SaveDataManager.instance.screenModeDropKey, dropdown.value);
                 break;
         }
     }
@@ -106,11 +106,11 @@ public class DropdownVisual : MonoBehaviour
         switch (dropdownType)
         {
             case DropdownType.Resolution:
-                dropdown.value = PlayerPrefs.GetInt(SaveDataManager.instance.resolutionKey, defaultResIndex);
+                dropdown.value = PlayerPrefs.GetInt(SaveDataManager.instance.resolutionDropKey, defaultResIndex);
                 break;
 
             case DropdownType.ScreenMode:
-                dropdown.value = PlayerPrefs.GetInt(SaveDataManager.instance.screenModeKey, 0);
+                dropdown.value = PlayerPrefs.GetInt(SaveDataManager.instance.screenModeDropKey, 0);
                 break;
         }
     }

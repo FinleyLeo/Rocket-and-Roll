@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caa7e20c8b273d14291d154049148ece, type: 3}
   m_Name: Spooky
   m_EditorClassIdentifier: Assembly-CSharp::PaletteSO
-  backgroundPrimary: {r: 0.82745105, g: 0.15686275, b: 0.21176472, a: 0}
-  backgroundSecondary: {r: 0.5294118, g: 0.10980393, b: 0.24313727, a: 0}
-  foregroundPrimary: {r: 0.18823531, g: 0.1764706, b: 0.4156863, a: 0}
-  foregroundSecondary: {r: 0.039215688, g: 0.1254902, b: 0.18431373, a: 0}
+  backgroundPrimary: {r: 0.82745105, g: 0.15686275, b: 0.21176472, a: 1}
+  backgroundSecondary: {r: 0.5294118, g: 0.10980393, b: 0.24313727, a: 1}
+  foregroundPrimary: {r: 0.18823531, g: 0.1764706, b: 0.4156863, a: 1}
+  foregroundSecondary: {r: 0.039215688, g: 0.1254902, b: 0.18431373, a: 1}

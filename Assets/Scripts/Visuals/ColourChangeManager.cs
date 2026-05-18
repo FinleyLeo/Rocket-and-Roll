@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ColourChangeManager : NetworkBehaviour
 {
-    public static ColourChangeManager Instance;
+    public static ColourChangeManager instance;
 
     public PaletteSO[] palettes;
     public PaletteSO selectedPalette;
@@ -19,11 +19,13 @@ public class ColourChangeManager : NetworkBehaviour
     public NetworkVariable<int> selectedPaletteIndex = new();
     public NetworkVariable<int> selectedPatternIndex = new();
 
+    public event System.Action<PaletteSO> OnPaletteChanged;
+
     private void Awake()
     {
-        if (Instance == null)
+        if (instance == null)
         {
-            Instance = this;
+            instance = this;
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -62,6 +64,8 @@ public class ColourChangeManager : NetworkBehaviour
             SetMapColours(selectedPalette);
 
             Debug.Log("Palette updated to: " + selectedPalette.name);
+
+            OnPaletteChanged?.Invoke(selectedPalette);
         }
     }
 

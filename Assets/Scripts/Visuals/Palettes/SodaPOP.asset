@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caa7e20c8b273d14291d154049148ece, type: 3}
   m_Name: SodaPOP
   m_EditorClassIdentifier: Assembly-CSharp::PaletteSO
-  backgroundPrimary: {r: 0.909804, g: 0.9058824, b: 0.7960785, a: 0}
-  backgroundSecondary: {r: 0.98823535, g: 0.6509804, b: 0.6745098, a: 0}
-  foregroundPrimary: {r: 1, g: 0.4901961, b: 0.43137258, a: 0}
-  foregroundSecondary: {r: 0.12941177, g: 0.46274513, b: 0.8000001, a: 0}
+  backgroundPrimary: {r: 0.909804, g: 0.9058824, b: 0.7960785, a: 1}
+  backgroundSecondary: {r: 0.98823535, g: 0.6509804, b: 0.6745098, a: 1}
+  foregroundPrimary: {r: 1, g: 0.4901961, b: 0.43137258, a: 1}
+  foregroundSecondary: {r: 0.12941177, g: 0.46274513, b: 0.8000001, a: 1}

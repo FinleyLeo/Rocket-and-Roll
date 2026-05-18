@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caa7e20c8b273d14291d154049148ece, type: 3}
   m_Name: Blueberry
   m_EditorClassIdentifier: Assembly-CSharp::PaletteSO
-  backgroundPrimary: {r: 1, g: 0.8862746, b: 0.8588236, a: 0}
-  backgroundSecondary: {r: 0.85098046, g: 0.654902, b: 0.77647066, a: 0}
-  foregroundPrimary: {r: 0.5529412, g: 0.5372549, b: 0.7803922, a: 0}
-  foregroundSecondary: {r: 0.45882356, g: 0.37254903, b: 0.6117647, a: 0}
+  backgroundPrimary: {r: 1, g: 0.8862746, b: 0.8588236, a: 1}
+  backgroundSecondary: {r: 0.85098046, g: 0.654902, b: 0.77647066, a: 1}
+  foregroundPrimary: {r: 0.5529412, g: 0.5372549, b: 0.7803922, a: 1}
+  foregroundSecondary: {r: 0.45882356, g: 0.37254903, b: 0.6117647, a: 1}

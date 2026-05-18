@@ -11,16 +11,13 @@ public class PauseMenuScript : NetworkBehaviour
 {
     public static PauseMenuScript instance;
 
+    [SerializeField] GameObject pauseMenu;
     [SerializeField] GameObject pauseMenuPanel;
-    [SerializeField] GameObject settingsMenuPanel;
-
     [SerializeField] Button closePausebutton;
 
     [SerializeField] Button quitToMenuButton;
     [SerializeField] Button quitGameButton;
 
-    [SerializeField] Button openSettingsButton;
-    [SerializeField] Button closeSettingsButton;
 
     [SerializeField] Button openCustomisationButton;
     [SerializeField] Button closeCustomisationButton;
@@ -31,44 +28,45 @@ public class PauseMenuScript : NetworkBehaviour
     [SerializeField] Material buttonBannerMat;
     [SerializeField] Material buttonHighlightMat;
 
-    //Animator anim;
-
-    float fillAmount;
+    [Space(10)]
+    [Header("Settings Menu")]
+    [SerializeField] GameObject settingsPanel;
+    [SerializeField] Button openSettingsButton;
+    [SerializeField] Button exitSettingsButton;
+    [SerializeField] GameObject accessibilityPanel, audioPanel, videoPanel, controlPanel;
+    [SerializeField] Button accessibilityTab, audioTab, videoTab, controlTab;
 
     public bool isPaused;
-    //bool animEnded;
+    float fillAmount;
 
     private void Start()
     {
         instance = this;
 
-        //anim = GetComponent<Animator>();
-
         closePausebutton.onClick.AddListener(ResumeGame);
 
         openSettingsButton.onClick.AddListener(OpenSettings);
-        closeSettingsButton.onClick.AddListener(CloseSettings);
+        exitSettingsButton.onClick.AddListener(CloseSettings);
 
         quitToMenuButton.onClick.AddListener(QuitToMenu);
         quitGameButton.onClick.AddListener(QuitGame);
 
-        //buttonBannerMat.SetFloat("_FillAmount", 0);
-        //buttonHighlightMat.SetFloat("_FillAmount", 0);
-        //anim.SetBool("isOpen", isPaused);
+
+        accessibilityTab.onClick.AddListener(delegate { SwitchTab(0); });
+        audioTab.onClick.AddListener(delegate { SwitchTab(1); });
+        videoTab.onClick.AddListener(delegate { SwitchTab(2); });
+        controlTab.onClick.AddListener(delegate { SwitchTab(3); });
     }
 
     private void Update()
     {
-        if (!settingsMenuPanel.activeSelf)
+        if (!settingsPanel.activeSelf)
         {
             if (Keyboard.current.escapeKey.wasPressedThisFrame)
             {
-                //animEnded = false;
                 isPaused = !isPaused;
 
-                pauseMenuPanel.SetActive(isPaused);
-
-                //anim.SetBool("isOpen", isPaused);
+                pauseMenu.SetActive(isPaused);
             }
         }
         FadeInOutBanner();
@@ -92,25 +90,11 @@ public class PauseMenuScript : NetworkBehaviour
         buttonBannerMat.SetFloat("_FillAmount", fillAmount);
         buttonHighlightMat.SetFloat("_FillAmount", fillAmount);
     }
-
-    //// Tells script when animation has finished updating through event to respond accordingly
-    //public void NotifyEnd()
-    //{
-    //    animEnded = true;
-    //}
-
     void ResumeGame()
     {
-        //if (animEnded)
-        //{
-        //    animEnded = false;
-        //    isPaused = false;
-
-        //    //anim.SetBool("isOpen", isPaused);
-        //}
-
-        settingsMenuPanel.SetActive(false);
-        pauseMenuPanel.SetActive(false);
+        isPaused = false;
+        settingsPanel.SetActive(false);
+        pauseMenu.SetActive(false);
     }
 
     void QuitToMenu()
@@ -141,11 +125,11 @@ public class PauseMenuScript : NetworkBehaviour
     void OpenSettings()
     {
         pauseMenuPanel.GetComponent<CanvasGroup>().interactable = false;
-        settingsMenuPanel.SetActive(true);
+        settingsPanel.SetActive(true);
     }
     void CloseSettings()
     {
-        settingsMenuPanel.SetActive(false);
+        settingsPanel.SetActive(false);
         pauseMenuPanel.GetComponent<CanvasGroup>().interactable = true;
     }
 
@@ -184,6 +168,37 @@ public class PauseMenuScript : NetworkBehaviour
                     LobbyManager.Instance.KickPlayer(player.Id);
                 });
             }
+        }
+    }
+
+    void SwitchTab(int tabIndex)
+    {
+        switch (tabIndex)
+        {
+            case 0: // accessobility
+                accessibilityPanel.SetActive(true);
+                audioPanel.SetActive(false);
+                videoPanel.SetActive(false);
+                controlPanel.SetActive(false);
+                break;
+            case 1: // audio
+                videoPanel.SetActive(false);
+                audioPanel.SetActive(true);
+                accessibilityPanel.SetActive(false);
+                controlPanel.SetActive(false);
+                break;
+            case 2: // video
+                videoPanel.SetActive(true);
+                accessibilityPanel.SetActive(false);
+                audioPanel.SetActive(false);
+                controlPanel.SetActive(false);
+                break;
+            case 3: // control
+                controlPanel.SetActive(true);
+                accessibilityPanel.SetActive(false);
+                audioPanel.SetActive(false);
+                videoPanel.SetActive(false);
+                break;
         }
     }
 }

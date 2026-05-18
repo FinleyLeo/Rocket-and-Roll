@@ -58,8 +58,40 @@ public class MenuManager : MonoBehaviour
 
     void Start()
     {
+        SetupListeners();
+
+        playerNameInput.text = PlayerPrefs.GetString("Username");
+
+        joinLobbyButton.interactable = false;
+        createRoomButton.interactable = false;
+
+        if (LobbyManager.Instance.IsInLobby())
+        {
+            LobbyManager.Instance.LeaveLobby();
+        }
+
+        TransitionManager.Instance.EndTransition();
+
+        Time.timeScale = 1f;
+    }
+
+    void Update()
+    {
+        if (lobbyListOpen)
+        {
+            HandleLobbiesListUpdate();
+        }
+
+        if (LobbyManager.Instance.servicesReady)
+        {
+            joinLobbyButton.interactable = true;
+            createRoomButton.interactable = true;
+        }
+    }
+
+    void SetupListeners()
+    {
         playButton.onClick.AddListener(OpenPlayOption);
-        //exitPlayerQueryButton.onClick.AddListener();
 
         createRoomButton.onClick.AddListener(CreateLobby);
 
@@ -115,32 +147,6 @@ public class MenuManager : MonoBehaviour
                 maxPlayersInput.text = 12.ToString(); // clamp upper limit to 12
             }
         });
-
-        playerNameInput.text = PlayerPrefs.GetString("Username");
-
-        joinLobbyButton.interactable = false;
-        createRoomButton.interactable = false;
-
-        if (LobbyManager.Instance.IsInLobby())
-        {
-            LobbyManager.Instance.LeaveLobby();
-        }
-
-        TransitionManager.Instance.EndTransition();
-    }
-
-    void Update()
-    {
-        if (lobbyListOpen)
-        {
-            HandleLobbiesListUpdate();
-        }
-
-        if (LobbyManager.Instance.servicesReady)
-        {
-            joinLobbyButton.interactable = true;
-            createRoomButton.interactable = true;
-        }
     }
 
     void OpenPlayOption()
@@ -175,9 +181,9 @@ public class MenuManager : MonoBehaviour
                 controlPanel.SetActive(false);
                 break;
             case 1: // audio
+                videoPanel.SetActive(false);
                 audioPanel.SetActive(true);
                 accessibilityPanel.SetActive(false);
-                videoPanel.SetActive(false);
                 controlPanel.SetActive(false);
                 break;
             case 2: // video

@@ -7,6 +7,7 @@ using UnityEngine;
 public class WinSceneManager : NetworkBehaviour
 {
     [SerializeField] TextMeshProUGUI winScreenText;
+    [SerializeField] TextMeshProUGUI winScreenTextShadow;
     [SerializeField] Transform[] podiumSpawns;
 
     public NetworkList<PlayerScore> scores = new();
@@ -45,11 +46,12 @@ public class WinSceneManager : NetworkBehaviour
             }
         }
 
+        TransitionManager.Instance.fillAmount = 1f;
         TransitionManager.Instance.EndTransition();
 
         SetWinText();
 
-        ColourChangeManager instanceTemp = ColourChangeManager.Instance;
+        ColourChangeManager instanceTemp = ColourChangeManager.instance;
         instanceTemp.selectedPalette = instanceTemp.palettes[instanceTemp.selectedPaletteIndex.Value];
         instanceTemp.SetBackgroundPattern(instanceTemp.selectedPatternIndex.Value);
     }
@@ -65,9 +67,10 @@ public class WinSceneManager : NetworkBehaviour
     void SetWinText()
     {
         var winner = MatchManager.Instance.GetWinner();
-        if (winner.Equals(default(PlayerScore)))
+        if (winner.Equals(default))
         {
             winScreenText.text = "No winner";
+            winScreenTextShadow.text = "No winner";
             return;
         }
 
@@ -76,14 +79,17 @@ public class WinSceneManager : NetworkBehaviour
             if (winner.clientId == client.ClientId)
             {
                 var pv = client.PlayerObject?.GetComponent<PlayerVisuals>();
+
                 if (pv != null)
                 {
                     string playerName = pv.usernameText.text;
                     winScreenText.text = playerName + " WINS!";
+                    winScreenTextShadow.text = playerName + " WINS!";
                 }
                 else
                 {
                     winScreenText.text = "Player WINS!";
+                    winScreenTextShadow.text = "Player WINS!";
                 }
                 break;
             }

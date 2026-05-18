@@ -31,12 +31,19 @@ public class LogoVisuals : MonoBehaviour
 
     private void Start()
     {
+        ColourChangeManager.instance.OnPaletteChanged += UpdateColours;
+
         rootCircleScale = logoCircle.localScale;
         rootTitleScale = logoTitle.localScale;
 
         StartCoroutine(StartDelay());
 
         TransitionManager.Instance.EndTransition();
+    }
+
+    void OnDestroy()
+    {
+        ColourChangeManager.instance.OnPaletteChanged -= UpdateColours;
     }
 
     private void Update()
@@ -62,18 +69,7 @@ public class LogoVisuals : MonoBehaviour
     IEnumerator StartDelay()
     {
         AudioManager.instance.PlayMusic("TitleStart");
-
-        yield return new WaitForSeconds(0.2f);
-
-        circleSr = logoCircle.GetComponent<Image>();
-        Color palette = ColourChangeManager.Instance.selectedPalette.backgroundPrimary;
-        Color.RGBToHSV(palette, out float h, out float s, out float v);
-
-        Color newCircleColour = Color.HSVToRGB(h, s, v + 0.2f);
-
-        circleSr.color = newCircleColour;
-
-        startText.color = ColourChangeManager.Instance.selectedPalette.foregroundSecondary;
+        UpdateColours(ColourChangeManager.instance.palettes[ColourChangeManager.instance.selectedPaletteIndex.Value]);
 
         yield return new WaitForSeconds(3f);
 
@@ -83,6 +79,19 @@ public class LogoVisuals : MonoBehaviour
 
         logoAnim.Play("StartLogo");
         canStartGame = true;
+    }
+
+    void UpdateColours(PaletteSO currentPalette)
+    {
+        circleSr = logoCircle.GetComponent<Image>();
+        Color palette = currentPalette.backgroundPrimary;
+        Color.RGBToHSV(palette, out float h, out float s, out float v);
+
+        Color newCircleColour = Color.HSVToRGB(h, s, v + 0.2f);
+
+        circleSr.color = newCircleColour;
+
+        startText.color = currentPalette.foregroundSecondary;
     }
 
     void CircleVisuals()

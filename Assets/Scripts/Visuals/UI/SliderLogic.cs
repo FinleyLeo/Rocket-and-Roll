@@ -10,7 +10,7 @@ enum SliderType
     ScreenShake,
 }
 
-public class SliderVisual : MonoBehaviour
+public class SliderLogic : MonoBehaviour
 {
     // copy format of dropdown and toggle
     [SerializeField] SliderType sliderType;

@@ -141,6 +141,8 @@ public class MissileScript : NetworkBehaviour
     {
         foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClients.Values)
         {
+            if (client.PlayerObject == null) return;
+
             // checks if the object is owned by the client
             if (client.PlayerObject.IsOwner)
             {

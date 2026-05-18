@@ -4,9 +4,10 @@ using UnityEngine.UI;
 enum ToggleType
 {
     Vsync,
+    Crowd
 }
 
-public class ToggleVisual : MonoBehaviour
+public class ToggleLogic : MonoBehaviour
 {
     [SerializeField] Sprite OnSprite, OffSprite;
     Image toggleImage;
@@ -55,7 +56,10 @@ public class ToggleVisual : MonoBehaviour
         switch (toggleType)
         {
             case ToggleType.Vsync:
-                PlayerPrefs.SetInt(SaveDataManager.instance.vSyncKey, toggle.isOn ? 1 : 0);
+                PlayerPrefs.SetInt(SaveDataManager.instance.vSyncToggleKey, toggle.isOn ? 1 : 0);
+                break;
+            case ToggleType.Crowd:
+                PlayerPrefs.SetInt(SaveDataManager.instance.crowdToggleKey, toggle.isOn ? 1 : 0);
                 break;
         }
     }
@@ -65,7 +69,10 @@ public class ToggleVisual : MonoBehaviour
         switch (toggleType)
         {
             case ToggleType.Vsync:
-                toggle.isOn = PlayerPrefs.GetInt(SaveDataManager.instance.vSyncKey, 0) == 1;
+                toggle.isOn = PlayerPrefs.GetInt(SaveDataManager.instance.vSyncToggleKey, 1) == 1;
+                break;
+            case ToggleType.Crowd:
+                toggle.isOn = PlayerPrefs.GetInt(SaveDataManager.instance.crowdToggleKey, 1) == 1;
                 break;
         }
     }
